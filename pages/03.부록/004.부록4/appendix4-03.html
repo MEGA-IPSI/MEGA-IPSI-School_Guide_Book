@@ -105,6 +105,18 @@
       overflow: visible;
     }
     
+    /* 권장과목 헤더 셀(1행 3번째 th)만 높이 더 작게 */
+    .subject-table thead tr:first-child th:nth-child(3) {
+      padding-top: 0.5mm;
+      padding-bottom: 0.5mm;
+      line-height: 1.1;
+    }
+    
+    /* 데이터 셀의 왼쪽 패딩 증가 */
+    .subject-table td {
+      padding-left: 2.5mm;
+    }
+    
     /* 마지막 컬럼은 오른쪽 선 제거 */
     .subject-table th:last-child,
     .subject-table td:last-child {
@@ -124,11 +136,6 @@
     /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
     .subject-table thead tr:first-child th:last-child {
       border-top-right-radius: 6px;
-    }
-    
-    /* 마지막 행의 첫 번째 셀 - 하단 왼쪽 모서리 */
-    .subject-table tbody tr:last-child td:first-child {
-      border-bottom-left-radius: 6px;
     }
     
     /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
@@ -162,40 +169,46 @@
       overflow: visible;
     }
     
-    /* 교과 열 */
-    .subject-table th:first-child,
-    .subject-table td:first-child {
-      width: 10.4%;
-      font-weight: 600;
-      background-color: #FAFAFA;
-    }
-    
-    /* 교과 헤더는 배경색 유지 */
-    .subject-table thead tr:first-child th:first-child {
+    /* 헤더 스타일 - 두 번째 행 */
+    .subject-table thead tr:nth-child(2) th {
       background-color: var(--color-primary);
       color: #ffffff;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 2.5mm 1.5mm !important;
+      text-align: center;
+      vertical-align: middle;
+      word-break: keep-all;
+      white-space: normal;
+      overflow: visible;
+    }
+    
+    /* 단과대학 열: 헤더는 너비만 지정 */
+    .subject-table th:first-child {
+      width: 18%;
     }
     
     .subject-table td:first-child {
+      width: 15%;
+    }
+    
+    /* 단과대학 이름이 들어간 셀만 배경 + 볼드 처리 */
+    .subject-table td.college-cell {
       background-color: #FAFAFA;
-      text-align: center;
-      vertical-align: middle;
+      font-weight: 600;
     }
     
-    /* 공통과목 열 */
-    .subject-table th:nth-child(2),
-    .subject-table td:nth-child(2) {
-      width: 10.8%;
+    /* 농업생명과학대학 셀(마지막 단과대학, rowspan=2)의 하단 이중선 제거 */
+    .subject-table td.college-cell-last {
+      border-bottom: none;
     }
     
-    /* 선택과목 열들 */
+    /* 수학/과학 컬럼 너비 축소 */
     .subject-table th:nth-child(3),
-    .subject-table td:nth-child(3),
     .subject-table th:nth-child(4),
-    .subject-table td:nth-child(4),
-    .subject-table th:nth-child(5),
-    .subject-table td:nth-child(5) {
-      width: 20%;
+    .subject-table td:nth-child(3),
+    .subject-table td:nth-child(4) {
+      width: 53%;
     }
     
     /* 선택과목 내부 구분 */
@@ -209,16 +222,14 @@
     
     /* 선택과목 셀의 subject-item은 인라인으로 표시 */
     .subject-table td:nth-child(3) .subject-item,
-    .subject-table td:nth-child(4) .subject-item,
-    .subject-table td:nth-child(5) .subject-item {
+    .subject-table td:nth-child(4) .subject-item {
       display: inline;
       margin-bottom: 0;
     }
     
     /* 선택과목 셀의 쉼표 뒤 공백 추가 */
     .subject-table td:nth-child(3) .subject-item::after,
-    .subject-table td:nth-child(4) .subject-item::after,
-    .subject-table td:nth-child(5) .subject-item::after {
+    .subject-table td:nth-child(4) .subject-item::after {
       content: '';
     }
     
@@ -261,155 +272,104 @@
   <div class="page">
     <!-- 중제목 -->
     <h2 class="title-2">
-      Chapter 4. 계열별 전공 연계 과목 선택 가이드
+      Chapter 4. 대학별 전공 연계 과목
     </h2>
     
     <!-- 소제목 -->
-    <h3 class="title-3">4-3. [의약/보건] 의학∙약학∙간호∙보건 계열 과목 선택 가이드</h3>
+    <h3 class="title-3">4-2. [고려대] 전공 연계 과목 (1)</h3>
     
-    <!-- 선택과목 표 -->
+    <!-- 권장과목 표 -->
     <div class="subject-table-wrapper">
       <table class="subject-table">
         <thead>
           <tr>
-            <th>교과</th>
-            <th>공통과목</th>
-            <th>일반선택</th>
-            <th>진로선택</th>
-            <th>융합선택</th>
+            <th rowspan="2">단과대학</th>
+            <th rowspan="2">모집단위</th>
+            <th colspan="2">권장과목</th>
+          </tr>
+          <tr>
+            <th>수학</th>
+            <th>과학</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>국어</td>
-            <td>
-              <span class="subject-item">공통국어1</span>
-              <span class="subject-item">공통국어2</span>
-            </td>
-            <td>
-              <span class="subject-item"><span class="subject-highlight">화법과언어</span>, <span class="subject-highlight">독서와작문</span>, <span class="subject-highlight">문학</span></span>
-            </td>
-            <td>
-              <span class="subject-item"><span class="subject-highlight">주제탐구독서</span>, 문학과영상, 직무의사소통</span>
-            </td>
-            <td>
-              <span class="subject-item"><span class="subject-highlight">독서토론과글쓰기</span>, 매체의사소통, 언어생활탐구</span>
-            </td>
+            <td class="college-cell">생명과학대학</td>
+            <td>생명과학부, 생명공학부, 식품공학과, 환경생태공학부</td>
+            <td>미적분Ⅱ</td>
+            <td>물질과에너지, 화학반응의세계, 세포와물질대사, 생물의유전<br>중 2개 과목 이상</td>
           </tr>
-        
           <tr>
-            <td>수학</td>
-            <td>
-              <span class="subject-item">공통수학1</span>
-              <span class="subject-item">공통수학2</span>
-              <span class="subject-item">기본수학1</span>
-              <span class="subject-item">기본수학2</span>
-            </td>
-            <td>
-              <span class="subject-item"><span class="subject-highlight">대수</span>, <span class="subject-highlight">미적분Ⅰ</span>, <span class="subject-highlight">확률과통계</span></span>
-            </td>
-            <td>
-              <span class="subject-item"><span class="subject-highlight">기하</span>, <span class="subject-highlight">미적분Ⅱ</span>, 경제수학, 인공지능수학, 직무수학</span>
-            </td>
-            <td>
-              <span class="subject-item">수학과문화, <span class="subject-highlight">실용통계</span>, <span class="subject-highlight">수학과제탐구</span></span>
-            </td>
-          </tr>
-        
-          <tr>
-            <td>영어</td>
-            <td>
-              <span class="subject-item">공통영어1</span>
-              <span class="subject-item">공통영어2</span>
-              <span class="subject-item">기본영어1</span>
-              <span class="subject-item">기본영어2</span>
-            </td>
-            <td>
-              <span class="subject-item"><span class="subject-highlight">영어Ⅰ</span>, <span class="subject-highlight">영어Ⅱ</span>, <span class="subject-highlight">영어독해와작문</span></span>
-            </td>
-            <td>
-              <span class="subject-item">영미문학읽기, <span class="subject-highlight">영어발표와토론</span>, <span class="subject-highlight">심화영어</span>, <span class="subject-highlight">심화영어독해와작문</span>, 직무영어</span>
-            </td>
-            <td>
-              <span class="subject-item">실생활영어회화, 미디어영어, 세계문화와영어</span>
-            </td>
-          </tr>
-        
-          <tr>
-            <td>사회(역사/<br>도덕/한국사)</td>
-            <td>
-              <span class="subject-item">한국사1</span>
-              <span class="subject-item">한국사2</span>
-              <span class="subject-item">통합사회1</span>
-              <span class="subject-item">통합사회2</span>
-            </td>
-            <td>
-              <span class="subject-item">세계시민과지리, 세계사, <span class="subject-highlight">사회와문화</span>, <span class="subject-highlight">현대사회와윤리</span></span>
-            </td>
-            <td>
-              <span class="subject-item">한국지리탐구, 도시의미래탐구, 동아시아역사기행, 정치, 법과사회, 경제, <span class="subject-highlight">윤리와사상</span>, <span class="subject-highlight">인문학과윤리</span>, 국제관계의이해</span>
-            </td>
-            <td>
-              <span class="subject-item">여행지리, 역사로탐구하는현대세계, <span class="subject-highlight">사회문제탐구</span>, 금융과경제생활, <span class="subject-highlight">윤리문제탐구</span>, 기후변화와지속가능한세계</span>
-            </td>
-          </tr>
-        
-          <tr>
-            <td>과학</td>
-            <td>
-              <span class="subject-item">통합과학1</span>
-              <span class="subject-item">통합과학2</span>
-              <span class="subject-item">과학탐구실험1</span>
-              <span class="subject-item">과학탐구실험2</span>
-            </td>
-            <td>
-              <span class="subject-item"><span class="subject-highlight">물리학</span>, <span class="subject-highlight">화학</span>, <span class="subject-highlight">생명과학</span>, 지구과학</span>
-            </td>
-            <td>
-              <span class="subject-item">역학과에너지, 전자기와양자, <span class="subject-highlight">물질과에너지</span>, <span class="subject-highlight">화학반응의세계</span>, <span class="subject-highlight">세포와물질대사</span>, <span class="subject-highlight">생물의유전</span>, 지구시스템과학, 행성우주과학</span>
-            </td>
-            <td>
-              <span class="subject-item"><span class="subject-highlight">과학의역사와문화</span>, <span class="subject-highlight">기후변화와환경생태</span>, <span class="subject-highlight">융합과학탐구</span></span>
-            </td>
-          </tr>
-        
-          <tr>
-            <td>기술가정/<br>정보</td>
+            <td rowspan="4" class="college-cell">이과대학</td>
+            <td>수학과</td>
+            <td>미적분Ⅱ, 기하</td>
             <td></td>
-            <td>
-              <span class="subject-item">기술가정, 정보</span>
-            </td>
-            <td>
-              <span class="subject-item">로봇과공학세계, <span class="subject-highlight">생활과학탐구</span>, <span class="subject-highlight">인공지능기초</span>, <span class="subject-highlight">데이터과학</span></span>
-            </td>
-            <td>
-              <span class="subject-item">창의공학설계, 지식재산일반, 생애설계와자립, 아동발달과부모, 소프트웨어와생활</span>
-            </td>
           </tr>
-        
           <tr>
-            <td>교양</td>
+            <td>물리학과</td>
+            <td>미적분Ⅱ</td>
+            <td>역학과에너지, 전자기와양자</td>
+          </tr>
+          <tr>
+            <td>화학과</td>
+            <td>미적분Ⅱ</td>
+            <td>물질과에너지, 화학반응의세계</td>
+          </tr>
+          <tr>
+            <td>지구환경과학과</td>
+            <td>미적분Ⅱ</td>
+            <td>지구시스템과학, 행성우주과학</td>
+          </tr>
+          <tr>
+            <td rowspan="6" class="college-cell">공과대학</td>
+            <td>공과대학(전공자율선택제)</td>
+            <td>미적분Ⅱ</td>
+            <td>역학과에너지,전자기와양자, 물질과에너지, 화학반응의세계, 세포와물질대사, 생물의유전<br>중 2개 과목 이상</td>
+          </tr>
+          <tr>
+            <td>화공생명공학과, 전기전자공학부</td>
+            <td>미적분Ⅱ, 기하</td>
+            <td>역학과에너지, 전자기와양자, 물질과에너지, 화학반응의세계 중 2개 과목 이상</td>
+          </tr>
+          <tr>
+            <td>신소재공학부, 융합에너지공학과</td>
+            <td>미적분Ⅱ</td>
+            <td>역학과에너지, 전자기와양자, 물질과에너지, 화학반응의세계 중 2개 과목 이상</td>
+          </tr>
+          <tr>
+            <td>건축사회환경공학부</td>
+            <td>미적분Ⅱ</td>
+            <td>역학과에너지</td>
+          </tr>
+          <tr>
+            <td>건축학과, 산업경영공학부</td>
+            <td>미적분Ⅱ</td>
             <td></td>
-            <td>
-              <span class="subject-item">진로와직업, <span class="subject-highlight">생태와환경</span></span>
-            </td>
-            <td>
-              <span class="subject-item">인간과철학, 논리와사고, <span class="subject-highlight">인간과심리</span>, 교육의이해, 삶과종교, <span class="subject-highlight">보건</span></span>
-            </td>
-            <td>
-              <span class="subject-item">인간과경제활동, 논술</span>
-            </td>
+          </tr>
+          <tr>
+            <td>기계공학부, 반도체시스템공학과, 차세대통신학과</td>
+            <td>미적분Ⅱ, 기하</td>
+            <td>역학과에너지, 전자기와양자</td>
+          </tr>
+          <tr>
+            <td class="college-cell">의과대학</td>
+            <td>의과대학</td>
+            <td>미적분Ⅱ</td>
+            <td>물질과에너지, 화학반응의세계, 세포와물질대사, 생물의유전<br>중 2개 과목 이상</td>
+          </tr>
+          <tr>
+            <td rowspan="2" class="college-cell college-cell-last">사범대학</td>
+            <td>가정교육과</td>
+            <td>미적분Ⅱ</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>수학교육과</td>
+            <td>미적분Ⅱ, 기하</td>
+            <td></td>
           </tr>
         </tbody>        
       </table>
-    </div>
-
-    <!-- 심플한 정보 박스 -->
-    <div class="info-box" style="margin-top: 4mm;">
-      <div class="info-title">안내 사항</div>
-      <div class="text-small">
-        계열 분류와 과목 추천은 메가스터디교육 기준에 따른 참고용 가이드로, 대학별 전형에 따라 달라질 수 있으므로 <strong>최종 확인은 각 대학 입학처를 통해 진행</strong>하시기 바랍니다. 추천 과목은 선택과목 위주로 구성되었으며, 공통과목과 제2외국어·한문 등은 제외되어 있어 <strong>개인의 진로와 전공에 맞춘 추가 검토가 필요</strong>합니다.
-      </div>
     </div>
 
     <!-- 페이지 하단 번호 -->
