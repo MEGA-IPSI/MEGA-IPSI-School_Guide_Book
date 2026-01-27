@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트2-05</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    .comparison-container {
+      display: flex;
+      gap: 6mm;
+      margin-top: 2mm;
+      margin-bottom: 3mm;
+    }
+    
+    .comparison-card {
+      flex: 1;
+      border-radius: 6px;
+      padding: 5mm;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    
+    .comparison-card.old-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.new-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .card-header {
+      text-align: center;
+      padding: 4mm 3mm;
+      margin: -5mm -5mm 3mm -5mm;
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-radius: 6px 6px 0 0;
+      border-bottom: none;
+    }
+    
+    .card-header.old-system {
+      border-bottom: none;
+    }
+    
+    .card-header.new-system {
+      background-color: #1653c9;
+      border-bottom: none;
+    }
+    
+    .card-grade {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-year {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.8;
+      margin-bottom: 0mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-revision {
+      display: inline-block;
+      padding: 1.5mm 4mm;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 1mm;
+    }
+    
+    .card-revision.old {
+      background-color: #F3F4F6;
+      color: #6B7280;
+    }
+    
+    .card-revision.new {
+      background-color: #DBEAFE;
+      color: var(--color-primary-dark);
+    }
+    
+    .section-block {
+      margin-top: 2.45mm;
+      margin-bottom: 2.45mm;
+      background-color: #FAFAFA;
+      border: 1px solid #F0F0F0;
+      border-radius: 8px;
+      padding: 3.5mm;
+    }
+    
+    .comparison-card .section-block:first-of-type {
+      margin-top: 0;
+    }
+    
+    .comparison-card .section-block:last-of-type {
+      margin-bottom: 0.3mm;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3mm;
+      padding-bottom: 3.5mm;
+      border-bottom: 1.5px solid #E5E7EB;
+      color: var(--color-text);
+    }
+    
+    .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+    }
+    
+    .section-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .section-content li {
+      padding-left: 5.5mm;
+      position: relative;
+      margin-bottom: 2mm;
+      line-height: 1.8;
+    }
+    
+    .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-content li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+    
+    .section-badge {
+      display: inline-block;
+      padding: 1.5mm 3.5mm;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2.5mm;
+      background-color: #EFF6FF;
+      color: var(--color-primary-dark);
+    }
+    
+    .highlight-box {
+      margin-top: 3mm;
+      padding: 3mm;
+      border-radius: 8px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      background-color: #F0F9FF;
+      border-left: 3px solid var(--color-primary);
+      color: var(--color-text);
+    }
+    
+    .intro-text {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--color-text-light);
+      margin-bottom: 4mm;
+      text-align: center;
+      padding: 3mm 4mm;
+      background-color: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 3. 과목 선택 전략 가이드
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">3-4. 실제 선배 사례 분석</h3>
+    
+    <!-- 상단 설명 -->
+    <div class="text-body" style="margin-bottom: 3mm;">
+        아래 사례는 과목 선택의 방향에 따라 학생부의 완성도와 전공 적합성이 어떻게 달라지고, 그 차이가 대입 결과에 어떤 영향을 미치는지를 구체적으로 보여줍니다.
+    </div>
+    
+    <!-- 비교 카드 컨테이너 -->
+    <div class="comparison-container">
+      
+      <!-- 우수 사례 : A학생 -->
+      <div class="comparison-card old-system">
+        <div class="card-header old-system">
+          <div class="card-grade">우수 사례 - A학생</div>
+          <div class="card-year">기계공학과 목표 설정</div>
+        </div>
+        
+        <!-- ① 1·2학년 과목 선택 섹션 -->
+        <div class="section-block">
+          <div class="section-title">① 1·2학년 과목 선택</div>
+          <div class="section-content">
+            <ul>
+              <li>대수·미적분Ⅰ같은 공학 수학 기초 선이수</li>
+              <li>향후 기하·미적분Ⅱ이수를 고려한 설계</li>
+              <li>물리학 이수로 역학·에너지 기초 개념 확립</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ② 3학년 과목 선택 섹션 -->
+        <div class="section-block">
+          <div class="section-title">② 3학년 과목 선택</div>
+          <div class="section-content">
+            <ul>
+              <li>미적분Ⅱ·기하 이수로 공간 사고력 심화</li>
+              <li>역학과에너지 이수로 힘과 운동 원리 이해</li>
+              <li>인공지능기초 이수로 데이터 역량 어필</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ③ 학생부에 드러난 내용 섹션 -->
+        <div class="section-block">
+          <div class="section-title">③ 학생부 내용 구성</div>
+          <div class="section-content">
+            <ul>
+              <li>수학 → 물리 → 공학으로 이어지는 흐름</li>
+              <li>기하·역학 중심의 구체적 탐구 활동 수행</li>
+              <li>공대 선호 과목인 수학과 물리 조합 완성</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ④ 최종 결과 섹션 -->
+        <div class="section-block">
+          <div class="section-title">④ 최종 평가 결과</div>
+          <div class="section-content">
+            <ul>
+              <li>전공 적합성 매우 높음</li>
+              <li>학업 역량 신뢰도 높음</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 아쉬운 사례 : B학생 -->
+      <div class="comparison-card new-system">
+        <div class="card-header new-system">
+          <div class="card-grade">아쉬운 사례 - B학생</div>
+          <div class="card-year">초기 진로 방향 부재</div>
+        </div>
+        
+        <!-- ① 1·2학년 과목 선택 섹션 -->
+        <div class="section-block">
+          <div class="section-title">① 1·2학년 과목 선택</div>
+          <div class="section-content">
+            <ul>
+              <li>점수 따기 쉬운 인문 과목 위주로 이수</li>
+              <li>진로 미확정, 공학 심화 과목 선이수 부족</li>
+              <li>화학·미적분Ⅱ등 공학 필수 교과 미이수</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ② 3학년 과목 선택 섹션 -->
+        <div class="section-block">
+          <div class="section-title">② 3학년 과목 선택</div>
+          <div class="section-content">
+            <ul>
+              <li>선이수 부족으로 공학 심화 과목 이수 불가</li>
+              <li>물리학 미이수로 역학과에너지 수강 불가</li>
+              <li>여행지리 등 공학 연계 부족 과목 선택</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ③ 학생부에 드러난 내용 섹션 -->
+        <div class="section-block">
+          <div class="section-title">③ 학생부 내용 구성</div>
+          <div class="section-content">
+            <ul>
+              <li>기하·물리 등 공학 기초 학습 근거 부족</li>
+              <li>공학 기초 과목에 대한 지속적 관심 미흡</li>
+              <li>공학 연계가 드러나지 않는 세특 구성</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ④ 최종 결과 섹션 -->
+        <div class="section-block">
+          <div class="section-title">④ 최종 평가 결과</div>
+          <div class="section-content">
+            <ul>
+              <li>전공 적합성 매우 낮음</li>
+              <li>학업 역량 판단 근거 부족</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 13 -</div>
+  </div>
+</body>
+</html>

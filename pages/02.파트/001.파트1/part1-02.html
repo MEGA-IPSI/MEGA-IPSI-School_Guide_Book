@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트1-02</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="page">
+    <!-- 리포트 스타일 대제목 -->
+    <h1 class="report-title">
+      <span class="report-title-badge">PART 1</span>
+      <span class="report-title-text">성공적인 고교 생활을 위한 핵심 가이드</span>
+    </h1>
+    
+    <!-- 본문 -->
+    <div class="text-body" style="margin-bottom: 4mm;">
+      고등학교 생활은 중학교와 비교할 수 없을 정도로 학습량·평가방식·학교생활 패턴이 완전히 달라지는 시기입니다. 변화하는 환경을 미리 이해하고 시행착오 없이 준비할 수 있도록 핵심 정보를 담았습니다.
+    </div>
+    
+    <!-- 심플한 정보 박스 -->
+    <div class="info-box">
+      <div class="info-title">가이드북 이용 안내</div>
+      <div class="text-small">
+        본 가이드는 고등학교 생활과 대입 정보를 궁금해하는 학생 및 학부모님을 위해 제작되었습니다. 특히, 학년별로 다르게 적용되는 <strong>교육과정(2015현행/2022개정)</strong>, <strong>내신제도(9등급/5등급)</strong>, <strong>수능(선택형/통합형)</strong>의 복잡한 내용을 이해할 수 있도록 학년별 맞춤 정보를 제공합니다.
+      </div>
+    </div>
+    
+    <!-- 중제목 -->
+    <h2 class="title-2" style="margin-top: 2mm;">
+      Chapter 1. 고교 생활의 핵심 키워드
+    </h2>
+    
+    <!-- 소제목 1-1 -->
+    <h3 class="title-3">1-1. 스스로 설계하는 3년 — 자기주도학습이 핵심인 이유</h3>
+    
+    <div class="text-body">
+      고등학교는 '자기주도성'이 무엇보다 중요해집니다. 학습량이 많아지고 내용이 깊어지기 때문에, 변화하는 학습 환경을 이해하고 나만의 전략으로 고교 3년을 주도적으로 '설계' 해야 합니다.
+    </div>
+    
+    <!-- 리포트 스타일 원형 아이콘 그리드 -->
+    <div class="icon-grid">
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <div style="width: 50mm; height: 50mm; border: 2px solid var(--color-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4mm; box-sizing: border-box; transform: translateY(0mm);">
+          <div style="font-size: 24px; margin-bottom: 3mm;">📚</div>
+          <div style="font-weight:bold; font-size:13.5px; margin-bottom:2mm; color: var(--color-text);">1) 학습량 폭증</div>
+          <div style="font-size:13.5px; color:#666; text-align: center; line-height: 1.4; margin-bottom:5mm;">중학 대비 2~3배 증가로<br>단순 숙제만으론 부족</div>
+        </div>
+      </div>
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <div style="width: 50mm; height: 50mm; border: 2px solid var(--color-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4mm; box-sizing: border-box; transform: translateY(0mm);">
+          <div style="font-size: 24px; margin-bottom: 3mm;">💡</div>
+          <div style="font-weight:bold; font-size:13.5px; margin-bottom:2mm; color: var(--color-text);">2) 나만의 공부법</div>
+          <div style="font-size:13.5px; color:#666; text-align: center; line-height: 1.4; margin-bottom:5mm;">계획·예습·복습 전략이<br>성적 차이를 만듦</div>
+        </div>
+      </div>
+      <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+        <div style="width: 50mm; height: 50mm; border: 2px solid var(--color-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4mm; box-sizing: border-box; transform: translateY(0mm);">
+          <div style="font-size: 24px; margin-bottom: 3mm;">📋</div>
+          <div style="font-weight:bold; font-size:13.5px; margin-bottom:2mm; color: var(--color-text);">3) 과정 평가</div>
+          <div style="font-size:13.5px; color:#666; text-align: center; line-height: 1.4; margin-bottom:5mm;">선택 및 탐구의 이유는<br>학생부 기록의 핵심</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 비교 차트 박스 -->
+    <div class="report-box" style="margin-top: 5mm;">
+      <h4 class="title-3" style="text-align:center; margin:2mm 0 4mm 0; color:#555; font-size:16px !important;">중학교 vs 고등학교 학습량 비교</h4>
+      <div style="display: flex; align-items: flex-end; justify-content: center; height: 50mm; gap: 7mm; padding: 5mm 4mm 2mm 4mm; position: relative; box-sizing: border-box;">
+        <div style="text-align: center; width: 25mm; display: flex; flex-direction: column; align-items: center;">
+          <div style="font-size:14px; font-weight:bold; color:#555; margin-bottom: 1.5mm; white-space: nowrap;">1배</div>
+          <div style="height: 9mm; background: #adb5bd; width: 100%; border-radius: 4px 4px 0 0; margin-top: auto; min-height: 9mm;"></div>
+          <div style="font-weight:bold; margin-top:1.5mm; color:#555; font-size:14px; white-space: nowrap;">중학교</div>
+        </div>
+        <div style="text-align: center; width: 25mm; display: flex; flex-direction: column; align-items: center;">
+          <div style="font-size:14px; font-weight:bold; color:var(--color-primary); margin-bottom: 1.5mm; white-space: nowrap;">약 3배</div>
+          <div style="height: 27mm; background: var(--color-primary); width: 100%; border-radius: 4px 4px 0 0; margin-top: auto; min-height: 27mm;"></div>
+          <div style="font-weight:bold; margin-top:1.5mm; color:var(--color-primary); font-size:14px; white-space: nowrap;">고등학교</div>
+        </div>
+      </div>
+      <p class="img-caption" style="margin-top:3mm; margin-bottom:2mm; font-size:15px !important;">단순 암기만으로는 3배 늘어난 분량을 감당하기 어렵습니다.</p>
+    </div>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 4 -</div>
+  </div>
+</body>
+</html>

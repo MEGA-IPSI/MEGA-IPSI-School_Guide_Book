@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트5-04</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    .comparison-container {
+      display: flex;
+      gap: 6mm;
+      margin-top: 2mm;
+      margin-bottom: 3mm;
+    }
+    
+    .comparison-card {
+      flex: 1;
+      border-radius: 6px;
+      padding: 5mm;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    
+    .comparison-card.old-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.new-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .card-header {
+      text-align: center;
+      padding: 4mm 3mm;
+      margin: -5mm -5mm 3mm -5mm;
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-radius: 6px 6px 0 0;
+      border-bottom: none;
+    }
+    
+    .card-header.old-system {
+      border-bottom: none;
+    }
+    
+    .card-header.new-system {
+      background-color: #1653c9;
+      border-bottom: none;
+    }
+    
+    .card-grade {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-year {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.8;
+      margin-bottom: 0mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-revision {
+      display: inline-block;
+      padding: 1.5mm 4mm;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 1mm;
+    }
+    
+    .card-revision.old {
+      background-color: #F3F4F6;
+      color: #6B7280;
+    }
+    
+    .card-revision.new {
+      background-color: #DBEAFE;
+      color: var(--color-primary-dark);
+    }
+    
+    .section-block {
+      margin-top: 2.45mm;
+      margin-bottom: 2.45mm;
+      background-color: #FAFAFA;
+      border: 1px solid #F0F0F0;
+      border-radius: 8px;
+      padding: 3.5mm;
+    }
+    
+    .comparison-card .section-block:first-of-type {
+      margin-top: 0;
+    }
+    
+    .comparison-card .section-block:last-of-type {
+      margin-bottom: 0.3mm;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3mm;
+      padding-bottom: 3.5mm;
+      border-bottom: 1.5px solid #E5E7EB;
+      color: var(--color-text);
+    }
+    
+    .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+    }
+    
+    .section-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .section-content li {
+      padding-left: 5.5mm;
+      position: relative;
+      margin-bottom: 2mm;
+      line-height: 1.8;
+    }
+    
+    .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-content li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    /* part2-06.html 스타일과 동일한 bullet point */
+    .section-block:not(.comparison-card .section-block) .section-content li {
+      padding-left: 5mm;
+      position: relative;
+      margin-bottom: 0.8mm;
+    }
+    
+    .section-block:not(.comparison-card .section-block) .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-block:not(.comparison-card .section-block) .section-content li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+    
+    .section-content li.no-bullet {
+      padding-left: 0;
+      text-align: justify;
+    }
+    
+    .section-content li.no-bullet::before {
+      display: none;
+    }
+    
+    .section-badge {
+      display: inline-block;
+      padding: 1.5mm 3.5mm;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2.5mm;
+      background-color: #EFF6FF;
+      color: var(--color-primary-dark);
+    }
+    
+    .highlight-box {
+      margin-top: 3mm;
+      padding: 3mm;
+      border-radius: 8px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      background-color: #F0F9FF;
+      border-left: 3px solid var(--color-primary);
+      color: var(--color-text);
+    }
+    
+    .intro-text {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--color-text-light);
+      margin-bottom: 4mm;
+      text-align: center;
+      padding: 3mm 4mm;
+      background-color: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+    }
+    
+    .conclusion-box {
+      margin-top: 2.5mm;
+      border: 1px solid #3B82F6;
+      padding: 2.5mm 2mm;
+      font-size: 13.5px !important;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      background-color: #FAFAFA;
+      color: #3B82F6;
+      border-radius: 4px;
+    }
+    
+    /* 교육과정 편제표 축소 스타일 */
+    .comparison-table.curriculum-table {
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+    
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      margin: 0 !important;
+    }
+    
+    /* 이중 테두리 방지 - 첫 번째 열은 왼쪽 테두리 제거 */
+    .comparison-table.curriculum-table th:first-child,
+    .comparison-table.curriculum-table td:first-child {
+      border-left: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      background-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    
+    /* 마지막 컬럼 헤더의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table thead th:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr {
+      height: auto !important;
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td {
+      padding: 2mm 2mm !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+    }
+    
+    /* 마지막 컬럼 데이터 셀의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td * {
+      font-size: 14px !important;
+    }
+    
+    /* 모든 행은 하얀색 배경 */
+    .comparison-table.curriculum-table tbody tr {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr td {
+      background-color: #ffffff !important;
+    }
+    
+    /* 마지막 컬럼 오른쪽 모서리 이중선 제거 */
+    .comparison-table.curriculum-table th:last-child,
+    .comparison-table.curriculum-table td:last-child,
+    .comparison-table.curriculum-table thead th:last-child,
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .comparison-table.curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    /* 첫 번째 행의 첫 번째 셀 - 상단 왼쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:first-child {
+      border-top-left-radius: 6px !important;
+    }
+    
+    /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:last-child {
+      border-top-right-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 첫 번째 셀 - 하단 왼쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 6px !important;
+      border-right: none !important;
+    }
+    
+    /* 교시 컬럼(1번째) 너비 줄이기 */
+    .comparison-table.curriculum-table th:nth-child(1),
+    .comparison-table.curriculum-table td:nth-child(1) {
+      width: 10% !important;
+    }
+    
+    /* 문항 수 컬럼(4번째) 너비 */
+    .comparison-table.curriculum-table th:nth-child(4),
+    .comparison-table.curriculum-table td:nth-child(4) {
+      width: 12% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 3. [수시] 학생부 종합 전형
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">3-1. 어떤 학생에게 유리할까? : 진로 스토리가 있는 학생</h3>
+    
+    <!-- 상단 설명 -->
+    <div class="text-body" style="margin-bottom: 3mm;">
+      학종은 성적과 함께 3년간의 고교 생활 전반을 종합적으로 평가하는 전형으로, 내신 평균이 낮더라도 성적의 성장세나 전공 관련 과목에서의 강점, 분명한 진로 연계 활동이 있다면 지원을 고려할 수 있습니다.
+    </div>
+
+    <!-- 총정리 박스 -->
+    <div class="info-box" style="margin-top: 1mm;">
+        <div class="info-title" style="margin-top: 0; margin-bottom: 3mm;">고3(9등급제)</div>
+        <div class="text-small" style="margin-top: 0; margin-bottom: 3mm;">
+            내신 등급의 변별력이 상대적으로 큰 구조이지만, <strong>내신이 3~4등급대이더라도 학생부 전반에 일관된 진로 스토리와 활동 흐름이 있다면</strong> 학종을 통해 내신의 한계를 극복하고 합격을 기대할 수 있는 전형입니다.</strong>
+        </div>
+        <div class="info-title" style="margin-top: 0; margin-bottom: 3mm;">고1·고2(5등급제)</div>
+        <div class="text-small" style="margin-top: 0; margin-bottom: -0.5mm;">
+            1등급 비율이 확대되어 내신만으로는 변별이 어려운 만큼, <strong>내신이 1등급 후반이나 2등급대 학생이라도 세특의 내용과 깊이, 과목 이수 흐름이 탄탄하다면</strong> 최상위권 대학까지 합격 가능성을 넓혀주는 전형입니다.
+        </div>
+    </div>
+
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3" style="margin-top: 1mm;">3-2. 학생부 평가 흐름</h3>
+    
+    <div class="text-body" style="margin-top: 0mm;">
+        대학은 학생부를 무작위로 평가하지 않고, 일정한 흐름에 따라 학생의 역량을 종합적으로 검증합니다. 이에 따라 과목 선택부터 세특과 창체 활동까지 하나의 전공 스토리를 유기적으로 연결하는 것이 중요합니다.
+    </div>
+
+    <!-- 학생부 평가 흐름 다이어그램 -->
+    <div style="margin-top: 1mm; margin-bottom: 4mm;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 1.5mm;">
+        <!-- Step 1: 전공관련과목 -->
+        <div style="flex: 1; min-width: 0;">
+          <div style="background-color: #ffffff; border: 2px solid var(--color-primary); border-radius: 5px; padding: 3mm 2mm; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div style="font-size: 19px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">✅</div>
+            <div style="font-size: 14px; color: #1F2937; font-weight: 600; margin-bottom: 2mm;">과목 선택</div>
+            <div style="font-size: 14px !important; color: #6b7280; text-align: center;">
+              전공 연계성<br>
+              이수 흐름도<br>
+            </div>
+          </div>
+        </div>
+        <!-- connector -->
+        <div style="width: 5mm; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-size: 15px;">
+          →
+        </div>
+        <!-- Step 2: 세특 내용 -->
+        <div style="flex: 1; min-width: 0;">
+          <div style="background-color: #ffffff; border: 2px solid var(--color-primary); border-radius: 5px; padding: 3mm 2mm; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div style="font-size: 19px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">✏️</div>
+            <div style="font-size: 14px; color: #1F2937; font-weight: 600; margin-bottom: 2mm;">세특 내용</div>
+            <div style="font-size: 14px !important; color: #6b7280; text-align: center;">
+              탐구 심화도<br>
+              수업 기여도<br>
+            </div>
+          </div>
+        </div>
+        <!-- connector -->
+        <div style="width: 5mm; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-size: 15px;">
+          →
+        </div>
+        <!-- Step 3: 창체 활동 -->
+        <div style="flex: 1; min-width: 0;">
+          <div style="background-color: #ffffff; border: 2px solid var(--color-primary); border-radius: 5px; padding: 3mm 2mm; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div style="font-size: 19px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">🤖</div>
+            <div style="font-size: 14px; color: #1F2937; font-weight: 600; margin-bottom: 2mm;">창체 활동</div>
+            <div style="font-size: 14px !important; color: #6b7280; text-align: center;">
+              관심 확장성<br>
+              지속 참여도<br>
+            </div>
+          </div>
+        </div>
+        <!-- connector -->
+        <div style="width: 5mm; display: flex; align-items: center; justify-content: center; color: #9CA3AF; font-size: 15px;">
+          →
+        </div>
+        <!-- Step 4: 종합 평가 -->
+        <div style="flex: 1; min-width: 0;">
+          <div style="background-color: #ffffff; border: 2px solid var(--color-primary); border-radius: 5px; padding: 3mm 2mm; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div style="font-size: 19px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">💯</div>
+            <div style="font-size: 14px; color: #1F2937; font-weight: 600; margin-bottom: 2mm;">종합 평가</div>
+            <div style="font-size: 14px !important; color: #6b7280; text-align: center;">
+              전공 적합성<br>
+              성장 가능성<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <h3 class="title-3" style="margin-top: 0mm;">3-3. 학생부 평가 요소</h3>
+
+    <!-- 3가지 핵심 역량 비교 박스 -->
+    <div style="display: flex; gap: 4mm; align-items: flex-start; margin-top: 1mm; margin-bottom: 3mm;">
+      <!-- 학업역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-top: 1mm; margin-bottom: 2.5mm;">학업역량</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; margin-bottom: 1mm; line-height: 1.6;">
+            학업 성취도 · 탐구력<br>
+            학습 지속성 · 학업 태도
+          </div>
+        </div>
+      </div>
+
+      <!-- 진로역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-top: 1mm; margin-bottom: 2.5mm;">진로역량</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; margin-bottom: 1mm; line-height: 1.6;">
+            세특 탐구 흐름 · 활동 지속성<br>
+            전공 과목 이수 · 진로 탐색 활동
+          </div>
+        </div>
+      </div>
+
+      <!-- 공동체역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-top: 1mm; margin-bottom: 2.5mm;">공동체역량</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; margin-bottom: 1mm; line-height: 1.6;">
+            성실성 · 배려 · 규칙 준수<br>
+            협업 · 리더십 · 소통 능력
+          </div>
+        </div>
+      </div>
+    </div>
+     
+     <h3 class="title-3" style="margin-top: 1mm;">3-4. 면접 준비 방법</h3>
+
+    <!-- 진로활동 팁 박스 -->
+    <div class="tip-box" style="font-size: 14.5px !important; margin-top: 1.5mm !important; padding-top: 4mm !important; padding-bottom: 3mm !important;">
+        <div class="tip-title" style="font-size: 15px !important; margin-bottom: 3mm !important;">면접 유형</div>
+        <ul class="list-check" style="font-size: 15px !important; margin-bottom: 0 !important;">
+          <li style="font-size: 15px !important;"><strong>서류 기반 : </strong>학생부에 기록된 활동을 중심으로 질문하니, 자신의 활동을 정리해 설명하는 준비 필요</li>
+          <li style="font-size: 15px !important;"><strong>제시문 기반 : </strong>제시문과 자료를 분석해 답해야 하니, 핵심 개념 이해 및 논리적으로 말하는 준비 필요</li>
+        </ul>
+      </div>
+  
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 35 -</div>
+  </div>
+</body>
+</html>

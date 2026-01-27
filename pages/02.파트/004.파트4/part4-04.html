@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트4-04</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    .comparison-container {
+      display: flex;
+      gap: 6mm;
+      margin-top: 2mm;
+      margin-bottom: 3mm;
+    }
+    
+    .comparison-card {
+      flex: 1;
+      border-radius: 6px;
+      padding: 5mm;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    
+    .comparison-card.old-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.new-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .card-header {
+      text-align: center;
+      padding: 4mm 3mm;
+      margin: -5mm -5mm 3mm -5mm;
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-radius: 6px 6px 0 0;
+      border-bottom: none;
+    }
+    
+    .card-header.old-system {
+      border-bottom: none;
+    }
+    
+    .card-header.new-system {
+      background-color: #1653c9;
+      border-bottom: none;
+    }
+    
+    .card-grade {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-year {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.8;
+      margin-bottom: 0mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-revision {
+      display: inline-block;
+      padding: 1.5mm 4mm;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 1mm;
+    }
+    
+    .card-revision.old {
+      background-color: #F3F4F6;
+      color: #6B7280;
+    }
+    
+    .card-revision.new {
+      background-color: #DBEAFE;
+      color: var(--color-primary-dark);
+    }
+    
+    .section-block {
+      margin-top: 2.45mm;
+      margin-bottom: 2.45mm;
+      background-color: #FAFAFA;
+      border: 1px solid #F0F0F0;
+      border-radius: 8px;
+      padding: 3.5mm;
+    }
+    
+    .comparison-card .section-block:first-of-type {
+      margin-top: 0;
+    }
+    
+    .comparison-card .section-block:last-of-type {
+      margin-bottom: 0.3mm;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3mm;
+      padding-bottom: 3.5mm;
+      border-bottom: 1.5px solid #E5E7EB;
+      color: var(--color-text);
+    }
+    
+    .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+    }
+    
+    .section-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .section-content li {
+      padding-left: 5.5mm;
+      position: relative;
+      margin-bottom: 2mm;
+      line-height: 1.8;
+    }
+    
+    .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-content li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+    
+    .section-content li.no-bullet {
+      padding-left: 0;
+      text-align: justify;
+    }
+    
+    .section-content li.no-bullet::before {
+      display: none;
+    }
+    
+    .section-badge {
+      display: inline-block;
+      padding: 1.5mm 3.5mm;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2.5mm;
+      background-color: #EFF6FF;
+      color: var(--color-primary-dark);
+    }
+    
+    .highlight-box {
+      margin-top: 3mm;
+      padding: 3mm;
+      border-radius: 8px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      background-color: #F0F9FF;
+      border-left: 3px solid var(--color-primary);
+      color: var(--color-text);
+    }
+    
+    .intro-text {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--color-text-light);
+      margin-bottom: 4mm;
+      text-align: center;
+      padding: 3mm 4mm;
+      background-color: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+    }
+    
+    .conclusion-box {
+      margin-top: 2.5mm;
+      border: 1px solid #3B82F6;
+      padding: 2.5mm 2mm;
+      font-size: 13.5px !important;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      background-color: #FAFAFA;
+      color: #3B82F6;
+      border-radius: 4px;
+    }
+    
+    /* 교육과정 편제표 축소 스타일 */
+    .comparison-table.curriculum-table {
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+    
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      margin: 0 !important;
+    }
+    
+    /* 이중 테두리 방지 - 첫 번째 열은 왼쪽 테두리 제거 */
+    .comparison-table.curriculum-table th:first-child,
+    .comparison-table.curriculum-table td:first-child {
+      border-left: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      background-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    
+    /* 마지막 컬럼 헤더의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table thead th:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr {
+      height: auto !important;
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td {
+      padding: 2mm 2mm !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+    }
+    
+    /* 마지막 컬럼 데이터 셀의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td * {
+      font-size: 14px !important;
+    }
+    
+    /* 모든 행은 하얀색 배경 */
+    .comparison-table.curriculum-table tbody tr {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr td {
+      background-color: #ffffff !important;
+    }
+    
+    /* 마지막 컬럼 오른쪽 모서리 이중선 제거 */
+    .comparison-table.curriculum-table th:last-child,
+    .comparison-table.curriculum-table td:last-child,
+    .comparison-table.curriculum-table thead th:last-child,
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .comparison-table.curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    /* 첫 번째 행의 첫 번째 셀 - 상단 왼쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:first-child {
+      border-top-left-radius: 6px !important;
+    }
+    
+    /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:last-child {
+      border-top-right-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 첫 번째 셀 - 하단 왼쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 6px !important;
+      border-right: none !important;
+    }
+    
+    /* 교시 컬럼(1번째) 너비 줄이기 */
+    .comparison-table.curriculum-table th:nth-child(1),
+    .comparison-table.curriculum-table td:nth-child(1) {
+      width: 10% !important;
+    }
+    
+    /* 문항 수 컬럼(4번째) 너비 */
+    .comparison-table.curriculum-table th:nth-child(4),
+    .comparison-table.curriculum-table td:nth-child(4) {
+      width: 12% !important;
+    }
+    
+    /* 대화 가이드 섹션 */
+    .guide-section {
+      margin-top: 2mm;
+      margin-bottom: 2mm;
+      display: flex;
+      flex-direction: column;
+      gap: 4mm;
+    }
+    
+    .guide-section > .guide-card {
+      margin: 0;
+    }
+    
+    .guide-section > .guide-card:nth-child(3) {
+      margin-top: 0.5mm;
+    }
+    
+    .guide-card {
+      background-color: #FFFFFF;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 6px;
+      padding: 3mm;
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+      margin: 0;
+    }
+    
+    .guide-header {
+      display: flex;
+      align-items: center;
+      gap: 2.5mm;
+    }
+    
+    .guide-number {
+      flex-shrink: 0;
+      color: var(--color-primary);
+      font-size: 16px;
+      margin-left: 1.5mm;
+      font-weight: 850;
+      -webkit-text-stroke: 0.3px var(--color-primary);
+      line-height: 2;
+      display: flex;
+      align-items: center;
+    }
+    
+    .guide-title {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 2;
+      display: flex;
+      align-items: center;
+    }
+    
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0mm;
+    }
+    
+    .guide-example {
+      font-size: 14px;
+      line-height: 1.8;
+      padding: 2mm 2.5mm;
+      border-radius: 4px;
+      background-color: #FAFAFA;
+      display: flex;
+      align-items: center;
+      gap: 2mm;
+    }
+    
+    .guide-text {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--color-text);
+      font-weight: 400;
+      text-align: justify;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 2. 수능의 구조 이해
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">2-3. 바뀌는 제도, 무엇을 의미하는가?</h3>
+    
+    <!-- 가이드 섹션 -->
+    <div class="guide-section">
+      <!-- 가이드 1 -->
+      <div class="guide-card">
+        <div class="guide-header">
+          <div class="guide-number">01</div>
+          <div class="guide-title">과목 선택의 눈치 싸움 종료</div>
+        </div>
+        <div class="guide-content">
+          <div class="guide-example">
+            <div class="guide-text">
+                지금까지는 '어떤 과목을 선택해야 표준점수가 잘 나올까?'를 고민하며 전략적으로 과목을 선택했습니다. 하지만 개편안에서는 선택과목이 폐지되어 모든 학생이 동일한 시험을 치르게 됩니다. 이에 따라 과목 선택에 따른 유불리는 사라지고, 과목별 순수한 실력인 원점수가 합격을 결정합니다.
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 가이드 2 -->
+      <div class="guide-card">
+        <div class="guide-header">
+          <div class="guide-number">02</div>
+          <div class="guide-title">완전히 붕괴된 문·이과 장벽</div>
+        </div>
+        <div class="guide-content">
+          <div class="guide-example">
+            <div class="guide-text">
+                가장 큰 변화는 모든 수험생이 통합사회와 통합과학을 공통으로 응시한다는 점입니다. 이에 따라 문과 지망생에게는 과학적 기초 소양이, 이과 지망생에게는 인문학적 사고력이 함께 요구됩니다. 이는 고1 과정에서 배우는 공통 과목(통합사회·통합과학)의 수능 영향력이 이전보다 더 커졌음을 의미합니다.
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 가이드 3 -->
+      <div class="guide-card">
+        <div class="guide-header">
+          <div class="guide-number">03</div>
+          <div class="guide-title">수학 학습 패러다임의 전환</div>
+        </div>
+        <div class="guide-content">
+          <div class="guide-example">
+            <div class="guide-text">
+                이과 최상위권의 변별 요소였던 미적분Ⅱ·기하가 수능 출제 범위에서 제외되었습니다. 이에 따라 문·이과 공통 범위인 대수·미적분Ⅰ·확률과통계 내에서 변별력을 확보하기 위해, 준킬러 문항이 더 까다롭게 출제될 가능성이 높습니다. 이에 따라 선행 학습보다 개념 이해와 문제 해결력이 더욱 중요합니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 29 -</div>
+  </div>
+</body>
+</html>

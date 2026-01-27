@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부록3-01</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    .mistake-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 3.67mm;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+    
+    .mistake-table:first-of-type {
+      margin-top: 3mm;
+    }
+    
+    .mistake-table td {
+      padding: 3mm 3mm;
+      vertical-align: middle;
+      border-bottom: none;
+    }
+    
+    .mistake-table td.mistake-content {
+      text-align: left;
+    }
+    
+    .mistake-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* ✅ 숫자칸(병합된 셀) 세로/가로 정중앙 */
+    .mistake-table td.mistake-number {
+      vertical-align: middle; /* 핵심 */
+      text-align: center;
+      border-bottom: none;
+      border-right: 1px solid #E5E7EB;
+    }
+    
+    .mistake-table tr:last-child td.mistake-number {
+      border-bottom: none;
+    }
+    
+    .mistake-number {
+      width: 9%;
+      text-align: center;
+      vertical-align: middle;
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+      background-color: #3B82F6;
+    }
+    
+    .mistake-content {
+      width: 91%;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--color-text);
+    }
+    
+    .mistake-title {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0mm;
+    }
+    
+    .mistake-explanation {
+      color: var(--color-text);
+      display: block;
+      margin-top: 0mm;
+    }
+    
+    .mistake-table tr:first-child td.mistake-content {
+      padding-bottom: 0.5mm;
+    }
+    
+    .mistake-table tr:last-child td.mistake-content {
+      padding-top: 0.5mm;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 -->
+    <h2 class="title-2">
+      Chapter 3. 이건 하지 마세요
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">3-1. 고교 생활 흔한 10가지 실수</h3>
+    
+    <!-- 실수 목록 -->
+    <!-- 실수 1 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">01</td>
+        <td class="mistake-content">
+          <span class="mistake-title">전공이 정해지지 않았다는 이유로 과목을 무작정 선택하는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">전공 탐색 없이 선택한 과목은 고2·고3에서 이수 흐름을 설명하기 어려워 학생부 해석에 불리합니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 2 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">02</td>
+        <td class="mistake-content">
+          <span class="mistake-title">동아리 활동이 매년 달라지는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">불리하지는 않지만, 각 시기의 선택이 진로와 관심사에 부합하는지는 함께 살펴볼 필요가 있습니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 3 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">03</td>
+        <td class="mistake-content">
+          <span class="mistake-title">수업 참여 없이 세특 기록만을 기대하는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">세특은 수업 중 참여와 활동을 근거로 작성되기 때문에, 참여가 부족하면 기록 자체가 제한됩니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 4 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">04</td>
+        <td class="mistake-content">
+          <span class="mistake-title">수행평가에만 집중하고 지필평가 대비를 소홀히 하는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">중간·기말은 내신 등급을 좌우하는 핵심 요소로, 대비 부족 시 성적 관리에 직접적인 영향을 줍니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 5 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">05</td>
+        <td class="mistake-content">
+          <span class="mistake-title">등급을 잘 받기 위해 쉬운 과목 위주로 선택하는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">대학은 등급뿐만 아니라 과목의 난이도와 이수 맥락을 함께 살펴 학업 준비도를 판단합니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 6 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">06</td>
+        <td class="mistake-content">
+          <span class="mistake-title">고3에서 진로 방향을 변경하는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">진로가 달라져도 괜찮지만, 변경된 진로에 맞는 과목 선택과 세특, 활동이 함께 이루어져야 합니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 7 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">07</td>
+        <td class="mistake-content">
+          <span class="mistake-title">자율동아리나 외부 활동만으로 학생부를 채우려는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">학생부 평가는 교과 수업과 정규 활동이 중심이어서, 외부 활동만으로는 한계가 있습니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 8 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">08</td>
+        <td class="mistake-content">
+          <span class="mistake-title">세특 기록이 전반적으로 짧은 상태로 유지되는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">5등급제에서 세특은 학업 태도를 보여주는 핵심 자료여서, 정보 부족이 불리하게 작용할 수 있습니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 9 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">09</td>
+        <td class="mistake-content">
+          <span class="mistake-title">학기 말에 세특을 급하게 보완하려는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">세특은 학기가 끝나기 전까지 보완이 가능하지만, 마지막에 급하게 준비하는 데에는 한계가 있습니다.</span>
+        </td>
+      </tr>
+    </table>
+    
+    <!-- 실수 10 -->
+    <table class="mistake-table">
+      <tr>
+        <td class="mistake-number" rowspan="2">10</td>
+        <td class="mistake-content">
+          <span class="mistake-title">상황에 따라 전략을 자주 바꾸는 경우</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="mistake-content">
+          <span class="mistake-explanation">전략이 자주 바뀌면 한 전형에 대한 준비가 분산되어, 충분히 깊이 있는 대비가 어려워질 수 있습니다.</span>
+        </td>
+      </tr>
+    </table>  
+
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 55 -</div>
+  </div>
+</body>
+</html>

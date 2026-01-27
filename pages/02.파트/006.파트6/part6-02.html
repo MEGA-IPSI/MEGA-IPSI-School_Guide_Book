@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트6-02</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    /* 교육과정 편제표 축소 스타일 */
+    .comparison-table.curriculum-table {
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+    
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      margin: 0 !important;
+    }
+    
+    /* 이중 테두리 방지 - 첫 번째 열은 왼쪽 테두리 제거 */
+    .comparison-table.curriculum-table th:first-child,
+    .comparison-table.curriculum-table td:first-child {
+      border-left: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      background-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    
+    /* 마지막 컬럼 헤더의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table thead th:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr {
+      height: auto !important;
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td {
+      padding: 2mm 2mm !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+    }
+    
+    /* 마지막 컬럼 데이터 셀의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(even) {
+      background-color: #fafafa !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(even) td {
+      background-color: #fafafa !important;
+      text-align: center !important;
+    }
+    
+    /* 홀수 행은 흰색 배경 */
+    .comparison-table.curriculum-table tbody tr:nth-child(odd) {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(odd) td {
+      background-color: #ffffff !important;
+    }
+    
+    /* 마지막 컬럼 오른쪽 모서리 이중선 제거 */
+    .comparison-table.curriculum-table th:last-child,
+    .comparison-table.curriculum-table td:last-child,
+    .comparison-table.curriculum-table thead th:last-child,
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .comparison-table.curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    /* 첫 번째 행의 첫 번째 셀 - 상단 왼쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:first-child {
+      border-top-left-radius: 6px !important;
+    }
+    
+    /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:last-child {
+      border-top-right-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 첫 번째 셀 - 하단 왼쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 6px !important;
+      border-right: none !important;
+    }
+    
+    /* grade-comparison-table 스타일 - part2-07.html과 동일 */
+    .grade-comparison-table th,
+    .grade-comparison-table th:nth-child(1),
+    .grade-comparison-table th:nth-child(2),
+    .grade-comparison-table th:nth-child(3) {
+      text-align: center !important;
+    }
+    
+    .grade-comparison-table td,
+    .grade-comparison-table td:nth-child(1),
+    .grade-comparison-table td:nth-child(2),
+    .grade-comparison-table td:nth-child(3) {
+      padding-top: 2mm !important;
+      padding-bottom: 2mm !important;
+      text-align: center !important;
+      font-weight: 400 !important;
+    }
+    
+    .grade-comparison-table tbody td:nth-child(1) {
+      background-color: transparent !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+      font-weight: 400 !important;
+      font-size: 14px !important;
+    }
+    
+    .grade-comparison-table th:nth-child(1),
+    .grade-comparison-table td:nth-child(1) {
+      width: 20% !important;
+    }
+    
+    .grade-comparison-table th:nth-child(2),
+    .grade-comparison-table td:nth-child(2) {
+      width: 20% !important;
+    }
+    
+    .grade-comparison-table th:nth-child(3),
+    .grade-comparison-table td:nth-child(3) {
+      width: 60% !important;
+    }
+    
+    .comparison-container {
+      display: flex;
+      gap: 6mm;
+      margin-top: 2mm;
+      margin-bottom: 3mm;
+    }
+    
+    .comparison-card {
+      flex: 1;
+      border-radius: 6px;
+      padding: 5mm;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.left {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.right {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .card-header {
+      text-align: center;
+      padding: 3mm 3mm;
+      margin: -5mm -5mm 4mm -5mm;
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-radius: 6px 6px 0 0;
+      border-bottom: none;
+    }
+    
+    .card-header.left {
+      background-color: var(--color-primary);
+    }
+    
+    .card-header.right {
+      background-color: #1653c9;
+    }
+    
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      margin-bottom: 1mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .comparison-card .section-block {
+      margin-top: 1mm;
+      margin-bottom: 1mm;
+      background-color: #FAFAFA;
+      border: 1px solid #F0F0F0;
+      border-radius: 8px;
+      padding: 2.5mm;
+    }
+    
+    .comparison-card .section-block:first-of-type {
+      margin-top: 0mm;
+    }
+    
+    .comparison-card .section-block:last-of-type {
+      margin-bottom: 0mm;
+    }
+    
+    .comparison-card .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+      padding: 0;
+      background-color: transparent;
+    }
+    
+    .comparison-card .section-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .comparison-card .section-content li {
+      padding-left: 5.5mm;
+      position: relative;
+      margin-bottom: 2mm;
+      line-height: 1.8;
+    }
+    
+    .comparison-card .section-content li:first-child {
+      margin-top: 1mm;
+    }
+    
+    .comparison-card .section-content li:last-child {
+      margin-bottom: 1mm;
+    }
+    
+    .comparison-card .section-content li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 리포트 스타일 대제목 -->
+    <h1 class="report-title">
+      <span class="report-title-badge">PART 6</span>
+      <span class="report-title-text">원서접수 이후 입시 일정 총정리</span>
+    </h1>
+    
+    <!-- 본문 -->
+    <div class="text-body">
+        원서접수는 이미 정해진 성적을 바탕으로 대학과 전형을 선택하는 입시의 마지막 단계로, 같은 성적이라도 전략에 따라 결과가 달라질 수 있으므로 자신에게 유리한 전형과 학교·학과를 파악해야 합니다.
+    </div>
+    
+    <!-- 중제목 (본문과의 실제 간격 2mm) -->
+    <h2 class="title-2" style="margin-top: 0mm;">
+      Chapter 1. 원서접수 필수 확인 사항
+    </h2>
+    
+    <!-- 소제목 1-1 -->
+    <h3 class="title-3" style="margin-top: 2mm;">1-1. 모집인원</h3>
+    
+    <div class="text-body">
+        모집인원은 대학이 해당 전형에서 선발을 약속한 인원으로, 모집인원 규모에 따라 경쟁률뿐 아니라 실질적인 합격 가능성에도 큰 영향을 미칩니다. 모집인원이 적은 전형일수록 신중한 지원 전략이 필요합니다.
+    </div>
+
+    <!-- 비교 카드 컨테이너 -->
+    <div class="comparison-container" style="margin-top: 0.5mm;">
+      
+      <!-- 소수 모집 -->
+      <div class="comparison-card left">
+        <div class="card-header left">
+          <div class="card-title">소수 모집 (5명↓)</div>
+        </div>
+        
+        <!-- 주요 특징 섹션 -->
+        <div class="section-block">
+          <div class="section-content" style="font-size: 14.5px !important;">
+            <ul>
+              <li>모집인원 수가 적어 경쟁 밀집</li>
+              <li>소폭 차이로 합격 결과 크게 변동</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 대규모 모집 -->
+      <div class="comparison-card right">
+        <div class="card-header right">
+          <div class="card-title">다수 모집 (20명↑)</div>
+        </div>
+        
+        <!-- 주요 특징 섹션 -->
+        <div class="section-block">
+          <div class="section-content" style="font-size: 14.5px !important;">
+            <ul>
+              <li>합격자의 성적 분포가 폭넓게 형성</li>
+              <li>연도별 합격선 변동이 비교적 완만</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3" style="margin-top: 2mm;">1-2. 경쟁률</h3>
+    
+    <div class="text-body" style="margin-top: 0.5mm;">
+        경쟁률은 지원자 수를 나타내는 지표일 뿐, 합격 가능성을 의미하지는 않습니다. 따라서 수능 최저학력기준 미충족자나 결시자 등을 제외한 실질 경쟁률을 기준으로 합격 가능성을 판단하는 것이 중요합니다.
+    </div>
+    
+    <!-- 비교 차트 박스 -->
+    <div class="report-box" style="margin-top: 2mm;">
+      <h4 class="title-3" style="text-align:center; margin:2mm 0 -7mm 0; color:#555; font-size:15px !important;">명목 경쟁률 vs 실질 경쟁률 비교</h4>
+      <div style="display: flex; align-items: flex-end; justify-content: center; height: 50mm; gap: 7mm; padding: 5mm 4mm 2mm 4mm; position: relative; box-sizing: border-box;">
+        <div style="text-align: center; width: 25mm; display: flex; flex-direction: column; align-items: center;">
+          <div style="font-size:14px; font-weight:bold; color:#555; margin-bottom: 1.5mm; white-space: nowrap;">9 대 1</div>
+          <div style="height: 19mm; background: #adb5bd; width: 100%; border-radius: 4px 4px 0 0; margin-top: auto; min-height: 19mm;"></div>
+          <div style="font-weight:bold; margin-top:1.5mm; color:#555; font-size:14px; white-space: nowrap;">명목 경쟁률</div>
+        </div>
+        <div style="text-align: center; width: 25mm; display: flex; flex-direction: column; align-items: center;">
+          <div style="font-size:14px; font-weight:bold; color:var(--color-primary); margin-bottom: 1.5mm; white-space: nowrap;">2 대 1</div>
+          <div style="height: 8mm; background: var(--color-primary); width: 100%; border-radius: 4px 4px 0 0; margin-top: auto; min-height: 8mm;"></div>
+          <div style="font-weight:bold; margin-top:1.5mm; color:var(--color-primary); font-size:14px; white-space: nowrap;">실질 경쟁률</div>
+        </div>
+      </div>
+      <p class="img-caption" style="margin-top:3mm; margin-bottom:2mm; font-size:15px !important;">수능 최저 미충족자와 결시자 제외 시 실질 경쟁률은 더 낮아집니다.</p>
+    </div>
+
+           <!-- 진로활동 팁 박스 -->
+    <div class="tip-box" style="font-size: 14.5px !important; margin-top: 1.5mm !important; padding-top: 4mm !important; padding-bottom: 3mm !important;">
+        <div class="tip-title" style="font-size: 15px !important; margin-bottom: 3mm !important;">기타 참고 요소</div>
+        <ul class="list-check" style="font-size: 15px !important; margin-bottom: 0 !important;">
+          <li style="font-size: 15px !important;">
+            <strong>합격컷 : </strong>경쟁률 변화가 큰 경우, 전년도 합격선이 상대적으로 낮았던 전형인지 확인해야 합니다.
+          </li>
+          <li style="font-size: 15px !important;">
+            <strong>충원 비율 : </strong>모집인원이 많더라도, 과거 추가 합격이 거의 없었던 전형은 합격 기회가 낮습니다.
+          </li>
+          <li style="font-size: 15px !important;">
+            <strong>전형 변화: </strong>면접 유무나 반영 비율 변경 등 전형 방식의 변화는 지원자의 선택에 영향을 줍니다.
+          </li>                                       
+        </ul>
+      </div>
+
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 41 -</div>
+  </div>
+</body>
+</html>

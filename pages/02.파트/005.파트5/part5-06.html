@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트5-06</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    .comparison-container {
+      display: flex;
+      gap: 6mm;
+      margin-top: 2mm;
+      margin-bottom: 3mm;
+    }
+    
+    .comparison-card {
+      flex: 1;
+      border-radius: 6px;
+      padding: 5mm;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.left {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.right {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.old-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.new-system {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .card-header {
+      text-align: center;
+      padding: 3mm 3mm;
+      margin: -5mm -5mm 4mm -5mm;
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-radius: 6px 6px 0 0;
+      border-bottom: none;
+    }
+    
+    .card-header.left {
+      background-color: var(--color-primary);
+    }
+    
+    .card-header.right {
+      background-color: #1653c9;
+    }
+    
+    .card-header.old-system {
+      border-bottom: none;
+    }
+    
+    .card-header.new-system {
+      background-color: #1653c9;
+      border-bottom: none;
+    }
+    
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      margin-bottom: 1mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-subtitle {
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.9;
+      margin-bottom: 0mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-grade {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-year {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.8;
+      margin-bottom: 0mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-revision {
+      display: inline-block;
+      padding: 1.5mm 4mm;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 1mm;
+    }
+    
+    .card-revision.old {
+      background-color: #F3F4F6;
+      color: #6B7280;
+    }
+    
+    .card-revision.new {
+      background-color: #DBEAFE;
+      color: var(--color-primary-dark);
+    }
+    
+    .section-block {
+      margin-top: 2.45mm;
+      margin-bottom: 2.45mm;
+      background-color: #FAFAFA;
+      border: 1px solid #F0F0F0;
+      border-radius: 8px;
+      padding: 3.5mm;
+    }
+    
+    .comparison-card .section-block {
+      margin-top: 1mm;
+      margin-bottom: 1mm;
+      background-color: #FAFAFA;
+      border: 1px solid #F0F0F0;
+      border-radius: 8px;
+      padding: 2.5mm;
+    }
+    
+    .comparison-card .section-block:first-of-type {
+      margin-top: 0mm;
+    }
+    
+    .comparison-card .section-block:last-of-type {
+      margin-bottom: 0mm;
+    }
+    
+    .comparison-card .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3mm;
+      padding-bottom: 3.5mm;
+      border-bottom: 1.5px solid #E5E7EB;
+      color: var(--color-text);
+      background-color: transparent;
+      text-align: left;
+      padding: 0 0 3.5mm 0;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3mm;
+      padding-bottom: 3.5mm;
+      border-bottom: 1.5px solid #E5E7EB;
+      color: var(--color-text);
+    }
+    
+    .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+    }
+    
+    .comparison-card .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+      padding: 0;
+      background-color: transparent;
+    }
+    
+    .section-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .section-content li {
+      padding-left: 5.5mm;
+      position: relative;
+      margin-bottom: 2mm;
+      line-height: 1.8;
+    }
+    
+    .comparison-card .section-content li {
+      padding-left: 5.5mm;
+      position: relative;
+      margin-bottom: 2mm;
+      line-height: 1.8;
+    }
+    
+    .comparison-card .section-content li:first-child {
+      margin-top: 1mm;
+    }
+    
+    .comparison-card .section-content li:last-child {
+      margin-bottom: 1mm;
+    }
+    
+    .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-content li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+    
+    .comparison-card .section-content li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+    
+    .comparison-card .section-content ul ul {
+      margin-top: 2mm;
+      margin-bottom: 0;
+    }
+    
+    .comparison-card .section-content ul ul li {
+      padding-left: 8mm;
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 1.5mm;
+    }
+    
+    .comparison-card .section-content ul ul li::before {
+      content: '-';
+      position: absolute;
+      left: 5.5mm;
+      top: 0;
+      color: #6B7280;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    /* part2-06.html 스타일과 동일한 bullet point */
+    .section-block:not(.comparison-card .section-block) .section-content li {
+      padding-left: 5mm;
+      position: relative;
+      margin-bottom: 0.8mm;
+    }
+    
+    .section-block:not(.comparison-card .section-block) .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-block:not(.comparison-card .section-block) .section-content li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+    
+    .section-content li.no-bullet {
+      padding-left: 0;
+      text-align: justify;
+    }
+    
+    .section-content li.no-bullet::before {
+      display: none;
+    }
+    
+    .section-badge {
+      display: inline-block;
+      padding: 1.5mm 3.5mm;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 2.5mm;
+      background-color: #EFF6FF;
+      color: var(--color-primary-dark);
+    }
+    
+    .highlight-box {
+      margin-top: 3mm;
+      padding: 3mm;
+      border-radius: 8px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      background-color: #F0F9FF;
+      border-left: 3px solid var(--color-primary);
+      color: var(--color-text);
+    }
+    
+    .intro-text {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--color-text-light);
+      margin-bottom: 4mm;
+      text-align: center;
+      padding: 3mm 4mm;
+      background-color: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+    }
+    
+    .conclusion-box {
+      margin-top: 2.5mm;
+      border: 1px solid #3B82F6;
+      padding: 2.5mm 2mm;
+      font-size: 13.5px !important;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      background-color: #FAFAFA;
+      color: #3B82F6;
+      border-radius: 4px;
+    }
+    
+    /* 교육과정 편제표 축소 스타일 */
+    .comparison-table.curriculum-table {
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+    
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      margin: 0 !important;
+    }
+    
+    /* 이중 테두리 방지 - 첫 번째 열은 왼쪽 테두리 제거 */
+    .comparison-table.curriculum-table th:first-child,
+    .comparison-table.curriculum-table td:first-child {
+      border-left: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      background-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    
+    /* 마지막 컬럼 헤더의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table thead th:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr {
+      height: auto !important;
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td {
+      padding: 2mm 2mm !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+    }
+    
+    /* 마지막 컬럼 데이터 셀의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td * {
+      font-size: 14px !important;
+    }
+    
+    /* 모든 행은 하얀색 배경 */
+    .comparison-table.curriculum-table tbody tr {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr td {
+      background-color: #ffffff !important;
+    }
+    
+    /* 마지막 컬럼 오른쪽 모서리 이중선 제거 */
+    .comparison-table.curriculum-table th:last-child,
+    .comparison-table.curriculum-table td:last-child,
+    .comparison-table.curriculum-table thead th:last-child,
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .comparison-table.curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    /* 첫 번째 행의 첫 번째 셀 - 상단 왼쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:first-child {
+      border-top-left-radius: 6px !important;
+    }
+    
+    /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:last-child {
+      border-top-right-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 첫 번째 셀 - 하단 왼쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 6px !important;
+      border-right: none !important;
+    }
+    
+    /* 교시 컬럼(1번째) 너비 줄이기 */
+    .comparison-table.curriculum-table th:nth-child(1),
+    .comparison-table.curriculum-table td:nth-child(1) {
+      width: 10% !important;
+    }
+    
+    /* 문항 수 컬럼(4번째) 너비 */
+    .comparison-table.curriculum-table th:nth-child(4),
+    .comparison-table.curriculum-table td:nth-child(4) {
+      width: 12% !important;
+    }
+    
+    .guide-section {
+      margin-top: 2mm;
+      margin-bottom: 2mm;
+      display: flex;
+      flex-direction: column;
+      gap: 4mm;
+    }
+    
+    .guide-section > .guide-card {
+      margin: 0;
+    }
+    
+    .guide-section > .guide-card:nth-child(3) {
+      margin-top: 0.5mm;
+    }
+    
+    .guide-card {
+      background-color: #FFFFFF;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 6px;
+      padding: 3mm;
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+      margin: 0;
+    }
+    
+    .guide-header {
+      display: flex;
+      align-items: center;
+      gap: 2.5mm;
+    }
+    
+    .guide-number {
+      flex-shrink: 0;
+      color: var(--color-primary);
+      font-size: 16px;
+      margin-left: 1.5mm;
+      font-weight: 850;
+      -webkit-text-stroke: 0.3px var(--color-primary);
+      line-height: 2;
+      display: flex;
+      align-items: center;
+    }
+    
+    .guide-title {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 2;
+      display: flex;
+      align-items: center;
+    }
+    
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+    }
+    
+    .guide-example {
+      font-size: 14px;
+      line-height: 1.8;
+      padding: 2mm 2.5mm;
+      border-radius: 4px;
+      background-color: #FAFAFA;
+      display: flex;
+      align-items: center;
+      gap: 2mm;
+    }
+    
+    .guide-text {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--color-text);
+      font-weight: 400;
+      text-align: justify;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 5. [정시] 수능 위주 전형
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">5-1. 어떤 학생에게 유리할까? : 모의고사가 강점인 학생</h3>
+    
+    <!-- 상단 설명 -->
+    <div class="text-body" style="margin-bottom: 3mm;">
+        수능 위주 전형은 수능 성적을 중심으로 선발하는 전형으로, 대학별 점수 반영 방식에 따라 합격 가능성이 달라집니다. 특히 재수생·N수생 비중이 높아 수능 성적 활용 전략의 중요성이 큰 전형입니다.
+    </div>
+
+    <!-- 총정리 박스 -->
+    <div class="info-box" style="margin-top: 1mm;">
+        <div class="info-title">권장 대상</div>
+        <div class="text-small">
+            학생부 관리가 충분하지 않거나 비교과 경쟁력이 낮은 편이지만, <strong>모의고사 성적이 꾸준히 우수</strong>하고 수능에서 실력을 그대로 발휘할 가능성이 높은 학생(N수생 포함)에게 적합합니다.
+        </div>
+        </div>
+
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3" style="margin-top: 1mm; margin-bottom: 1.5mm;">5-2. 수능 평가 방식</h3>
+
+    <!-- 비교 카드 컨테이너 -->
+    <div class="comparison-container">
+      
+      <!-- 고3 (선택형 수능) -->
+      <div class="comparison-card left">
+        <div class="card-header left">
+          <div class="card-title">고3 (선택형 수능)</div>
+        </div>
+        
+        <!-- 주요 특징 섹션 -->
+        <div class="section-block">
+          <div class="section-content" style="font-size: 14.5px !important;">
+            <ul>
+              <li>공통 과목과 선택 과목을 함께 응시</li>
+              <li>과목 선택에 따른 유불리 발생 가능</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 고1·고2 (통합형 수능) -->
+      <div class="comparison-card right">
+        <div class="card-header right">
+          <div class="card-title">고1·고2 (통합형 수능)</div>
+        </div>
+        
+        <!-- 주요 특징 섹션 -->
+        <div class="section-block">
+          <div class="section-content" style="font-size: 14.5px !important;">
+            <ul>
+              <li>모든 수험생이 동일한 공통 과목 응시</li>
+              <li>과목 선택에 따른 유불리 구조 축소</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 총정리 박스 -->
+    <div class="info-box" style="margin-top: 1.5mm;">
+        <div class="info-title">주의 사항</div>
+        <div class="text-small">
+            주요 대학을 중심으로 <strong>정시 전형에서도 교과 평가가 점차 도입</strong>되고 있습니다. 특히 심화 과목 이수 여부가 정시 점수 산출에 영향을 줄 수 있으므로 정시를 목표로 하더라도 학생부 관리를 소홀히 해서는 안 됩니다.
+        </div>
+        </div>
+
+      <h3 class="title-3" style="margin-top: 1mm;">5-3. 수능 점수 활용법</h3>
+    
+    <!-- 수능 지표 섹션 -->
+    <div class="section-block" style="margin-top: 1mm;">
+      <div class="section-title" style="font-size: 15px !important;">① 대학 활용 지표</div>
+      <div class="section-content" style="font-size: 15px !important;">
+        <ul>
+            <li>대학마다 수능 성적 반영 방식은 다르며, 대부분의 대학은 '표준점수' 또는 '백분위'를 주요 지표로 활용</li>
+            <li>국어·수학·탐구는 표준점수 또는 백분위를 중심으로 활용하고, 영어와 한국사는 등급을 기준으로 반영</li>
+        </ul>
+      </div>
+    </div>
+
+        <!-- 수능 지표 섹션 -->
+    <div class="section-block" style="margin-top: 2mm;">
+      <div class="section-title" style="font-size: 15px !important;">② 영역별 가중치</div>
+      <div class="section-content" style="font-size: 15px !important;">
+        <ul>
+          <li>인문 계열 : 국어 반영 비중이 높은 구조 (예: 국어 35% + 수학 25%)</li>
+          <li>자연 계열 : 수학·과학 반영 비중이 높은 구조 (예: 국어 20% + 수학 40%)</li>          
+          <li>같은 성적이라도 대학별 영역 가중치와 반영 방식에 따라 환산 점수가 달라지므로, 맞춤 지원 전략 필요</li>
+        </ul>
+      </div>
+    </div>
+  
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 37 -</div>
+  </div>
+</body>
+</html>

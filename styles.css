@@ -1,0 +1,970 @@
+/* ============================================
+   A4 전자책 페이지 템플릿 - 공통 디자인 테마
+   ============================================ */
+
+/* Google Fonts - Noto Sans KR */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+
+/* ============================================
+   기본 설정 및 A4 규격
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #e7e7eb;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+:root {
+  /* 컬러 팔레트 - 리포트 스타일 */
+  --color-primary: #3B82F6;
+  --color-primary-light: #60A5FA;
+  --color-primary-dark: #2563EB;
+  --color-accent: #FF6B35;  /* 오렌지 악센트 */
+  --color-accent-light: #FF8C5A;
+  --color-text: #1F2937;
+  --color-text-light: #6B7280;
+  --color-text-lighter: #9CA3AF;
+  --color-bg: #FFFFFF;
+  --color-bg-warm: #FAFAFA;
+  --color-bg-blue: #E3F2FD;
+  --color-border: #E5E7EB;
+  --color-border-light: #F0F0F0;
+  --color-shadow: rgba(0, 0, 0, 0.06);
+  --color-grey: #9E9E9E;
+  
+  /* 폰트 */
+  --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  /* 여백 - 고정된 상하좌우 여백 */
+  --page-padding-top: 10mm;
+  --page-padding-bottom: 10mm;
+  --page-padding-left: 10mm;
+  --page-padding-right: 10mm;
+  --spacing-standard: 3mm;  /* 모든 항목 간 표준 간격 */
+  
+  /* 사용 가능 영역 계산 */
+  --page-content-width: calc(210mm - var(--page-padding-left) - var(--page-padding-right));
+  --page-content-height: calc(297mm - var(--page-padding-top) - var(--page-padding-bottom));
+}
+
+/* ============================================
+   페이지 컨테이너 (A4 규격)
+   ============================================ */
+.page {
+  width: 210mm;
+  height: 297mm;
+  background-color: var(--color-bg);
+  padding: var(--page-padding-top) var(--page-padding-right) var(--page-padding-bottom) var(--page-padding-left);
+  font-family: var(--font-family);
+  color: var(--color-text);
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+  /* 내용이 여백 안에 유동적으로 배치되도록 */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 화면에서만 테두리와 그림자 표시 */
+@media screen {
+  .page {
+    /* 웹에서 A4 영역 표시용 테두리 */
+    border: 2px solid #3B82F6;
+    box-shadow: none;
+  }
+}
+
+/* 페이지 내용 영역 - 여백을 넘지 않도록 */
+.page > * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 마지막 요소의 하단 여백 제거하여 하단 여백 최적화 */
+.page > *:last-child:not(.page-footer) {
+  margin-bottom: 0;
+}
+
+/* 페이지 하단 번호는 절대 위치로 배치되어 여백에 영향 없음 */
+
+/* ============================================
+   페이지 사이 블러/그림자 효과 (플립북 모드용)
+   ============================================ */
+/* 플립북 모드에서 페이지 사이 입체감을 주는 효과 */
+#flipbook .page.even {
+  position: relative;
+}
+
+#flipbook .page.even::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to left, 
+    rgba(0, 0, 0, 0.15) 0%, 
+    rgba(0, 0, 0, 0.08) 30%, 
+    rgba(0, 0, 0, 0.03) 60%, 
+    transparent 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+#flipbook .page.odd {
+  position: relative;
+}
+
+#flipbook .page.odd::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to right, 
+    rgba(0, 0, 0, 0.15) 0%, 
+    rgba(0, 0, 0, 0.08) 30%, 
+    rgba(0, 0, 0, 0.03) 60%, 
+    transparent 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+
+/* ============================================
+   인쇄 설정 (@page 및 @media print)
+   ============================================ */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+  }
+  
+  body.page-title-body {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+  }
+  
+  .page {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: var(--page-padding-top) var(--page-padding-right) var(--page-padding-bottom) var(--page-padding-left);
+    page-break-after: always;
+    page-break-inside: avoid;
+    overflow: visible;
+    border: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+  
+  .page-title-page {
+    border: none;
+    box-shadow: none;
+  }
+  
+  .layout-3col {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3mm;
+  }
+}
+
+/* ============================================
+   텍스트 스타일
+   ============================================ */
+
+/* ============================================
+   책 스타일 타이포그래피
+   ============================================ */
+
+/* PART 제목 (대제목) - 고정 크기: 25px */
+.title-1 {
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text);
+  margin-bottom: 4mm;
+  margin-top: 0;
+  letter-spacing: -0.3px;
+}
+
+/* Chapter 제목 (중제목) - 고정 크기: 20px */
+.title-2 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text);
+  margin-bottom: 3mm;
+  margin-top: 5mm;
+  letter-spacing: -0.2px;
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: 2mm;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Chapter 전용 파란 박스 헤더 */
+.chapter-header-box {
+  width: 100%;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  padding: 4mm 6mm;
+  margin-top: 5mm;
+  margin-bottom: 8mm;
+  box-sizing: border-box;
+}
+
+.chapter-header-box .chapter-title-main {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 1mm 0;
+}
+
+.chapter-header-box .chapter-title-sub {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* 소제목 (1-1. 부분) - 고정 크기: 17px */
+.title-3 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text);
+  margin-bottom: 3mm;
+  margin-top: 3mm;
+  letter-spacing: -0.1px;
+}
+
+/* 일반 텍스트 (본문) - 고정 크기: 15px - 양측 정렬 */
+.text-body {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-standard);
+  margin-top: 0;
+  text-align: justify;
+  letter-spacing: 0.1px;
+}
+
+/* 주석/작은 텍스트 - 고정 크기: 15px */
+.text-small {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-light);
+  margin-bottom: var(--spacing-standard);
+  margin-top: 0;
+}
+
+/* ============================================
+   레이아웃 시스템
+   ============================================ */
+
+/* 3단 본문 */
+.layout-3col {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-standard);
+  margin-bottom: var(--spacing-standard);
+  margin-top: 0;
+}
+
+/* ============================================
+   박스 스타일
+   ============================================ */
+
+/* 정보 박스 (안내용) */
+.box-info {
+  background-color: #F0F9FF;
+  border: 1px solid var(--color-primary-light);
+  border-radius: 8px;
+  padding: var(--spacing-standard);
+  margin-bottom: var(--spacing-standard);
+  margin-top: 0;
+  box-shadow: none;
+}
+
+.box-info .title-3 {
+  color: var(--color-primary);
+  margin-top: 0;
+  margin-bottom: var(--spacing-standard);
+}
+
+/* 팁 박스 */
+.box-tip {
+  background-color: #F0F9FF;
+  border-left: 4px solid var(--color-primary);
+  border-radius: 6px;
+  padding: var(--spacing-standard);
+  margin-bottom: var(--spacing-standard);
+  margin-top: 0;
+  box-shadow: none;
+}
+
+.box-tip .title-3 {
+  color: var(--color-primary-dark);
+  margin-top: 0;
+  margin-bottom: var(--spacing-standard);
+}
+
+/* 비교 차트 박스 */
+.box-chart {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--spacing-standard);
+  margin-bottom: var(--spacing-standard);
+  margin-top: 0;
+  box-shadow: none;
+}
+
+.box-chart .title-3 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: var(--spacing-standard);
+  color: var(--color-text);
+}
+
+/* 회색 박스 (아이콘 카드) */
+.gray-box {
+  background-color: var(--color-bg-warm);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: var(--spacing-standard);
+  box-shadow: none;
+}
+
+/* ============================================
+   리스트 스타일
+   ============================================ */
+
+/* 체크리스트 */
+.list-check {
+  list-style: none;
+  margin-bottom: var(--spacing-standard);
+  margin-top: 0;
+  padding-left: 0;
+}
+
+.list-check li {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-standard);
+  padding-left: 5mm;
+  position: relative;
+}
+
+.list-check li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+/* 팁 박스 내부 체크리스트 스타일 - 심플한 스타일 */
+.tip-box .list-check {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.tip-box .list-check li {
+  font-size: 15px !important;
+  line-height: 1.7;
+  color: var(--color-text-light);
+  margin-bottom: 2mm;
+  padding-left: 6mm;
+  position: relative;
+}
+
+.tip-box .list-check li:last-child {
+  margin-bottom: 0;
+}
+
+.tip-box .list-check li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+/* 번호 리스트 */
+.list-number {
+  list-style: decimal;
+  list-style-position: inside;
+  margin-bottom: var(--spacing-standard);
+  margin-top: 0;
+  padding-left: 2mm;
+}
+
+.list-number li {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-standard);
+}
+
+/* ============================================
+   페이지 하단 번호
+   ============================================ */
+/* 페이지 하단 번호 - 책 스타일 (하단 중앙) */
+.page-footer {
+  position: absolute;
+  bottom: 5mm;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--color-text-light);
+  text-align: center;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   리포트 스타일 추가 요소
+   ============================================ */
+
+/* 섹션 번호 아이콘 (제목 왼쪽) - PART용 원형 */
+.section-number {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Chapter용 네모 번호 */
+.section-number.chapter-number {
+  border-radius: 4px;
+}
+
+/* 책 스타일 제목 (PART/Chapter) - PART는 25px */
+.report-title {
+  display: flex;
+  align-items: center;
+  margin-top: 0;
+  margin-bottom: 4mm;
+  padding: 0;
+  background-color: #f5f5f5;
+  border-radius: 2px;
+  overflow: hidden;
+  letter-spacing: -0.3px;
+}
+
+/* PART 번호 배지 (왼쪽 진한 파란 영역) */
+.report-title-badge {
+  position: relative;
+  padding: 5mm 10mm;
+  background-color: var(--color-primary-dark);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 삼각형 장식 제거 (단순 직사각형 배지 사용) */
+
+/* PART 제목 텍스트가 들어가는 옆의 연한 영역 */
+.report-title-text {
+  flex: 1;
+  padding: 4mm 4mm;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 책 스타일 섹션 헤더 (선택사항) */
+.report-section-header {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-lighter);
+  margin-bottom: 2mm;
+  margin-top: var(--spacing-standard);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 원형 아이콘 카드 (리포트 스타일) */
+.icon-card {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin: 0 auto 2mm;
+}
+
+.icon-card.active {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.icon-card.inactive {
+  background-color: var(--color-bg-warm);
+  color: var(--color-grey);
+}
+
+/* 심플한 파란색 도형 아이콘 */
+.simple-icon-circle {
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  margin: 0 auto;
+}
+
+.simple-icon-square {
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 2px;
+  margin: 0 auto;
+}
+
+/* 책 스타일 박스 - 세련된 디자인 */
+.report-box {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 4px;
+  padding: 4mm;
+  margin-bottom: var(--spacing-standard);
+  box-shadow: none;
+  font-size: 13px;
+}
+
+.report-box * {
+  font-size: 13px !important;
+}
+
+.report-box .title-3 {
+  font-size: 13px !important;
+}
+
+.report-box-blue {
+  background-color: rgba(245, 245, 245, 0.6);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 6px;
+  backdrop-filter: blur(2px);
+  box-shadow: none;
+}
+
+/* 통일된 박스 스타일 - 심플한 연한 반투명 회색 (가이드북 이용 안내 스타일) */
+.info-box,
+.tip-box {
+  background-color: rgba(245, 245, 245, 0.6);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: 6px;
+  padding: 5mm;
+  margin-bottom: var(--spacing-standard);
+  backdrop-filter: blur(2px);
+  font-size: 14px;
+}
+
+/* 박스 내부 내용과 모서리 간 여백 통일 */
+.info-box > *:first-child {
+  margin-top: 0;
+}
+
+.info-box > *:last-child {
+  margin-bottom: 0;
+}
+
+.tip-box > *:first-child {
+  margin-top: 0;
+}
+
+.tip-box > *:last-child {
+  margin-bottom: 0;
+}
+
+.info-box *,
+.tip-box * {
+  font-size: 15px !important;
+}
+
+/* 박스 내부 텍스트 여백 통일 */
+.info-box .text-small {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.7;
+  text-align: justify;
+}
+
+/* 박스 내부 제목 스타일 통일 */
+.info-box .info-title,
+.tip-box .tip-title {
+  font-size: 15px !important;
+  font-weight: 700;
+  color: var(--color-text-light);
+  margin-bottom: 3mm;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  letter-spacing: -0.2px;
+}
+
+.info-box .info-title::before {
+  content: '■';
+  color: var(--color-primary);
+  margin-right: 4px;
+  font-size: 15px;
+}
+
+.tip-box .tip-title::before {
+  content: '■';
+  color: var(--color-primary);
+  margin-right: 4px;
+  font-size: 15px;
+}
+
+/* 책 스타일 하이라이트 섹션 - 세련된 디자인 */
+.report-highlight {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  padding: 3mm 4mm;
+  border-radius: 4px;
+  margin: var(--spacing-standard) 0;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  box-shadow: none;
+}
+
+/* 리포트 스타일 원형 아이콘 그리드 */
+.icon-grid {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin: var(--spacing-standard) 0;
+  gap: 4mm;
+}
+
+/* 리포트 스타일 비교 테이블 - 박스 안 텍스트 15px */
+.comparison-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: var(--spacing-standard) 0;
+  font-size: 15px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+/* 그림 밑 텍스트 - 13px */
+.img-caption {
+  font-size: 14px;
+  color: var(--color-text-light);
+  text-align: center;
+  margin-top: 2mm;
+  font-style: italic;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 4mm;
+  text-align: center;
+  border-bottom: 1px solid #E5E7EB;
+  border-right: 1px solid #E5E7EB;
+}
+
+.comparison-table th {
+  background-color: var(--color-primary);
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+  padding-top: 5mm;
+  padding-bottom: 5mm;
+}
+
+.comparison-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.comparison-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* 마지막 컬럼은 오른쪽 선 제거 */
+.comparison-table th:last-child,
+.comparison-table td:last-child {
+  border-right: none;
+}
+
+/* 첫 번째 컬럼(학년) 폭을 넓게 */
+.comparison-table th:first-child,
+.comparison-table tbody td:first-child {
+  width: 28mm;
+  white-space: nowrap;
+}
+
+/* 두 번째 컬럼(설계 내용) 좌우 여백 축소 */
+.comparison-table tbody td:nth-child(2) {
+  padding-left: 2mm;
+  padding-right: 2mm;
+}
+
+/* 표 본문은 모두 같은 크기, 볼드 제거 */
+.comparison-table tbody td {
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.comparison-table tbody td strong {
+  font-weight: 400;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ============================================
+   페이지 표지 (page-title.html) 스타일
+   ============================================ */
+
+/* 표지 페이지 전용 body 스타일 */
+body.page-title-body {
+  background: #e7e7eb;
+  font-family: "Noto Sans KR", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* A4 비율 - page-01.html과 동일한 여백 구조 */
+.page-title-page {
+  width: 210mm;
+  height: 297mm;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+  /* A4 기준 여백: 10mm씩 */
+  padding: var(--page-padding-top) var(--page-padding-right) var(--page-padding-bottom) var(--page-padding-left);
+  display: block !important;
+  flex-direction: unset !important;
+  box-sizing: border-box;
+}
+
+/* 화면에서만 테두리와 그림자 표시 */
+@media screen {
+  .page-title-page {
+    /* 웹에서 A4 영역 표시용 테두리 */
+    border: 2px solid #3B82F6;
+    box-shadow: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+/* ==============================
+   🔵 "고" 글자를 형상화한 배경 패턴
+   ============================== */
+/* 10mm ≈ 37.795px (96 DPI 기준) */
+.block-go-1 {
+  position: absolute;
+  top: calc(130px - 37.795px);
+  left: calc(200px - 37.795px);
+  width: 430px;
+  height: 110px;
+  background: #1653c9;
+  box-shadow: none;
+}
+
+.block-go-2 {
+  position: absolute;
+  top: calc(130px - 37.795px);
+  left: calc(535px - 37.795px);
+  width: 165px;
+  height: 350px;
+  background: #1653c9;
+  box-shadow: none;
+}
+
+.block-go-3 {
+  position: absolute;
+  top: calc(330px - 37.795px);
+  left: calc(320px - 37.795px);
+  width: 155px;
+  height: 450px;
+  background: #1653c9;
+  box-shadow: none;
+}
+
+.block-go-4 {
+  position: absolute;
+  bottom: calc(140px - 37.795px);
+  left: calc(320px - 37.795px);
+  width: 400px;
+  height: 160px;
+  background: #1653c9;
+  border-bottom-right-radius: 80px;
+  box-shadow: none;
+}
+
+/* ==============================
+   📌 세로 타이틀
+   ============================== */
+.title-strip {
+  position: absolute;
+  top: calc(330px - 37.795px);
+  left: calc(115px - 37.795px);
+  border-left: 4px solid #1653c9;
+  padding-left: 12px;
+}
+
+.title-strip .grade {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #1653c9;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 3px;
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.title-strip .title-vertical {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1653c9;
+  letter-spacing: 0.14em;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  line-height: 1.35;
+}
+
+/* ==============================
+   🌸 말풍선 태그
+   ============================== */
+.tag {
+  position: absolute;
+  padding: 6px 16px 7px;
+  background: #03c6fc;
+  color: #ffffff;
+  font-size: 15px;
+  border-radius: 18px;
+  white-space: nowrap;
+  font-weight: 500;
+  z-index: 6;
+}
+
+.tag::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 20px;
+  border-width: 9px 7px 0 7px;
+  border-style: solid;
+  border-color: #03c6fc transparent transparent transparent;
+}
+
+.tag-1 {
+  top: calc(600px - 37.795px);
+  left: calc(220px - 37.795px);
+}
+
+.tag-2 {
+  top: calc(220px - 37.795px);
+  right: calc(80px - 37.795px);
+}
+
+.tag-3 {
+  bottom: calc(360px - 37.795px);
+  right: calc(220px - 37.795px);
+}
+
+/* ==============================
+   🔹 우측 정보 (세로 배치)
+   ============================== */
+.side-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: #1653c9;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  transform: rotate(90deg);
+  transform-origin: center;
+}
+
+.side-info {
+  position: absolute;
+  bottom: calc(310px - 37.795px);
+  left: calc(535px - 37.795px);
+  color: #1653c9;
+  z-index: 6;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+}
+
+.side-year {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1653c9;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.side-text {
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  white-space: nowrap;
+}

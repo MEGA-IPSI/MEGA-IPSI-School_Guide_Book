@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부록2-03</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    /* 용어 사전 표 스타일 */
+    .glossary-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 3mm 0 2mm 0;
+      font-size: 15px;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+    
+    .glossary-table th,
+    .glossary-table td {
+      padding: 3mm 4mm;
+      text-align: left;
+      border-bottom: 1px solid #E5E7EB;
+      border-right: 1px solid #E5E7EB;
+      vertical-align: top;
+    }
+    
+    .glossary-table th {
+      background-color: var(--color-primary);
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: center;
+      padding-top: 4mm;
+      padding-bottom: 4mm;
+    }
+    
+    .glossary-table th:first-child {
+      width: 25%;
+    }
+    
+    .glossary-table th:last-child {
+      width: 75%;
+    }
+    
+    .glossary-table tbody tr:nth-child(even) {
+      background-color: #FAFAFA;
+    }
+    
+    .glossary-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .glossary-table td:first-child {
+      font-size: 14.5px;
+      color: var(--color-text);
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .glossary-table td:last-child {
+      font-size: 14.5px;
+      color: var(--color-text);
+      line-height: 1.6;
+      text-align: left;
+    }
+    
+    .glossary-table th:last-child,
+    .glossary-table td:last-child {
+      border-right: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 -->
+    <h2 class="title-2">
+      Chapter 2. 대입 용어 사전
+    </h2>
+    
+    <!-- 소제목 1-3 -->
+    <h3 class="title-3">2-2. 원서접수·서류·일정 </h3>
+    
+<!-- 용어 사전 표 -->
+<table class="glossary-table">
+  <thead>
+    <tr>
+      <th>용어</th>
+      <th>정의</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>원서접수</td>
+      <td>대학에 지원 의사를 표시하기 위해 지원서를 제출하는 절차</td>
+    </tr>
+    <tr>
+      <td>원서접수 기간</td>
+      <td>대학에 지원서를 제출할 수 있도록 정해진 기간</td>
+    </tr>
+    <tr>
+      <td>원서 접수번호</td>
+      <td>원서접수 대행사를 통해 지원서를 제출할 때 부여되는 공통 관리 번호</td>
+    </tr>
+    <tr>
+      <td>대학 수험번호</td>
+      <td>원서접수 완료 후 각 대학이 개별적으로 부여하는 지원자 식별 번호</td>
+    </tr>
+    <tr>
+      <td>수능 수험번호</td>
+      <td>한국교육과정평가원이 수능 응시자에게 부여하는 고유 번호</td>
+    </tr>
+    <tr>
+      <td>지원자격</td>
+      <td>해당 대학·전형에 지원하기 위해 충족해야 하는 기본 조건</td>
+    </tr>
+    <tr>
+      <td>제출서류</td>
+      <td>해당 대학·전형에 지원하기 위해 제출해야 하는 학생부 및 기타 서류</td>
+    </tr>
+    <tr>
+      <td>서류제출 마감</td>
+      <td>학생부 외 추가 서류를 제출해야 하는 최종 기한</td>
+    </tr>
+    <tr>
+      <td>전형일정</td>
+      <td>면접·논술·실기·합격자 발표·등록 등 전형 전반의 진행 일정</td>
+    </tr>
+    <tr>
+      <td>합격자 발표</td>
+      <td>전형 결과에 따라 최초 합격자를 공개하는 절차</td>
+    </tr>
+    <tr>
+      <td>추가합격 발표</td>
+      <td>등록 포기자가 발생할 경우 예비 순번에 따라 추가로 합격자를 선발하는 과정</td>
+    </tr>
+    <tr>
+      <td>등록기간</td>
+      <td>합격자가 등록 의사를 확정해야 하는 기간</td>
+    </tr>
+    <tr>
+      <td>예치금</td>
+      <td>수시 합격자가 등록 의사를 표시하기 위해 먼저 납부하는 금액</td>
+    </tr>
+    <tr>
+      <td>등록확정</td>
+      <td>합격자가 해당 대학에 입학하겠다는 의사를 최종적으로 확정하는 절차</td>
+    </tr>
+    <tr>
+      <td>등록금</td>
+      <td>최종 등록을 위해 납부하는 대학 입학 관련 금액</td>
+    </tr>
+    <tr>
+      <td>등록 포기 기한</td>
+      <td>등록을 완료한 이후에도 등록을 취소할 수 있는 마감 시점</td>
+    </tr>
+    <tr>
+      <td>추가모집 일정</td>
+      <td>정시 전형 종료 이후 미충원 인원을 대상으로 진행되는 모집 일정</td>
+    </tr>
+  </tbody>
+</table>
+  
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 51 -</div>
+  </div>
+</body>
+</html>

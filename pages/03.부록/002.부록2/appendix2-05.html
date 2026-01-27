@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부록2-05</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    /* 용어 사전 표 스타일 */
+    .glossary-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 3mm 0 2mm 0;
+      font-size: 15px;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+    
+    .glossary-table th,
+    .glossary-table td {
+      padding: 3mm 4mm;
+      text-align: left;
+      border-bottom: 1px solid #E5E7EB;
+      border-right: 1px solid #E5E7EB;
+      vertical-align: top;
+    }
+    
+    .glossary-table th {
+      background-color: var(--color-primary);
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: center;
+      padding-top: 4mm;
+      padding-bottom: 4mm;
+    }
+    
+    .glossary-table th:first-child {
+      width: 25%;
+    }
+    
+    .glossary-table th:last-child {
+      width: 75%;
+    }
+    
+    .glossary-table tbody tr:nth-child(even) {
+      background-color: #FAFAFA;
+    }
+    
+    .glossary-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .glossary-table td:first-child {
+      font-size: 14.5px;
+      color: var(--color-text);
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .glossary-table td:last-child {
+      font-size: 14.5px;
+      color: var(--color-text);
+      line-height: 1.6;
+      text-align: left;
+    }
+    
+    .glossary-table th:last-child,
+    .glossary-table td:last-child {
+      border-right: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 -->
+    <h2 class="title-2">
+      Chapter 2. 대입 용어 사전
+    </h2>
+    
+    <!-- 소제목 1-3 -->
+    <h3 class="title-3">2-3. 점수·성적·체계 (2)</h3>
+    
+<!-- 용어 사전 표 -->
+<table class="glossary-table">
+    <thead>
+      <tr>
+        <th>용어</th>
+        <th>정의</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>통합형 수능(2028~)</td>
+        <td>2028학년도부터 모든 학생이 동일한 공통 과목을 응시하는 수능 체계</td>
+      </tr>
+      <tr>
+        <td>선택형 수능(~2027)</td>
+        <td>2027학년도까지 선택 과목에 따라 시험 구조가 달랐던 수능 체계</td>
+     </tr> 
+     <tr>
+        <td>수능 등급</td>
+        <td>수능 영역별 성적을 상대평가·절대평가 기준에 따라 구분한 9등급 구조</td>
+      </tr>  
+      <tr>
+        <td>표준점수</td>
+        <td>시험 난이도와 점수 분포를 반영해, 내 점수의 상대적 위치를 나타낸 값</td>
+      </tr>
+      <tr>
+        <td>백분위</td>
+        <td>전체 응시자 중 본인보다 낮은 점수를 받은 학생의 비율</td>
+      </tr>
+      <tr>
+        <td>수능 최저학력기준</td>
+        <td>수시 전형에서 합격을 위해 반드시 충족해야 하는 최소 수능 성적 기준</td>
+      </tr>
+      <tr>
+        <td>환산점수</td>
+        <td>대학이 정한 기준에 따라 각 전형 요소 점수를 계산해 산출한 비교 점수</td>
+      </tr>
+      <tr>
+        <td>총점</td>
+        <td>전형에서 점수를 산출할 때 기준이 되는 전체 점수</td>
+      </tr>
+      <tr>
+        <td>반영과목</td>
+        <td>성적 산출 시 실제 점수 계산에 포함되는 과목</td>
+      </tr>
+      <tr>
+        <td>반영학년</td>
+        <td>성적 산출 시 실제 점수 계산에 포함되는 학년 범위</td>
+      </tr>
+      <tr>
+        <td>가중치</td>
+        <td>특정 학년·과목·영역의 점수를 더 크게 반영하도록 설정한 기준</td>
+      </tr>
+      <tr>
+        <td>영어 등급 환산</td>
+        <td>영어 등급을 가산점 또는 감점 방식으로 점수에 반영하는 구조</td>
+      </tr>
+      <tr>
+        <td>한국사 반영 방식</td>
+        <td>필수 응시 후, 일정 등급 충족 여부에 따라 가점 또는 감점하는 방식</td>
+      </tr>
+      <tr>
+        <td>탐구 변환표준점수</td>
+        <td>과목 간 난이도 차이를 고려해 백분위 점수를 활용하여 대학 기준으로 보정한 점수</td>
+      </tr>
+      <tr>
+        <td>컷라인(최초/최종)</td>
+        <td>주로 참고용 추정치로 제시되는, 합격과 불합격을 가르는 기준 점수</td>
+      </tr>
+    </tbody>
+  </table>  
+  
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 53 -</div>
+  </div>
+</body>
+</html>

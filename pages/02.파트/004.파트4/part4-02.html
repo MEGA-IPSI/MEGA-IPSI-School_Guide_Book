@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트4-02</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    /* 교육과정 편제표 축소 스타일 */
+    .comparison-table.curriculum-table {
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+    
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 14px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      margin: 0 !important;
+    }
+    
+    /* 이중 테두리 방지 - 첫 번째 열은 왼쪽 테두리 제거 */
+    .comparison-table.curriculum-table th:first-child,
+    .comparison-table.curriculum-table td:first-child {
+      border-left: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      background-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    
+    /* 마지막 컬럼 헤더의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table thead th:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr {
+      height: auto !important;
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td {
+      padding: 2mm 2mm !important;
+      font-size: 14px !important;
+      font-weight: 400 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+    }
+    
+    /* 마지막 컬럼 데이터 셀의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(even) {
+      background-color: #fafafa !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(even) td {
+      background-color: #fafafa !important;
+      text-align: center !important;
+    }
+    
+    /* 홀수 행은 흰색 배경 */
+    .comparison-table.curriculum-table tbody tr:nth-child(odd) {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(odd) td {
+      background-color: #ffffff !important;
+    }
+    
+    /* 마지막 컬럼 오른쪽 모서리 이중선 제거 */
+    .comparison-table.curriculum-table th:last-child,
+    .comparison-table.curriculum-table td:last-child,
+    .comparison-table.curriculum-table thead th:last-child,
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .comparison-table.curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    /* 첫 번째 행의 첫 번째 셀 - 상단 왼쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:first-child {
+      border-top-left-radius: 6px !important;
+    }
+    
+    /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:last-child {
+      border-top-right-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 첫 번째 셀 - 하단 왼쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 6px !important;
+      border-right: none !important;
+    }
+    
+    /* grade-comparison-table 스타일 - part2-07.html과 동일 */
+    .grade-comparison-table th,
+    .grade-comparison-table th:nth-child(1),
+    .grade-comparison-table th:nth-child(2),
+    .grade-comparison-table th:nth-child(3) {
+      text-align: center !important;
+    }
+    
+    .grade-comparison-table td,
+    .grade-comparison-table td:nth-child(1),
+    .grade-comparison-table td:nth-child(2),
+    .grade-comparison-table td:nth-child(3) {
+      padding-top: 2mm !important;
+      padding-bottom: 2mm !important;
+      text-align: center !important;
+      font-weight: 400 !important;
+    }
+    
+    .grade-comparison-table tbody td:nth-child(1) {
+      background-color: transparent !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+      font-weight: 400 !important;
+      font-size: 14px !important;
+    }
+    
+    .grade-comparison-table th:nth-child(1),
+    .grade-comparison-table td:nth-child(1) {
+      width: 20% !important;
+    }
+    
+    .grade-comparison-table th:nth-child(2),
+    .grade-comparison-table td:nth-child(2) {
+      width: 20% !important;
+    }
+    
+    .grade-comparison-table th:nth-child(3),
+    .grade-comparison-table td:nth-child(3) {
+      width: 60% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 리포트 스타일 대제목 -->
+    <h1 class="report-title">
+      <span class="report-title-badge">PART 4</span>
+      <span class="report-title-text">수험생이 꼭 알아야 할 수능과 모의고사</span>
+    </h1>
+    
+    <!-- 본문 -->
+    <div class="text-body">
+        수능은 수시 전형의 최저학력기준 충족은 물론, 정시 전형에서 합격을 좌우하는 가장 중요한 시험입니다. 학평과 모평을 통해 실전 감각을 기르고, 이를 바탕으로 나만의 최적화된 입시 전략을 수립해야 합니다.
+    </div>
+    
+    <!-- 중제목 (본문과의 실제 간격 2mm) -->
+    <h2 class="title-2" style="margin-top: 0mm;">
+      Chapter 1. 모의고사란 무엇인가?
+    </h2>
+    
+    <!-- 소제목 1-1 -->
+    <h3 class="title-3" style="margin-top: 2mm;">1-1. 모의고사의 목적</h3>
+    
+    <div class="text-body">
+        모의고사는 수능과 유사한 환경에서 실전 감각을 점검하고, 성적표 지표를 분석해 과목별 강·약점과 향후 학습 방향, 입시 전략을 조정하기 위한 시험입니다.
+    </div>
+
+    <!-- 모의고사 목적 4가지 박스 (2x2 그리드) -->
+    <div style="margin-top: 1mm; margin-bottom: 3mm;">
+      <!-- 상단 2개 박스 -->
+      <div style="display: flex; gap: 4mm; align-items: flex-start; margin-bottom: 4mm;">
+        <!-- 1. 나의 위치 파악 -->
+        <div style="flex: 1;">
+          <div style="border: 1px solid #E5E7EB; padding: 2mm 3mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+            <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🙂</div>
+            <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 1mm;">나의 위치 파악</div>
+            <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6; margin-bottom: 1mm;">
+                백분위·등급으로 현재 위치 확인
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 수능 문제 유형 적응 -->
+        <div style="flex: 1;">
+            <div style="border: 1px solid #E5E7EB; padding: 2mm 3mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+            <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">💪🏻</div>
+            <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 1mm;">수능 실전 감각 향상</div>
+            <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6; margin-bottom: 1mm;">
+                수능 유형과 시간 배분 연습
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단 2개 박스 -->
+      <div style="display: flex; gap: 4mm; align-items: flex-start;">
+        <!-- 3. 과목별 취약 단원 분석 -->
+        <div style="flex: 1;">
+            <div style="border: 1px solid #E5E7EB; padding: 2mm 3mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+            <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">💊</div>
+            <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 1mm;">과목별 취약 단원 분석</div>
+            <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6; margin-bottom: 1mm;">
+                약점 파악 후 학습 계획 보완
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. 대학 목표 설정 -->
+        <div style="flex: 1;">
+            <div style="border: 1px solid #E5E7EB; padding: 2mm 3mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+            <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🎓</div>
+            <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 1mm;">대학 목표 설정</div>
+            <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6; margin-bottom: 1mm;">
+            6·9월 모평 성적 기준 설정
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3" style="margin-top: 2mm;">1-2. 학년별 모의고사 시기 및 특징</h3>
+    
+    <div class="text-body" style="margin-top: 0.5mm;">
+        모의고사는 시·도교육청이 주관하는 전국연합학력평가와, 수능을 출제하는 한국교육과정평가원이 시행하는 모의평가로 나뉘며, 특히 평가원 모의평가는 수능과 가장 유사한 기준으로 시행됩니다.
+    </div>
+
+    <!-- 학년별 모의고사 비교 표 -->
+    <table class="comparison-table curriculum-table certification-table" style="margin-top: 1mm;">
+      <thead>
+        <tr>
+          <th style="padding: 3mm 2mm !important; height: 1.6mm !important;">구분</th>
+          <th style="padding: 3mm 2mm !important; height: 1.6mm !important;">고1·고2 학력평가</th>
+          <th style="padding: 3mm 2mm !important; height: 1.6mm !important;">고3 학력평가</th>
+          <th style="padding: 3mm 2mm !important; height: 1.6mm !important;">고3 모의평가</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>주관 기관</td>
+          <td>교육청</td>
+          <td>교육청</td>
+          <td>평가원</td>
+        </tr>
+        <tr>
+          <td>응시 대상</td>
+          <td>고1·고2</td>
+          <td>고3 재학생 </td>
+          <td>고3·졸업생</td>
+        </tr>
+        <tr>
+          <td>시행 횟수</td>
+          <td>연 4회</td>
+          <td>연 4회</td>
+          <td>6월·9월</td>
+        </tr>
+        <tr>
+          <td>출제 기준</td>
+          <td>교육과정 중심</td>
+          <td>교육과정 중심</td>
+          <td>수능 동일</td>
+        </tr>
+        <tr>
+          <td>응시 목적</td>
+          <td>기초 점검</td>
+          <td>실력 점검</td>
+          <td>실전 대비</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 자율·자치활동 팁 박스 -->
+    <div class="tip-box" style="font-size: 14.5px !important; margin-top: 1.5mm; padding-top: 4mm !important; padding-bottom: 3mm !important;">
+      <div class="tip-title" style="font-size: 15px !important; margin-bottom: 3mm !important;">6월∙9월 모의평가 왜 중요할까?</div>
+      <ul class="list-check" style="font-size: 15px !important; margin-bottom: 0 !important;">
+        <li style="font-size: 15px !important;"><strong>출제 기관 : </strong>실제 수능을 출제하는 한국교육과정평가원(KICE)이 직접 주관하는 시험입니다.</li>
+        <li style="font-size: 15px !important;"><strong>응시 대상 : </strong>재학생뿐 아니라 N수생도 함께 응시하여, 실제 수능에서의 내 위치를 파악할 수 있습니다.</li>
+        <li style="font-size: 15px !important;"><strong>수능 예측 : </strong>해당 연도 수능의 출제 방향과 난이도를 예측할 수 있는 가장 중요한 기준 시험입니다.</li>               
+      </ul>
+    </div>
+
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 27 -</div>
+  </div>
+</body>
+</html>

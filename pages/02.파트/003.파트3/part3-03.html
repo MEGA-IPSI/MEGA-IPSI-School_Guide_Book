@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트3-03</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    /* 교육과정 편제표 축소 스타일 */
+    .comparison-table.curriculum-table {
+      font-size: 12px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+      table-layout: fixed !important;
+      width: 100% !important;
+    }
+    
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 12px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+      margin: 0 !important;
+    }
+    
+    /* 이중 테두리 방지 - 첫 번째 열은 왼쪽 테두리 제거 */
+    .comparison-table.curriculum-table th:first-child,
+    .comparison-table.curriculum-table td:first-child {
+      border-left: none !important;
+    }
+    
+    /* 이중 테두리 방지 - 첫 번째 행은 위쪽 테두리 제거 (이미 thead th에 border-top: none 설정됨) */
+    
+    .comparison-table.curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 12.5px !important;
+      font-weight: 600 !important;
+      background-color: var(--color-primary) !important;
+      color: #ffffff !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      text-align: center !important;
+      vertical-align: middle !important;
+    }
+    
+    /* 마지막 컬럼 헤더의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table thead th:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table thead th * {
+      font-size: 12.5px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr {
+      height: auto !important;
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td {
+      padding: 1mm 1.6mm !important;
+      font-size: 13.5px !important;
+      font-weight: 400 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+    }
+    
+    /* 마지막 컬럼 데이터 셀의 오른쪽 테두리 제거 */
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td * {
+      font-size: 13.5px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(even) {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(even) td {
+      background-color: #ffffff !important;
+      text-align: center !important;
+    }
+    
+    /* 수상경력 표 - 회색 배경 완전 제거 */
+    .comparison-table.curriculum-table tbody tr {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td {
+      background-color: #ffffff !important;
+    }
+    
+    /* 마지막 컬럼 오른쪽 모서리 이중선 제거 */
+    .comparison-table.curriculum-table th:last-child,
+    .comparison-table.curriculum-table td:last-child,
+    .comparison-table.curriculum-table thead th:last-child,
+    .comparison-table.curriculum-table tbody td:last-child {
+      border-right: none !important;
+    }
+    
+    /* 과목 컬럼 (1, 3, 5, 7, 9, 11번째) 가로 넓이 지정 */
+    .comparison-table.curriculum-table th:nth-child(1),
+    .comparison-table.curriculum-table th:nth-child(3),
+    .comparison-table.curriculum-table th:nth-child(5),
+    .comparison-table.curriculum-table th:nth-child(7),
+    .comparison-table.curriculum-table th:nth-child(9),
+    .comparison-table.curriculum-table th:nth-child(11),
+    .comparison-table.curriculum-table td:nth-child(1),
+    .comparison-table.curriculum-table td:nth-child(3),
+    .comparison-table.curriculum-table td:nth-child(5),
+    .comparison-table.curriculum-table td:nth-child(7),
+    .comparison-table.curriculum-table td:nth-child(9),
+    .comparison-table.curriculum-table td:nth-child(11) {
+      width: 10% !important;
+    }
+    
+    /* 학점 컬럼 (2, 4, 6, 8, 10, 12번째) 가로 넓이 지정 */
+    .comparison-table.curriculum-table th:nth-child(2),
+    .comparison-table.curriculum-table th:nth-child(4),
+    .comparison-table.curriculum-table th:nth-child(6),
+    .comparison-table.curriculum-table th:nth-child(8),
+    .comparison-table.curriculum-table th:nth-child(10),
+    .comparison-table.curriculum-table th:nth-child(12),
+    .comparison-table.curriculum-table td:nth-child(2),
+    .comparison-table.curriculum-table td:nth-child(4),
+    .comparison-table.curriculum-table td:nth-child(6),
+    .comparison-table.curriculum-table td:nth-child(8),
+    .comparison-table.curriculum-table td:nth-child(10),
+    .comparison-table.curriculum-table td:nth-child(12) {
+      width: 3% !important;
+    }
+    
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .comparison-table.curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    
+    /* rowspan 셀의 하단 테두리 이중선 제거 - 첫 번째 행의 첫 번째 셀(rowspan="2")의 하단 테두리 제거 */
+    /* 이렇게 하면 rowspan 셀의 중간(첫 번째 행과 두 번째 행 사이)에 테두리가 없어지고,
+       두 번째 행의 하단 테두리만 표시됩니다 */
+    .comparison-table.curriculum-table tbody tr:first-child td[rowspan="2"]:first-child {
+      border-bottom: none !important;
+    }
+    
+    /* 출결상황 표 - "기타" 셀들의 오른쪽 테두리 명시적 추가 */
+    /* 헤더 2행의 "기타" 셀들 (3, 6, 9, 12번째 열) */
+    .comparison-table.curriculum-table thead tr:nth-child(2) th:nth-child(3),
+    .comparison-table.curriculum-table thead tr:nth-child(2) th:nth-child(6),
+    .comparison-table.curriculum-table thead tr:nth-child(2) th:nth-child(9),
+    .comparison-table.curriculum-table thead tr:nth-child(2) th:nth-child(12) {
+      border-right: 1px solid #E5E7EB !important;
+    }
+    
+    /* 데이터 행의 "기타" 셀들 (5, 8, 11, 14번째 열) */
+    .comparison-table.curriculum-table tbody td:nth-child(5),
+    .comparison-table.curriculum-table tbody td:nth-child(8),
+    .comparison-table.curriculum-table tbody td:nth-child(11),
+    .comparison-table.curriculum-table tbody td:nth-child(14) {
+      border-right: 1px solid #E5E7EB !important;
+    }
+    
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    /* 첫 번째 행의 첫 번째 셀 - 상단 왼쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:first-child {
+      border-top-left-radius: 6px !important;
+    }
+    
+    /* 첫 번째 행의 마지막 셀 - 상단 오른쪽 모서리 */
+    .comparison-table.curriculum-table thead tr:first-child th:last-child {
+      border-top-right-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 첫 번째 셀 - 하단 왼쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 6px !important;
+    }
+    
+    /* 마지막 행의 마지막 셀 - 하단 오른쪽 모서리 */
+    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 6px !important;
+      border-right: none !important;
+    }
+    
+    /* 출결상황 표 - 텍스트 잘림 방지 */
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td {
+      white-space: nowrap !important;
+      overflow: visible !important;
+      word-wrap: normal !important;
+      min-width: fit-content !important;
+    }
+    
+    /* 출결상황 표 - table-layout을 auto로 변경하여 컬럼 너비 자동 조정 */
+    .comparison-table.curriculum-table {
+      table-layout: auto !important;
+      width: auto !important;
+      min-width: 100% !important;
+    }
+    
+    /* 출결상황 표 - 첫 번째 셀을 다른 셀과 동일한 스타일로 */
+    .comparison-table.curriculum-table tbody td:nth-child(1) {
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      font-weight: 400 !important;
+      font-size: 13.5px !important;
+      text-align: center !important;
+    }
+    
+    .comparison-table.curriculum-table tbody tr:nth-child(even) td:nth-child(1) {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td:nth-child(1) * {
+      font-size: 13.5px !important;
+      color: var(--color-text) !important;
+    }
+    
+    /* section-block 스타일 */
+    .section-block {
+      margin-top: 0;
+      margin-bottom: 0;
+      border: 1px solid #E5E7EB;
+      border-radius: 4px;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 3mm 8mm;
+      background-color: #3B82F6;
+      text-align: center;
+      box-sizing: border-box;
+      color: #FFFFFF;
+      border-radius: 4px 4px 0 0;
+      margin-bottom: 0;
+    }
+    
+    .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+      padding: 3mm 4mm;
+      background-color: #ffffff;
+      box-sizing: border-box;
+      border-radius: 0 0 4px 4px;
+    }
+    
+    .section-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .section-content li {
+      padding-left: 5mm;
+      position: relative;
+      margin-bottom: 0.8mm;
+    }
+    
+    .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-content li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+    
+    /* 마지막 section-block의 section-content 하단 여백 줄이기 */
+    .section-block:last-child .section-content {
+      padding-bottom: 2mm;
+    }
+    
+    .section-content strong {
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    
+    /* comparison-table 헤더를 section-title과 동일한 스타일로 - 무조건 14px (curriculum-table과 student-info-table 제외) */
+    .comparison-table:not(.curriculum-table):not(.student-info-table) th {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      padding: 3mm 8mm !important;
+      background-color: #3B82F6 !important;
+      text-align: center !important;
+      color: #FFFFFF !important;
+    }
+    
+    .comparison-table:not(.curriculum-table):not(.student-info-table) th * {
+      font-size: 14px !important;
+    }
+    
+    /* comparison-table 본문 글자 크기 13px 및 상하 여백 줄이기 (curriculum-table과 student-info-table 제외) */
+    .comparison-table:not(.curriculum-table):not(.student-info-table) {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table:not(.curriculum-table):not(.student-info-table) * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table:not(.curriculum-table):not(.student-info-table) td {
+      font-size: 14px !important;
+      padding-top: 4mm !important;
+      padding-bottom: 4mm !important;
+    }
+    
+    .comparison-table:not(.curriculum-table):not(.student-info-table) td * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table:not(.curriculum-table):not(.student-info-table) td strong {
+      font-size: 14px !important;
+    }
+    
+    /* 첫 번째 열(단계) 글자 크기 강제 (curriculum-table과 student-info-table 제외) */
+    .comparison-table:not(.curriculum-table):not(.student-info-table) tbody td:nth-child(1),
+    .comparison-table:not(.curriculum-table):not(.student-info-table) tbody td:nth-child(1) *,
+    .comparison-table:not(.curriculum-table):not(.student-info-table) tbody td:nth-child(1) strong {
+      font-size: 13px !important;
+    }
+    
+    /* 두 번째 열(평가 유형) 글자 크기 강제 (curriculum-table과 student-info-table 제외) */
+    .comparison-table:not(.curriculum-table):not(.student-info-table) tbody td:nth-child(2),
+    .comparison-table:not(.curriculum-table):not(.student-info-table) tbody td:nth-child(2) * {
+      font-size: 14px !important;
+    }
+    
+    /* 세 번째 열(내용 및 중요도) 글자 크기 강제 (curriculum-table과 student-info-table 제외) */
+    .comparison-table:not(.curriculum-table):not(.student-info-table) tbody td:nth-child(3),
+    .comparison-table:not(.curriculum-table):not(.student-info-table) tbody td:nth-child(3) * {
+      font-size: 14px !important;
+    }
+    
+    /* 세 번째 열(내용 및 중요도) 좌측 정렬 */
+    .comparison-table td:nth-child(3) {
+      text-align: left !important;
+    }
+    
+    /* comparison-table 컬럼별 가로 넓이 지정 */
+    .comparison-table th:nth-child(1),
+    .comparison-table td:nth-child(1) {
+      width: 20% !important;
+    }
+    
+    .comparison-table th:nth-child(2),
+    .comparison-table td:nth-child(2) {
+      width: 20% !important;
+    }
+    
+    .comparison-table th:nth-child(3),
+    .comparison-table td:nth-child(3) {
+      width: 60% !important;
+    }
+    
+    /* 첫 번째 열(단계) 파란색 배경, 흰색 글씨 - grade-comparison-table과 curriculum-table에는 적용 안 함 */
+    .comparison-table:not(.grade-comparison-table):not(.curriculum-table) tbody td:nth-child(1) {
+      background-color: #3B82F6 !important;
+      color: #FFFFFF !important;
+      text-align: center !important;
+      font-weight: 550 !important;
+    }
+    
+    .comparison-table:not(.grade-comparison-table):not(.curriculum-table) tbody td:nth-child(1) strong {
+      color: #FFFFFF !important;
+      font-weight: 550 !important;
+    }
+    
+    /* grade-comparison-table 스타일 - part2-04.html과 동일 */
+    .grade-comparison-table th,
+    .grade-comparison-table th:nth-child(1),
+    .grade-comparison-table th:nth-child(2),
+    .grade-comparison-table th:nth-child(3) {
+      text-align: center !important;
+    }
+    
+    .grade-comparison-table td,
+    .grade-comparison-table td:nth-child(1),
+    .grade-comparison-table td:nth-child(2),
+    .grade-comparison-table td:nth-child(3) {
+      padding-top: 2mm !important;
+      padding-bottom: 2mm !important;
+      text-align: center !important;
+      font-weight: 400 !important;
+    }
+    
+    .grade-comparison-table:not(.student-info-table) tbody td:nth-child(1) {
+      background-color: transparent !important;
+      color: var(--color-text) !important;
+      text-align: center !important;
+      font-weight: 400 !important;
+      font-size: 14px !important;
+    }
+    
+    /* part3-03.html의 모든 표 글자 크기 강제 적용 (최우선 규칙) */
+    /* 학생정보 표와 출결상황 표: 헤더 13px, 데이터 13.5px (최종 강제 규칙에서 덮어씀) */
+    .student-info-table,
+    .student-info-table *,
+    .student-info-table th,
+    .student-info-table td,
+    .student-info-table th *,
+    .student-info-table td *,
+    .student-info-table tbody td:nth-child(1),
+    .student-info-table tbody td:nth-child(1) *,
+    .student-info-table tbody td:nth-child(2),
+    .student-info-table tbody td:nth-child(2) *,
+    .comparison-table.student-info-table,
+    .comparison-table.student-info-table *,
+    .comparison-table.student-info-table th,
+    .comparison-table.student-info-table td,
+    .comparison-table.student-info-table thead th,
+    .comparison-table.student-info-table thead th *,
+    .comparison-table.student-info-table tbody th,
+    .comparison-table.student-info-table tbody th *,
+    .comparison-table.student-info-table tbody td,
+    .comparison-table.student-info-table tbody td *,
+    .comparison-table.student-info-table th *,
+    .comparison-table.student-info-table td *,
+    .grade-comparison-table.student-info-table,
+    .grade-comparison-table.student-info-table *,
+    .grade-comparison-table.student-info-table th,
+    .grade-comparison-table.student-info-table td,
+    .grade-comparison-table.student-info-table thead th,
+    .grade-comparison-table.student-info-table thead th *,
+    .grade-comparison-table.student-info-table tbody th,
+    .grade-comparison-table.student-info-table tbody th *,
+    .grade-comparison-table.student-info-table tbody td,
+    .grade-comparison-table.student-info-table tbody td *,
+    .grade-comparison-table.student-info-table tbody td:nth-child(1),
+    .grade-comparison-table.student-info-table tbody td:nth-child(1) *,
+    .grade-comparison-table.student-info-table th *,
+    .grade-comparison-table.student-info-table td * {
+      font-size: 12.5px !important;
+    }
+    .comparison-table.curriculum-table,
+    .comparison-table.curriculum-table *,
+    .comparison-table.curriculum-table th,
+    .comparison-table.curriculum-table td,
+    .comparison-table.curriculum-table thead th,
+    .comparison-table.curriculum-table thead th *,
+    .comparison-table.curriculum-table tbody th,
+    .comparison-table.curriculum-table tbody th *,
+    .comparison-table.curriculum-table tbody td,
+    .comparison-table.curriculum-table tbody td *,
+    .comparison-table.curriculum-table tbody td:nth-child(1),
+    .comparison-table.curriculum-table tbody td:nth-child(1) *,
+    .comparison-table.curriculum-table th *,
+    .comparison-table.curriculum-table td * {
+      font-size: 12px !important;
+    }
+    
+    .grade-comparison-table th:nth-child(1),
+    .grade-comparison-table td:nth-child(1) {
+      width: 20% !important;
+    }
+    
+    .grade-comparison-table th:nth-child(2),
+    .grade-comparison-table td:nth-child(2) {
+      width: 20% !important;
+    }
+    
+    .grade-comparison-table th:nth-child(3),
+    .grade-comparison-table td:nth-child(3) {
+      width: 60% !important;
+    }
+    
+    /* comparison-container 및 comparison-card 스타일 */
+    .comparison-container {
+      display: flex;
+      gap: 6mm;
+      margin-top: 2mm;
+      margin-bottom: 3mm;
+    }
+    
+    .comparison-card {
+      flex: 1;
+      border-radius: 6px;
+      padding: 5mm;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.left {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .comparison-card.right {
+      background-color: #ffffff;
+      border: 1.5px solid #E5E7EB;
+    }
+    
+    .card-header {
+      text-align: center;
+      padding: 4mm 3mm;
+      margin: -5mm -5mm 4mm -5mm;
+      background-color: var(--color-primary);
+      color: #ffffff;
+      border-radius: 6px 6px 0 0;
+      border-bottom: none;
+    }
+    
+    .card-header.left {
+      background-color: var(--color-primary);
+    }
+    
+    .card-header.right {
+      background-color: #1653c9;
+    }
+    
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .card-subtitle {
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.9;
+      margin-bottom: 0mm;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .comparison-card .section-block {
+      margin-top: 1.5mm;
+      margin-bottom: 2mm;
+      background-color: #FAFAFA;
+      border: 1px solid #F0F0F0;
+      border-radius: 8px;
+      padding: 2.5mm;
+    }
+    
+    .comparison-card .section-block:first-of-type {
+      margin-top: 1mm;
+    }
+    
+    .comparison-card .section-block:last-of-type {
+      margin-bottom: 1mm;
+    }
+    
+    .comparison-card .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3mm;
+      padding-bottom: 3.5mm;
+      border-bottom: 1.5px solid #E5E7EB;
+      color: var(--color-text);
+      background-color: transparent;
+      text-align: left;
+      padding: 0 0 3.5mm 0;
+    }
+    
+    .comparison-card .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+      padding: 0;
+      background-color: transparent;
+    }
+    
+    .comparison-card .section-content li {
+      padding-left: 5.5mm;
+      position: relative;
+      margin-bottom: 2mm;
+      line-height: 1.8;
+    }
+    
+    .comparison-card .section-content li:first-child {
+      margin-top: 1mm;
+    }
+    
+    .comparison-card .section-content li:last-child {
+      margin-bottom: 1mm;
+    }
+    
+    .comparison-card .section-content li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+    
+    .comparison-card .section-content ul ul {
+      margin-top: 2mm;
+      margin-bottom: 0;
+    }
+    
+    .comparison-card .section-content ul ul li {
+      padding-left: 8mm;
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 1.5mm;
+    }
+    
+    .comparison-card .section-content ul ul li::before {
+      content: '-';
+      position: absolute;
+      left: 5.5mm;
+      top: 0;
+      color: #6B7280;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    
+    .conclusion-box {
+      margin-top: 3mm;
+      border: 1px solid #3B82F6;
+      padding: 2.5mm 2mm;
+      font-size: 13.5px !important;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      background-color: #FAFAFA;
+      color: #3B82F6;
+      border-radius: 4px;
+    }
+    
+    /* 대화 가이드 섹션 */
+    .guide-section {
+      margin-top: -1mm;
+      margin-bottom: 2mm;
+      display: flex;
+      flex-direction: column;
+      gap: 4mm;
+    }
+    
+    .guide-card {
+      background-color: #FFFFFF;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 6px;
+      padding: 3mm;
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+    }
+    
+    .guide-header {
+      display: flex;
+      align-items: center;
+      gap: 2.5mm;
+    }
+    
+    .guide-number {
+      flex-shrink: 0;
+      color: var(--color-primary);
+      font-size: 16px;
+      margin-left: 1.5mm;
+      font-weight: 850;
+      -webkit-text-stroke: 0.3px var(--color-primary);
+      line-height: 2;
+      display: flex;
+      align-items: center;
+    }
+    
+    .guide-title {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 2;
+      display: flex;
+      align-items: center;
+    }
+    
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5mm;
+    }
+    
+    .guide-example {
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 2mm 2.5mm;
+      border-radius: 4px;
+      background-color: #FAFAFA;
+      display: flex;
+      align-items: center;
+      gap: 2mm;
+    }
+    
+    .guide-icon {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+    
+    .guide-example.bad .guide-icon {
+      color: #DC2626;
+    }
+    
+    .guide-example.good .guide-icon {
+      color: var(--color-primary);
+    }
+    
+    .guide-text {
+      flex: 1;
+    }
+    
+    .guide-example.bad .guide-text {
+      color: var(--color-text);
+      font-weight: 400;
+    }
+    
+    .guide-example.good .guide-text {
+      color: var(--color-text);
+      font-weight: 400;
+    }
+    
+    /* 학생정보 표 스타일 - part2-07.html 디자인 적용 */
+    .student-info-table {
+      font-size: 12.5px !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+    }
+    
+    .student-info-table * {
+      font-size: 12.5px !important;
+    }
+    
+    .comparison-table.student-info-table th,
+    .grade-comparison-table.student-info-table th,
+    .student-info-table th {
+      text-align: center !important;
+      padding-left: 4mm !important;
+      padding-right: 4mm !important;
+      font-size: 12.5px !important;
+    }
+    
+    .comparison-table.student-info-table th *,
+    .grade-comparison-table.student-info-table th *,
+    .student-info-table th * {
+      font-size: 12.5px !important;
+    }
+    
+    .student-info-table tbody tr {
+      background-color: #ffffff !important;
+    }
+    
+    .student-info-table tbody tr:nth-child(even) {
+      background-color: #ffffff !important;
+    }
+    
+    .comparison-table.student-info-table td,
+    .grade-comparison-table.student-info-table td,
+    .student-info-table td {
+      padding-top: 2mm !important;
+      padding-bottom: 2mm !important;
+      padding-left: 4mm !important;
+      padding-right: 4mm !important;
+      text-align: left !important;
+      font-weight: 400 !important;
+      font-size: 13.5px !important;
+      background-color: #ffffff !important;
+      color: var(--color-text) !important;
+      line-height: 1.8;
+      vertical-align: middle;
+    }
+    
+    .comparison-table.student-info-table td *,
+    .grade-comparison-table.student-info-table td *,
+    .student-info-table td * {
+      font-size: 13.5px !important;
+    }
+    
+    .comparison-table.student-info-table tbody td:nth-child(1),
+    .comparison-table.student-info-table tbody td:nth-child(1) *,
+    .grade-comparison-table.student-info-table tbody td:nth-child(1),
+    .grade-comparison-table.student-info-table tbody td:nth-child(1) * {
+      font-size: 12.5px !important;
+    }
+    
+    /* student-info-table 모서리 둥글기 - curriculum-table과 동일하게 */
+    .comparison-table.student-info-table,
+    .grade-comparison-table.student-info-table {
+      border-radius: 6px !important;
+      overflow: hidden !important;
+    }
+    
+    .comparison-table.student-info-table th,
+    .comparison-table.student-info-table td,
+    .grade-comparison-table.student-info-table th,
+    .grade-comparison-table.student-info-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    .comparison-table.student-info-table tbody tr:first-child th:first-child,
+    .grade-comparison-table.student-info-table tbody tr:first-child th:first-child {
+      border-top-left-radius: 6px !important;
+    }
+    
+    .comparison-table.student-info-table tbody tr:first-child th:last-child,
+    .comparison-table.student-info-table tbody tr:first-child td:last-child,
+    .grade-comparison-table.student-info-table tbody tr:first-child th:last-child,
+    .grade-comparison-table.student-info-table tbody tr:first-child td:last-child {
+      border-top-right-radius: 6px !important;
+    }
+    
+    .comparison-table.student-info-table tbody tr:last-child td:first-child,
+    .grade-comparison-table.student-info-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: 6px !important;
+    }
+    
+    .comparison-table.student-info-table tbody tr:last-child th:first-child,
+    .grade-comparison-table.student-info-table tbody tr:last-child th:first-child {
+      border-bottom-left-radius: 0 !important;
+      border-bottom: none !important;
+    }
+    
+    .comparison-table.student-info-table tbody tr:last-child th,
+    .grade-comparison-table.student-info-table tbody tr:last-child th {
+      border-bottom: none !important;
+    }
+    
+    .comparison-table.student-info-table tbody tr:last-child td,
+    .grade-comparison-table.student-info-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    
+    .comparison-table.student-info-table tbody tr:last-child td:last-child,
+    .grade-comparison-table.student-info-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: 6px !important;
+    }
+    
+    .student-info-table th {
+      vertical-align: middle;
+    }
+    
+    .student-info-table th:nth-child(1),
+    .student-info-table td:nth-child(1) {
+      width: 10% !important;
+    }
+    
+    .student-info-table th:nth-child(2),
+    .student-info-table td:nth-child(2) {
+      width: 90% !important;
+      text-align: left !important;
+    }
+    
+    /* 최종 강제: 출결상황 표와 학생정보 표의 텍스트 크기 설정 (최우선 최종 규칙) */
+    /* 출결상황 표: 헤더 12.5px, 데이터 13.5px */
+    .comparison-table.curriculum-table thead th,
+    .comparison-table.curriculum-table thead th * {
+      font-size: 12.5px !important;
+    }
+    
+    .comparison-table.curriculum-table tbody td,
+    .comparison-table.curriculum-table tbody td *,
+    .comparison-table.curriculum-table tbody td:nth-child(1),
+    .comparison-table.curriculum-table tbody td:nth-child(1) * {
+      font-size: 13.5px !important;
+    }
+    
+    /* 학생정보 표: 헤더 12.5px, 데이터 13.5px */
+    .comparison-table.student-info-table th,
+    .comparison-table.student-info-table thead th,
+    .comparison-table.student-info-table thead th *,
+    .comparison-table.student-info-table th *,
+    .grade-comparison-table.student-info-table th,
+    .grade-comparison-table.student-info-table thead th,
+    .grade-comparison-table.student-info-table thead th *,
+    .grade-comparison-table.student-info-table th *,
+    .student-info-table th,
+    .student-info-table th * {
+      font-size: 12.5px !important;
+    }
+    
+    .comparison-table.student-info-table td,
+    .comparison-table.student-info-table tbody td,
+    .comparison-table.student-info-table tbody td *,
+    .comparison-table.student-info-table td *,
+    .grade-comparison-table.student-info-table td,
+    .grade-comparison-table.student-info-table tbody td,
+    .grade-comparison-table.student-info-table tbody td *,
+    .grade-comparison-table.student-info-table td *,
+    .student-info-table td,
+    .student-info-table td * {
+      font-size: 13.5px !important;
+    }
+    
+    /* 최종 강제: 수상경력 표 마지막 컬럼 오른쪽 테두리 제거 (최우선 최종 규칙) */
+    .comparison-table.curriculum-table thead th:last-child,
+    .comparison-table.curriculum-table tbody td:last-child,
+    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
+      border-right: none !important;
+    }
+    
+    /* 학교폭력 조치상황 표 - 헤더 배경색 빨간색으로 변경 */
+    .comparison-table.violence-table thead th {
+      background-color: #DC2626 !important;
+    }
+    
+    /* 학교폭력 조치상황 표 - 컬럼 너비 지정 */
+    .comparison-table.violence-table th:nth-child(1),
+    .comparison-table.violence-table td:nth-child(1) {
+      width: 15% !important;
+    }
+    
+    .comparison-table.violence-table th:nth-child(2),
+    .comparison-table.violence-table td:nth-child(2) {
+      width: 20% !important;
+    }
+    
+    .comparison-table.violence-table th:nth-child(3),
+    .comparison-table.violence-table td:nth-child(3) {
+      width: 65% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 2. 2022 개정 학생부 구성
+    </h2>
+    
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3">2-1. 학교생활 기본 이력</h3>
+
+    <div class="text-body" style="margin-bottom: 2mm;">
+      ① 인적∙학적사항
+    </div>
+
+    <div class="text-body" style="margin-bottom: 3mm;">
+      위 항목은 학생의 기본 신상과 학교 이력을 정리한 부분으로, 대입 전형의 평가 요소에는 포함되지 않습니다. 다만 필요할 경우, 지원 자격 확인을 위한 행정 자료로 활용됩니다.
+    </div>
+
+    <!-- 학생정보 표 -->
+    <table class="comparison-table grade-comparison-table student-info-table" style="margin-top: 1mm; margin-bottom: 3mm;">
+      <tbody>
+        <tr>
+          <th style="padding: 2mm 2mm !important; height: 2mm !important;">학생정보</th>
+          <td>
+            <span style="display: inline-block; margin-right: 8mm;">성명 : 김메가</span>
+            <span style="display: inline-block; margin-right: 8mm;">성별 : 남</span>
+            <span style="display: inline-block;">주민등록번호 : 123456-1234567</span><br>
+            주소 : 가상특별시 메가구 스터디로 12, 3동 456호
+          </td>
+        </tr>
+        <tr>
+          <th style="padding: 2mm 2mm !important; height: 2mm !important;">학적사항</th>
+          <td>
+            2025년 01월 08일 메가중학교 제3학년 졸업<br>
+            2025년 03월 01일 메가고등학교 제1학년 입학
+          </td>
+        </tr>
+        <tr>
+          <th style="padding: 5.5mm 2mm !important; height: 5.5mm !important;">특기사항</th>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text-body" style="margin-top: 1mm; margin-bottom: 2mm;">
+      ② 출결상황
+    </div>
+
+    <div class="text-body" style="margin-bottom: 2mm;">
+      위 항목은 결석·지각·조퇴 여부를 통해 성실성을 판단하는 부분입니다. 질병·공결은 문제가 되지 않지만, 미인정 출결은 감점 요인이므로 사정이 있는 경우 선생님께 증빙서류를 제출해 인정결석으로 처리해야 합니다.
+    </div>
+
+    <!-- 출결상황 표 -->
+    <table class="comparison-table curriculum-table" style="margin-top: 2mm;">
+      <thead>
+        <tr>
+          <th rowspan="2" style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">학년</th>
+          <th rowspan="2" style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">수업일수</th>
+          <th colspan="3" style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">결석일수</th>
+          <th colspan="3" style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">지각</th>
+          <th colspan="3" style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">조퇴</th>
+          <th colspan="3" style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">결과</th>
+          <th rowspan="2" style="padding: 2mm 2mm !important; height: 2mm !important;">특기사항</th>
+        </tr>
+        <tr>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">질병</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">미인정</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">기타</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">질병</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">미인정</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">기타</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">질병</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">미인정</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">기타</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">질병</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">미인정</th>
+          <th style="padding: 1.6mm 2mm !important; height: 1.6mm !important;">기타</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>165</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td>.</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text-body" style="margin-top: 1mm; margin-bottom: 2mm;">
+      ③ 학교폭력 조치상황 관리
+    </div>
+
+    <div class="text-body" style="margin-bottom: 2mm;">
+      위 항목은 학교폭력 관련 기록을 확인하는 부분으로, 학교폭력 조치(1호~9호)는 많은 대학에서 불합격 사유로 판단합니다. 따라서 교과 성적이나 비교과 활동이 아무리 우수하더라도, 평가가 불리해질 수 있습니다.
+    </div>
+
+    <!-- 학교폭력 조치상황 표 -->
+    <table class="comparison-table curriculum-table violence-table" style="margin-top: 2mm;">
+      <thead>
+        <tr>
+          <th style="padding: 2mm 2mm !important; height: 1.6mm !important;">학년</th>
+          <th style="padding: 2mm 2mm !important; height: 1.6mm !important;">조치결정 일자</th>
+          <th style="padding: 2mm 2mm !important; height: 1.6mm !important;">조치사항</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="3">해당 사항 없음</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 18 -</div>
+  </div>
+</body>
+</html>

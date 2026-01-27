@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트2-02</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="page">
+    <!-- 리포트 스타일 대제목 -->
+    <h1 class="report-title">
+      <span class="report-title-badge">PART 2</span>
+      <span class="report-title-text">고교학점제와 2022 개정 교육과정</span>
+    </h1>
+    
+    <!-- 본문 -->
+    <div class="text-body">
+        고교학점제 교육과정은 1학년(공통) 기초 과정 위에 2·3학년(선택) 심화 과정을 쌓는 구조입니다. 변화하는 과목 구조를 이해하고, 자신의 진로와 적성에 맞춰 과목을 선택하는 것이 대입 성공의 첫걸음입니다.
+    </div>
+    
+    <!-- 중제목 (본문과의 실제 간격 2mm) -->
+    <h2 class="title-2" style="margin-top: 0mm;">
+      Chapter 1. 2022 개정 교육과정 이해
+    </h2>
+    
+    <!-- 소제목 1-1 -->
+    <h3 class="title-3">1-1. 보통교과 구조 (공통과목/일반선택/진로선택/융합선택)</h3>
+    
+    <div class="text-body">
+        공통과목·일반선택 교과는 '기초적인 학업역량'을 다지는 역할을 하고, 진로선택·융합선택 교과는 '전공과의 연계성과 학업 심화 수준'을 보여주는 핵심 과목군입니다.
+    </div>
+
+    <!-- 보통교과 구조 다이어그램 -->
+    <div class="report-box" style="margin-top: 1mm; border: none; padding: 0;">
+      <!-- 1학년(공통과목) 레이블 -->
+      <div style="margin-bottom:4mm;">
+        <div style="display:block; width: 100%; padding: 2mm 8mm; background-color:#3B82F6; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 4px;">
+          1학년
+        </div>
+      </div>
+
+      <!-- 1학년 공통과목 + 대학의 평가 포인트 (하나의 박스 안에) -->
+      <div style="border: 1px solid #E5E7EB; padding: 1mm 4mm; box-sizing: border-box; background-color:#ffffff; margin-bottom: 3mm; border-radius: 4px;">
+        <div style="display:flex; gap: 4mm; align-items: stretch; margin-top: 3.5mm;">
+          <!-- ① 공통과목 박스 -->
+          <div style="flex: 1.8;">
+            <div style="font-size:14px !important; font-weight:600; margin-bottom:1.5mm; color: #1F2937";>① 공통과목</div>
+            <div class="text-small" style="margin-top:0; font-size:14px !important;">
+              공통국어1/2, 공통수학 1/2, 기본수학 1/2, 공통영어 1/2, 기본영어 1/2, 한국사1/2, 통합사회1/2, 통합과학1/2, 과학탐구실험1/2
+            </div>
+          </div>
+
+          <!-- 대학의 평가 포인트 박스 -->
+          <div style="flex: 1.2; border: 1px solid #3B82F6; padding: 6.5mm 4mm; box-sizing: border-box; display:flex; align-items:center; justify-content:center; background-color:#FAFAFA; align-self: flex-start; border-radius: 4px;">
+            <div style="text-align:center; font-size:13.5px !important; font-weight:700; color: #3B82F6; line-height:1.3;">기초 학업역량 평가</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 아래로 화살표 -->
+      <div style="text-align:center; margin: 3mm 0 3mm 0; font-size:15px !important; color: #6b7280;">
+        ↓
+      </div>
+
+      <!-- 2·3학년(선택과목) 레이블 -->
+      <div style="margin-bottom:4mm;">
+        <div style="display:block; width: 100%; padding: 2mm 8mm; background-color:#3B82F6; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 4px;">
+          2·3학년
+        </div>
+      </div>
+
+      <!-- ② 일반선택 / ③ 진로선택 / ④ 융합선택 박스 (가로 배치) -->
+      <div style="display:flex; gap: 3mm;">
+        <!-- ② 일반선택 -->
+        <div style="flex:1; border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing:border-box; background-color:#ffffff; border-radius: 4px;">
+          <div style="font-size:14px !important; font-weight:600; margin-bottom:1.5mm; color: #1F2937";>② 일반선택</div>
+          <div class="text-small" style="margin-top:0; font-size:14px !important;">
+            화법과언어, 확률과 통계, 영어 독해와 작문, 세계사, 물리학 등
+          </div>
+          <div style="margin-top:3mm; border: 1px solid #3B82F6; padding: 2.5mm 2mm; font-size:13.5px !important; font-weight:700; line-height:1.5; text-align:center; background-color:#FAFAFA; color: #3B82F6; border-radius: 4px;">
+            학업 성실성 평가
+          </div>
+        </div>
+
+        <!-- ③ 진로선택 -->
+        <div style="flex:1; border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing:border-box; background-color:#ffffff; border-radius: 4px;">
+          <div style="font-size:14px !important; font-weight:600; margin-bottom:1.5mm; color: #1F2937";>③ 진로선택</div>
+          <div class="text-small" style="margin-top:0; font-size:14px !important;">
+            주제 탐구 독서, 영미 문학 읽기, 한국지리 탐구, 전자기와 양자 등
+          </div>
+          <div style="margin-top:3mm; border: 1px solid #3B82F6; padding: 2.5mm 2mm; font-size:13.5px !important; font-weight:700; line-height:1.5; text-align:center; background-color:#FAFAFA; color: #3B82F6; border-radius: 4px;">
+            전공 적합성 평가
+          </div>
+        </div>
+
+        <!-- ④ 융합선택 -->
+        <div style="flex:1; border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing:border-box; background-color:#ffffff; border-radius: 4px;">
+          <div style="font-size:14px !important; font-weight:600; margin-bottom:1.5mm; color: #1F2937";>④ 융합선택</div>
+          <div class="text-small" style="margin-top:0; font-size:14px !important;">
+            매체 의사소통, 수학과 문학, 미디어 영어, 여행지리, 논술 등
+          </div>
+          <div style="margin-top:3mm; border: 1px solid #3B82F6; padding: 2.5mm 2mm; font-size:13.5px !important; font-weight:700; line-height:1.5; text-align:center; background-color:#FAFAFA; color: #3B82F6; border-radius: 4px;">
+            융합 사고력 평가
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3">1-2. 등급 구조의 변화 (1등급 확대)</h3>
+    
+    <div class="text-body" style="margin-top: 1mm;">
+      9등급제에서는 상위 약 4%만 1등급이었지만, 5등급제에서는 상위 약 10%가 1등급이 됩니다. 따라서 대학은 등급 숫자만으로는 변별이 어려워져 원점수·성취도(A~E)·세특 내용까지 종합적으로 평가합니다.
+    </div>
+
+    <!-- 등급제 비교 다이어그램: 표 형태로 밀착 배치 -->
+    <div class="report-box" style="margin-top: 1mm; border: 1px solid #E5E7EB; padding: 0; box-sizing: border-box; overflow: hidden; border-radius: 4px;">
+      <div style="display: flex; gap: 0; align-items: stretch;">
+        <!-- 과거 9등급제 -->
+        <div style="flex: 1; border-right: 1px solid #E5E7EB; box-sizing: border-box;">
+          <div style="padding: 2mm 8mm; background-color:#3B82F6; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 4px 0 0 0;">
+            과거 9등급제
+          </div>
+          <div style="padding: 4mm 4mm; background-color: #ffffff; text-align: center; box-sizing: border-box;">
+            <div style="font-size: 14px !important; font-weight: 600; margin-bottom: 1mm; color: #1F2937;">1등급 = 4%</div>
+            <div style="font-size: 14px !important; color: #6b7280;">등급 간 변별력 높음</div>
+          </div>
+        </div>
+        <!-- 현재 5등급제 -->
+        <div style="flex: 1; box-sizing: border-box;">
+          <div style="padding: 2mm 8mm; background-color:#1653c9; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 0 4px 0 0;">
+            현재 5등급제
+          </div>
+          <div style="padding: 4mm 4mm; background-color: #ffffff; text-align: center; box-sizing: border-box;">
+            <div style="font-size: 14px !important; font-weight: 600; margin-bottom: 1mm; color: #1F2937;">1등급 = 10%</div>
+            <div style="font-size: 14px!important; color: #6b7280;">상위권 학생 범위 확대</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 10 -</div>
+  </div>
+</body>
+</html>

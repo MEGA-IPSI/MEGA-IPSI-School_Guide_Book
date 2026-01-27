@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트3-01</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../styles.css">
+
+  <style>
+    :root{
+      --blue:#1653c9;
+      --blue-light:#03c6fc;
+      --text:#1F2937;
+      --muted:#6B7280;
+      --paper:#ffffff;
+      --bg:#e7e7eb;
+    }
+
+    body.part1-00-body {
+      background: var(--bg);
+      font-family: "Noto Sans KR", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .part1-00-page {
+      width: 210mm;
+      height: 297mm;
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
+      padding: var(--page-padding-top) var(--page-padding-right) var(--page-padding-bottom) var(--page-padding-left);
+      display: block !important;
+      box-sizing: border-box;
+    }
+
+    @media screen {
+      .part1-00-page {
+        border: 2px solid #3B82F6;
+      }
+    }
+
+    @media print {
+      body.part1-00-body { margin: 0; padding: 0; background-color: white; }
+      .part1-00-page { border: none; }
+    }
+
+    /* ===== 개선된 디자인 ===== */
+    .content-area{
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 30mm 32mm 30mm 15mm;
+      box-sizing: border-box;
+    }
+
+    /* 은은한 배경 장식 (책 느낌) */
+    .content-area::before{
+      content:"";
+      position:absolute;
+      top: 18mm;
+      right: -18mm;
+      width: 90mm;
+      height: 230mm;
+      background: rgba(22,83,201,0.05);
+      border-radius: 40mm;
+      transform: rotate(10deg);
+      pointer-events:none;
+    }
+
+    /* 상단 라벨 + 캡슐 */
+    .chapter-label{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      padding: 6px 10px;
+      border: 1px solid rgba(22,83,201,0.22);
+      border-radius: 999px;
+      background: rgba(22,83,201,0.04);
+      margin-bottom: 10mm;
+    }
+
+    /* 큰 번호: 워터마크 + 실제 텍스트 분리 */
+    .chapter-number-wrap{
+      position: relative;
+      margin-bottom: 18mm;
+      margin-left: -2mm;
+    }
+
+    .chapter-number{
+      font-size: 110px;
+      font-weight: 800;
+      color: #2563EB;    
+      ; /* 워터마크 */
+      line-height: 1;
+      letter-spacing: -4px;
+      margin: 0;
+      user-select:none;
+    }
+
+    /* 파란 포인트 라인 */
+    .accent-line{
+      width: 90mm;
+      height: 2px;
+      background: #2563EB;      
+      border-radius: 2px;
+      margin: 10mm 0 15mm 0;
+    }
+
+    /* 타이틀 */
+    .main-title{
+      font-size: 33px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.35;
+      letter-spacing: -0.8px;
+      margin: 0;
+      max-width: 150mm;
+    }
+
+    /* 서브 카피(지금은 내용 유지해야 해서 타이틀 아래 보조 문장처럼) */
+    .subtitle{
+      font-size: 17px;
+      font-weight: 405;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-top: 6mm;
+      margin-left: 0.3mm;
+      max-width: 150mm;
+    }
+
+    /* 리스트 카드 느낌 - 배경 박스 제거 */
+    .chapter-card{
+      margin-top: 12mm;
+      padding: 0;
+      max-width: 120mm;
+    }
+
+    .chapter-list{
+      list-style:none;
+      padding: 0;
+      margin: 0;
+      counter-reset: item;
+    }
+
+    .chapter-list li{
+      counter-increment: item;
+      display:flex;
+      align-items:center;
+      gap: 4mm;
+      padding: 2.8mm 0;
+      font-size: 15.5px;
+      font-weight: 400;
+      color: var(--text);
+      letter-spacing: -0.1px;
+      line-height: 1.5;
+    }
+
+    .chapter-list li:first-child{ padding-top: 0; }
+
+    /* 번호 뱃지 - 심플하고 세련된 디자인 */
+    .chapter-list li::before{
+      content: counter(item);
+      flex: 0 0 auto;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #1653c9;      
+      border: 1px solid #1653c9;
+      box-shadow: 0 0 0 0.5px #1653c9;      
+    }
+  </style>
+
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+</head>
+
+<body class="part1-00-body">
+  <div class="page part1-00-page">
+    <div class="content-area">
+
+      <div class="chapter-number-wrap">
+        <div class="chapter-number">03</div>
+      </div>
+
+      <div class="main-title">대입 전략의 출발점인 학교생활기록부</div>
+      <div class="subtitle">대입 전형 전반에서 핵심 기준으로 활용되는 학생부 완벽 이해</div>
+      <div class="accent-line"></div>
+
+      <div class="chapter-card">
+        <ol class="chapter-list">
+          <li>학생부의 역할과 중요성</li>
+          <li>2022 개정 학생부 구성</li>
+          <li>학생부의 실제 사례 분석</li>
+        </ol>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

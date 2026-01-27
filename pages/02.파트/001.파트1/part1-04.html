@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트1-04</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 2. 학년별 적용되는 제도 이해
+    </h2>
+    
+    <!-- 소제목 -->
+    <h3 class="title-3">2-1. 학생부 내신 : 5등급제 vs 9등급제</h3>
+    
+    <!-- 상단 설명 -->
+    <div class="text-body" style="margin-bottom: 3mm;">
+      고등학교 성적은 수시(교과·종합) 전형의 핵심 자료입니다. 하지만 학년마다 적용되는 제도(등급체계·교육과정·수능구조)가 다르기 때문에 먼저 '내가 어떤 제도에 해당하는지'를 정확히 아는 것이 중요합니다.
+    </div>
+    
+    <!-- 비교 차트 박스 -->
+    <div class="report-box" style="margin-top: 2mm;">
+      <h4 class="title-3" style="text-align:center; margin:2mm 0 4mm 0; color:#555; font-size:16px !important;">9등급제 vs 5등급제 비율 비교</h4>
+
+      <div style="display:flex; align-items:center; justify-content:center; gap: 8mm; padding: 5mm 4mm 2mm 4mm; box-sizing: border-box;">
+        
+        <div style="text-align:center; width: 32mm;">
+          <!-- ✅ 9등급제 파이 차트 (상위 4% 정확 각도 적용) -->
+          <svg width="32mm" height="32mm" viewBox="0 0 100 100"
+               style="margin:0 auto 2mm auto; display:block; font-size: 12px !important;"
+               shape-rendering="geometricPrecision">
+            <!-- 배경 원 -->
+            <circle cx="50" cy="50" r="50" fill="#eef0f3"/>
+            <!-- 상위 4% 조각 (14.4°) : 시작점 12시(50,0) → 시계방향 -->
+            <path d="M 50 50 L 50 0 A 50 50 0 0 1 62.43 1.57 Z" fill="#6b7280"/>
+            <!-- 중앙 텍스트 -->
+            <text x="50" y="60" text-anchor="middle" dominant-baseline="middle"
+                  font-weight="700" font-size="12" fill="#6b7280" style="font-size: 12px !important;">9등급제</text>
+          </svg>
+
+          <div style="font-size:14px !important; color:#6b7280; font-weight:700;">상위 4%</div>
+        </div>
+
+        <div style="font-size:15px !important; color:#6b7280; line-height:1; display:flex; align-items:center; justify-content:center; transform: scale(1.5) translateY(-5px);">→</div>
+
+        <div style="text-align:center; width: 32mm;">
+          <!-- ✅ 5등급제 파이 차트 (상위 10% 정확 각도 적용) -->
+          <svg width="32mm" height="32mm" viewBox="0 0 100 100"
+               style="margin:0 auto 2mm auto; display:block; font-size: 12px !important;"
+               shape-rendering="geometricPrecision">
+            <!-- 배경 원 -->
+            <circle cx="50" cy="50" r="50" fill="#dbeafe"/>
+            <!-- 상위 10% 조각 (36°) : 시작점 12시(50,0) → 시계방향 -->
+            <path d="M 50 50 L 50 0 A 50 50 0 0 1 79.39 9.55 Z" fill="#3B82F6"/>
+            <!-- 중앙 텍스트 -->
+            <text x="50" y="60" text-anchor="middle" dominant-baseline="middle"
+                  font-weight="700" font-size="12" fill="#3B82F6" style="font-size: 12px !important;">5등급제</text>
+          </svg>
+
+          <div style="font-size:14px !important; color:#3B82F6; font-weight:700;">상위 10%</div>
+        </div>
+
+      </div>
+
+      <p class="img-caption" style="margin-top:3mm; margin-bottom:2mm; font-size:15px !important;">
+        1등급에 해당하는 학생 비율이 9등급제 대비 5등급제가 약 2.5배 높습니다.
+      </p>
+    </div>
+    
+    <!-- 비교 테이블 -->
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th style="width: 50%;">고3 (2024 입학)</th>
+          <th style="width: 50%; background-color: #1653c9;">고1·고2 (2025 이후 입학)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="width: 50%;">9등급제 + 표준편차</td>
+          <td style="width: 50%;">5등급제 + 성취도 (A~E)</td>
+        </tr>
+        <tr>
+          <td style="width: 50%;">1등급: 상위 4%<br>2등급: 누적 11%<br>3등급: 누적 23%</td>
+          <td style="width: 50%;">1등급: 상위 10%<br>2등급: 누적 34%<br>3등급: 누적 66%</td>
+        </tr>
+        <tr>
+          <td style="width: 50%;">소수점 차이로 등급 갈림</td>
+          <td style="width: 50%;">내신 등급 경쟁 다소 완화</td>
+        </tr>
+        <tr>
+          <td style="width: 50%;">등급 관리가 최우선 과제</td>
+          <td style="width: 50%;">세특, 과목선택, 원점수 중요도 상승</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 심플한 정보 박스 -->
+    <div class="info-box" style="margin-top:3mm;">
+      <div class="info-title">5등급제 시대의 변화 (고1·고2 필독)</div>
+      <div class="text-small">
+        통합형 수능 도입으로 정시에서 학생부 반영 가능성이 커지면서, 대학은 단순 내신 등급보다 <strong>어떤 과목을 이수했고 수업 시간에 어떤 학습 과정을 보였는지(세특)</strong>를 꼼꼼히 살펴보는 방향으로 평가를 강화하고 있습니다.
+      </div>
+    </div>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 6 -</div>
+  </div>
+</body>
+</html>

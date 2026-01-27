@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>목차</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../styles.css" />
+
+  <script>
+    (function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get("flipbook") === "1";
+
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          document.body.style.margin = "0";
+          document.body.style.padding = "0";
+          document.body.style.background = "white";
+          document.body.style.display = "block";
+          document.body.style.overflow = "hidden";
+          document.body.style.width = "100%";
+          document.body.style.height = "100%";
+
+          const pageElement = document.querySelector(".page");
+          if (pageElement) {
+            pageElement.style.margin = "0";
+            pageElement.style.border = "none";
+
+            const a4WidthPx = 210 * 3.7795;
+            const a4HeightPx = 297 * 3.7795;
+
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = "top left";
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+
+            window.addEventListener("message", function (event) {
+              if (event.data && event.data.type === "flipbook-resize") {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+
+        let resizeTimer;
+        window.addEventListener("resize", function () {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+
+<style>
+  /* 페이지 베이스 */
+  .toc-page{
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    background:#fff;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding: 0mm 0mm;
+    box-sizing:border-box;
+  }
+
+  /* 상단 타이틀 */
+  .toc-main-title{
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight:900;
+    font-size:45px;
+    letter-spacing:0.02em;
+    color:#2563EB;
+    line-height:1;
+    text-align:center;
+    margin-bottom:2mm;
+    margin-top:-5mm;
+    padding-top:0;
+    transform: scaleY(1.1);
+  }
+
+  /* 목차 섹션들 */
+  .toc-sections{
+    display:flex;
+    flex-direction:column;
+    gap:3mm;
+    width:100%;
+    margin-top:0;
+    background: rgba(60,90,150,0.04);
+    padding:10mm 10mm 5mm 10mm;
+    position:relative;
+    border-radius:0mm;
+  }
+
+
+  /* 각 섹션 */
+  .toc-section{
+    display:flex;
+    flex-direction:column;
+    gap:2mm;
+  }
+
+  /* 마지막 섹션 하단 여백 */
+  .toc-section:last-child{
+    margin-bottom:1mm;
+  }
+
+  /* 섹션 상단 구분선 */
+  .section-line{
+    width:100%;
+    height:2px;
+    background:#2563EB;
+  }
+
+  /* 섹션 헤더 (번호 + 제목) */
+  .section-header{
+    font-family:"Noto Sans KR", sans-serif;
+    font-weight:500;
+    font-size:13px;
+    color:#1F2937;
+    letter-spacing:-0.3px;
+    line-height:1.4;
+    margin-top:1mm;
+    margin-bottom:0;
+    padding-left:0.5mm;
+  }
+
+  /* 하위 항목들 */
+  .section-items{
+    display:flex;
+    flex-direction:column;
+    gap:1.5mm;
+    padding-left:1mm;
+    padding-right:1.5mm;
+    margin-top:0.5mm;
+  }
+
+  /* 섹션 항목 내 마지막 구분선 여백 */
+  .section-items .section-line:last-child{
+    margin-top:1mm;
+  }
+
+  /* 각 항목 */
+  .section-item{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    column-gap:3mm;
+  }
+
+  /* 항목 텍스트 */
+  .item-text{
+    font-family:"Noto Sans KR", sans-serif;
+    font-weight:400;
+    font-size:12.5px;
+    color:#1F2937;;
+    letter-spacing:-0.2px;
+    line-height:1.405;
+  }
+
+  /* 항목 가로선 */
+  .item-line{
+    height:1px;
+    background:rgba(90, 150, 230, 0.5);
+    width:100%;
+  }
+
+  /* 페이지 번호 */
+  .item-page{
+    font-family:"Noto Sans KR", sans-serif;
+    font-weight:400;
+    font-size:12px;
+    color:#1F2937;;
+    letter-spacing:-0.2px;
+    white-space:nowrap;
+  }
+</style>
+
+</head>
+
+<body class="page-title-body">
+  <div class="page page-title-page">
+    <div class="toc-page">
+      <!-- 목차 섹션들 -->
+      <div class="toc-sections">
+        <!-- 메인 타이틀 -->
+        <div class="toc-main-title">INDEX</div>
+
+        <!-- 섹션 1 -->
+        <div class="toc-section">
+          <div class="section-line"></div>
+          <div class="section-header">PART 1. 성공적인 고교 생활을 위한 핵심 가이드</div>
+          <div class="section-items">
+            <div class="section-item">
+              <span class="item-text">1. 고교 생활의 핵심 키워드</span>
+              <span class="item-line"></span>
+              <span class="item-page">04</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">2. 학년별 적용되는 제도 이해</span>
+              <span class="item-line"></span>
+              <span class="item-page">06</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">3. 고교 3년 주요 일정 로드맵</span>
+              <span class="item-line"></span>
+              <span class="item-page">08</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 섹션 2 -->
+        <div class="toc-section">
+          <div class="section-line"></div>
+          <div class="section-header">PART 2. 고교학점제와 2022 개정 교육과정</div>
+          <div class="section-items">
+            <div class="section-item">
+              <span class="item-text">1. 2022 개정 교육과정 이해</span>
+              <span class="item-line"></span>
+              <span class="item-page">10</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">2. 고교학점제 핵심 개념</span>
+              <span class="item-line"></span>
+              <span class="item-page">11</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">3. 과목 선택 전략 가이드</span>
+              <span class="item-line"></span>
+              <span class="item-page">12</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">4. 내신 평가 구조와 성적 산출</span>
+              <span class="item-line"></span>
+              <span class="item-page">14</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 섹션 3 -->
+        <div class="toc-section">
+          <div class="section-line"></div>
+          <div class="section-header">PART 3. 대입 전략의 출발점인 학교생활기록부</div>
+          <div class="section-items">
+            <div class="section-item">
+              <span class="item-text">1. 학생부의 역할과 중요성</span>
+              <span class="item-line"></span>
+              <span class="item-page">17</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">2. 2022 개정 학생부 구성</span>
+              <span class="item-line"></span>
+              <span class="item-page">18</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">3. 학생부의 실제 사례 분석</span>
+              <span class="item-line"></span>
+              <span class="item-page">25</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 섹션 4 -->
+        <div class="toc-section">
+          <div class="section-line"></div>
+          <div class="section-header">PART 4. 수험생이 꼭 알아야 할 수능과 모의고사</div>
+          <div class="section-items">
+            <div class="section-item">
+              <span class="item-text">1. 모의고사란 무엇인가?</span>
+              <span class="item-line"></span>
+              <span class="item-page">27</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">2. 수능의 구조 이해</span>
+              <span class="item-line"></span>
+              <span class="item-page">28</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">3. 수능 성적표 읽기</span>
+              <span class="item-line"></span>
+              <span class="item-page">30</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">4. 수능의 입시 반영 방식</span>
+              <span class="item-line"></span>
+              <span class="item-page">31</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 섹션 5 -->
+        <div class="toc-section">
+          <div class="section-line"></div>
+          <div class="section-header">PART 5. 수시와 정시 선택의 갈림길</div>
+          <div class="section-items">
+            <div class="section-item">
+              <span class="item-text">1. 수시와 정시 전형 비교</span>
+              <span class="item-line"></span>
+              <span class="item-page">33</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">2. [수시] 학생부 교과 전형</span>
+              <span class="item-line"></span>
+              <span class="item-page">34</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">3. [수시] 학생부 종합 전형</span>
+              <span class="item-line"></span>
+              <span class="item-page">35</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">4. [수시] 논술 전형</span>
+              <span class="item-line"></span>
+              <span class="item-page">36</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">5. [정시] 수능 위주 전형</span>
+              <span class="item-line"></span>
+              <span class="item-page">37</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">6. 나에게 맞는 전형 찾기</span>
+              <span class="item-line"></span>
+              <span class="item-page">38</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 섹션 6 -->
+        <div class="toc-section">
+          <div class="section-line"></div>
+          <div class="section-header">PART 6. 원서접수 이후 입시 일정 총정리</div>
+          <div class="section-items">
+            <div class="section-item">
+              <span class="item-text">1. 원서접수 필수 확인 사항</span>
+              <span class="item-line"></span>
+              <span class="item-page">41</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">2. 원서접수 전략 설계 방식</span>
+              <span class="item-line"></span>
+              <span class="item-page">42</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">3. 원서접수 이후 진행 흐름</span>
+              <span class="item-line"></span>
+              <span class="item-page">43</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 섹션 6 -->
+        <div class="toc-section">
+          <div class="section-line"></div>
+          <div class="section-header">PART 7. [부록] 고교 생활과 대입 관련 참고 자료</div>
+          <div class="section-items">
+            <div class="section-item">
+              <span class="item-text">1. 학년별 핵심 Q&A</span>
+              <span class="item-line"></span>
+              <span class="item-page">45</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">2. 대입 용어 사전</span>
+              <span class="item-line"></span>
+              <span class="item-page">49</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">3. 이건 하지 마세요</span>
+              <span class="item-line"></span>
+              <span class="item-page">55</span>
+            </div>
+            <div class="section-item">
+              <span class="item-text">4. 계열별 전공 연계 과목 선택 가이드</span>
+              <span class="item-line"></span>
+              <span class="item-page">56</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

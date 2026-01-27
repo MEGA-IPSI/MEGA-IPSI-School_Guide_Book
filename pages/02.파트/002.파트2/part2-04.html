@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트2-04</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    /* 교육과정 편제표 축소 스타일 */
+    .curriculum-table {
+      font-size: 11px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+    }
+    .curriculum-table th,
+    .curriculum-table td {
+      padding: 1.2mm 1.5mm !important;
+      font-size: 11px !important;
+      line-height: 1.4 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    .curriculum-table thead th {
+      padding: 1.5mm 1.5mm !important;
+      font-size: 11px !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    .curriculum-table tbody tr {
+      height: auto !important;
+    }
+    .curriculum-table tbody td {
+      padding: 1mm 1.5mm !important;
+      font-size: 11px !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    /* 과목 컬럼 (1, 3, 5, 7, 9, 11번째) 가로 넓이 지정 */
+    .curriculum-table th:nth-child(1),
+    .curriculum-table th:nth-child(3),
+    .curriculum-table th:nth-child(5),
+    .curriculum-table th:nth-child(7),
+    .curriculum-table th:nth-child(9),
+    .curriculum-table th:nth-child(11),
+    .curriculum-table td:nth-child(1),
+    .curriculum-table td:nth-child(3),
+    .curriculum-table td:nth-child(5),
+    .curriculum-table td:nth-child(7),
+    .curriculum-table td:nth-child(9),
+    .curriculum-table td:nth-child(11) {
+      width: 12% !important;
+    }
+    /* 학점 컬럼 (2, 4, 6, 8, 10, 12번째) 가로 넓이 지정 */
+    .curriculum-table th:nth-child(2),
+    .curriculum-table th:nth-child(4),
+    .curriculum-table th:nth-child(6),
+    .curriculum-table th:nth-child(8),
+    .curriculum-table th:nth-child(10),
+    .curriculum-table th:nth-child(12),
+    .curriculum-table td:nth-child(2),
+    .curriculum-table td:nth-child(4),
+    .curriculum-table td:nth-child(6),
+    .curriculum-table td:nth-child(8),
+    .curriculum-table td:nth-child(10),
+    .curriculum-table td:nth-child(12) {
+      width:2% !important;
+    }
+    /* 마지막 컬럼(이수 학점)은 오른쪽 선 제거, 왼쪽 선도 제거 (12번째 컬럼의 border-right가 표시됨) */
+    .curriculum-table th:last-child,
+    .curriculum-table td:last-child {
+      border-right: none !important;
+      border-left: none !important;
+      width: 3% !important;
+    }
+    /* 12번째 컬럼(마지막 학점 컬럼)의 오른쪽 테두리 유지 - 학점과 이수학점 사이 */
+    .curriculum-table th:nth-child(12),
+    .curriculum-table td:nth-child(12) {
+      border-right: 1px solid #E5E7EB !important;
+    }
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    /* 이수학점 칸 하단·모서리 이중선 제거
+       - 마지막 행의 12번째 셀(계 11), 마지막 셀
+       - 상단에서 rowspan으로 이어진 111 셀(td[rowspan])의 하단선도 제거 */
+    .curriculum-table tbody tr:last-child td:nth-child(12),
+    .curriculum-table tbody tr:last-child td:last-child,
+    .curriculum-table td[rowspan] {
+      border-bottom: none !important;
+      border-right: none !important;
+    }
+
+    /* "계 11" 셀은 오른쪽 테두리를 다시 표시 */
+    .curriculum-table tbody tr:last-child td.total-credits-last {
+      border-right: 1px solid #E5E7EB !important;
+    }
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .curriculum-table th,
+    .curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    
+    /* section-block 스타일 */
+    .section-block {
+      margin-top: 0;
+      margin-bottom: 0;
+      border: 1px solid #E5E7EB;
+      border-radius: 4px;
+      overflow: hidden;
+      background-color: #ffffff;
+    }
+    
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      padding: 3mm 8mm;
+      background-color: #3B82F6;
+      text-align: center;
+      box-sizing: border-box;
+      color: #FFFFFF;
+      border-radius: 4px 4px 0 0;
+      margin-bottom: 0;
+    }
+    
+    .section-content {
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 0;
+      color: var(--color-text);
+      padding: 3mm 4mm;
+      background-color: #ffffff;
+      box-sizing: border-box;
+      border-radius: 0 0 4px 4px;
+    }
+    
+    .section-content ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    
+    .section-content li {
+      padding-left: 5mm;
+      position: relative;
+      margin-bottom: 0.8mm;
+    }
+    
+    .section-content li:last-child {
+      margin-bottom: 0;
+    }
+    
+    .section-content li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+    
+    /* 마지막 section-block의 section-content 하단 여백 줄이기 */
+    .section-block:last-child .section-content {
+      padding-bottom: 2mm;
+    }
+    
+    .section-content strong {
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    
+    /* comparison-table 헤더를 section-title과 동일한 스타일로 - 무조건 14px */
+    .comparison-table th {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      padding: 3mm 8mm !important;
+      background-color: #3B82F6 !important;
+      text-align: center !important;
+      color: #FFFFFF !important;
+    }
+    
+    .comparison-table th * {
+      font-size: 14px !important;
+    }
+    
+    /* comparison-table 본문 글자 크기 14px 및 상하 여백 줄이기 - 무조건 14px */
+    .comparison-table td {
+      font-size: 14px !important;
+      padding-top: 2mm !important;
+      padding-bottom: 2mm !important;
+    }
+    
+    .comparison-table td * {
+      font-size: 14px !important;
+    }
+    
+    .comparison-table td strong {
+      font-size: 14px !important;
+    }
+    
+    /* comparison-table 컬럼별 가로 넓이 지정 */
+    .comparison-table th:nth-child(1),
+    .comparison-table td:nth-child(1) {
+      width: 10% !important;
+    }
+    
+    .comparison-table th:nth-child(2),
+    .comparison-table td:nth-child(2) {
+      width: 35% !important;
+    }
+    
+    .comparison-table th:nth-child(3),
+    .comparison-table td:nth-child(3) {
+      width: 40% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 3. 과목 선택 전략 가이드
+    </h2>
+    
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3">3-1. 과목 선택이 대입으로 연결되는 과정</h3>
+    
+    <div class="text-body">
+        입시에서 과목 선택은 전공을 어떻게 준비해 왔는지를 보여주는 중요한 기준입니다. 대학은 학생부를 통해 과목 선택의 흐름과 전공과의 연계성을 살펴보기 때문에, 진로를 고려한 전략적인 과목 선택이 필요합니다.
+    </div>
+
+    <!-- 과목 선택 → 전공 적합성 평가 흐름 다이어그램 -->
+    <div style="margin-top: 1mm; margin-bottom: 4mm;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 2mm;">
+        <!-- 과목 선택 -->
+        <div style="flex: 1; min-width: 0; display:flex; justify-content:center;">
+          <div style="width: 27mm; height: 27mm; border: 2px solid var(--color-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1mm; box-sizing: border-box; background-color: #ffffff;">
+            <div style="font-size: 19px; margin-bottom: 1mm;">📌</div>
+            <div style="font-size: 13px !important; color: var(--color-text); font-weight: 450;">과목 선택</div>
+          </div>
+        </div>
+        <!-- connector -->
+        <div style="width: 3mm; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 15px;">
+          →
+        </div>
+        <!-- 수업 활동 -->
+        <div style="flex: 1; min-width: 0; display:flex; justify-content:center;">
+          <div style="width: 27mm; height: 27mm; border: 2px solid var(--color-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1mm; box-sizing: border-box; background-color: #ffffff;">
+            <div style="font-size: 19px; margin-bottom: 1mm;">👨‍🏫</div>
+            <div style="font-size: 13px !important; color: var(--color-text); font-weight: 450;">수업 활동</div>
+          </div>
+        </div>
+        <!-- connector -->
+        <div style="width: 3mm; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 15px;">
+          →
+        </div>
+        <!-- 수행평가·보고서 -->
+        <div style="flex: 1; min-width: 0; display:flex; justify-content:center;">
+          <div style="width: 27mm; height: 27mm; border: 2px solid var(--color-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1mm; box-sizing: border-box; background-color: #ffffff;">
+            <div style="font-size: 19px; margin-bottom: 1mm;">📝</div>
+            <div style="font-size: 13px !important; color: var(--color-text); font-weight: 450;">수행평가</div>
+          </div>
+        </div>
+        <!-- connector -->
+        <div style="width: 3mm; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 15px;">
+          →
+        </div>
+        <!-- 세특 기록 -->
+        <div style="flex: 1; min-width: 0; display:flex; justify-content:center;">
+          <div style="width: 27mm; height: 27mm; border: 2px solid var(--color-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1mm; box-sizing: border-box; background-color: #ffffff;">
+            <div style="font-size: 19px; margin-bottom: 1mm;">🖊️</div>
+            <div style="font-size: 13px !important; color: var(--color-text); font-weight: 450;">세특 기록</div>
+          </div>
+        </div>
+        <!-- connector -->
+        <div style="width: 3mm; display: flex; align-items: center; justify-content: center; color: #6b7280; font-size: 15px;">
+          →
+        </div>
+        <!-- 전공 적합성 평가 -->
+        <div style="flex: 1; min-width: 0; display:flex; justify-content:center;">
+          <div style="width: 27mm; height: 27mm; border: 2px solid var(--color-primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1mm; box-sizing: border-box; background-color: #ffffff;">
+            <div style="font-size: 19px; margin-bottom: 1mm;">🔍</div>
+            <div style="font-size: 13px !important; color: var(--color-text); font-weight: 450;">적합성 평가</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 총정리 박스 -->
+    <div class="info-box" style="margin-top: 1mm;">
+        <div class="info-title">학생부 핵심 평가 요소</div>
+        <div class="text-small">
+            대학은 학생부를 통해 <strong>학생의 목표 전공</strong>이 무엇인지, <strong>전공에 필요한 기초·심화 과목</strong>을 실제로 이수했는지, 그리고 <strong>전공과 연계된 교과 세특</strong>이 어떻게 구성되어 있는지를 묻고 이를 종합적으로 평가합니다.
+        </div>
+      </div>
+
+    <!-- 소제목 1-3 -->
+    <h3 class="title-3">3-2. 진로 탐색 기반 과목 선택</h3>
+    
+    <div class="text-body" style="margin-bottom: 2mm;">
+      내가 탐구하고 싶은 주제가 포함된 과목을 선택해야 수업 활동이 수행평가로, 수행평가가 다시 세특 기록으로 자연스럽게 연결됩니다. 따라서 과목을 선택할 때는 최소한 다음 세 가지를 함께 고려해야 합니다.
+    </div>
+    
+    <!-- 3가지 고려사항 section-block -->
+    <div style="display: flex; gap: 3mm; margin-top: 3mm; margin-bottom: 2mm;">
+      <!-- 1. 나의 진로 방향(계열) -->
+      <div class="section-block" style="flex: 1;">
+        <div class="section-title">나의 진로 방향</div>
+        <div class="section-content">
+          <ul>
+            <li>인문·사회·경영·경제 계열</li>
+            <li>자연·공학·컴퓨터 계열</li>
+            <li>의약·보건·생명 계열</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- 2. 필수/권장 과목 -->
+      <div class="section-block" style="flex: 1;">
+        <div class="section-title">전공 추천 과목</div>
+        <div class="section-content">
+          <ul>
+            <li>경제, 미디어영어, 세계사</li>
+            <li>미적분Ⅰ·Ⅱ, 물리학, 정보</li>
+            <li>화학, 생명과학, 융합과학탐구</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- 3. 탐구주제(예시) -->
+      <div class="section-block" style="flex: 1;">
+        <div class="section-title">과목 탐구 주제</div>
+        <div class="section-content" style="padding-bottom: 2mm !important;">
+          <ul>
+            <li>생성형 AI의 사회적 영향 분석</li>
+            <li>기후 데이터 기반 신기술 개발</li>
+            <li>실험 기반 질병 치료 방법 탐구</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 소제목 1-3 -->
+    <h3 class="title-3">3-3. 계열별 과목 설계 가이드</h3>
+    
+    <!-- 계열별 과목 설계 가이드 표 -->
+    <table class="comparison-table" style="margin-top: 2mm;">
+      <thead>
+        <tr>
+          <th>계열</th>
+          <th>기본 (공통·일반선택)</th>
+          <th>심화 (진로·융합선택)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>인문·어문</strong></td>
+          <td>문학, 독서와작문, 화법과언어</td>
+          <td>한문고전읽기, 언어생활탐구, 실생활영어회화</td>
+        </tr>
+        <tr>
+          <td><strong>경영·경제</strong></td>
+          <td>미적분Ⅰ, 영어독해와작문, 확률과통계</td>
+          <td>경제수학, 금융과경제생활, 데이터과학</td>
+        </tr>
+        <tr>
+          <td><strong>컴퓨터·공학</strong></td>
+          <td>미적분Ⅰ, 물리학, 정보</td>
+          <td>미적분Ⅱ, 기하, 인공지능기초</td>
+        </tr>
+        <tr>
+          <td><strong>자연·생명</strong></td>
+          <td>미적분Ⅰ, 화학, 생명과학</td>
+          <td>화학반응의세계, 세포와물질대사, 생활과학탐구</td>
+        </tr>
+        <tr>
+          <td><strong>의학·약학</strong></td>
+          <td>미적분Ⅰ, 화학, 생명과학</td>
+          <td>생물의유전, 화학반응의세계, 수학과제탐구</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 12 -</div>
+  </div>
+</body>
+</html>

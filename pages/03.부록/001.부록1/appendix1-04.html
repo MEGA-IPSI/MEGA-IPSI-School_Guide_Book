@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>부록1-04</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    /* 대화 가이드 섹션 */
+    .guide-section {
+      margin-top: 3mm;
+      margin-bottom: 2mm;
+      display: flex;
+      flex-direction: row;
+      gap: 4mm;
+      align-items: flex-start;
+    }
+    
+    .guide-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6mm;
+      min-height: 0;
+    }
+    
+    .guide-card {
+      background-color: #FFFFFF;
+      border: 1.5px solid #E5E7EB;
+      border-radius: 6px;
+      padding: 3mm;
+      display: flex;
+      flex-direction: column;
+      gap: 2mm;
+      flex: 1;
+      min-height: 0;
+    }
+    
+    .guide-header {
+      display: flex;
+      align-items: center;
+      gap: 2.5mm;
+    }
+    
+    .guide-number {
+      flex-shrink: 0;
+      color: var(--color-primary);
+      font-size: 15px;
+      margin-left: 1.5mm;
+      font-weight: 850;
+      -webkit-text-stroke: 0.3px var(--color-primary);
+      line-height: 2;
+      display: flex;
+      align-items: center;
+    }
+    
+    .guide-title {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-text);
+      line-height: 1.6;
+      display: flex;
+      align-items: center;
+    }
+    
+    .guide-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5mm;
+    }
+    
+    .guide-example {
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 2mm 2.5mm;
+      border-radius: 4px;
+      background-color: #FAFAFA;
+      text-align: justify;
+      color: var(--color-text);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 -->
+    <h2 class="title-2">
+      Chapter 1. 학년별 핵심 Q&A
+    </h2>
+    
+    <!-- 소제목 1-3 -->
+    <h3 class="title-3">1-3. 고3을 위한 핵심 Q&A (10문 10답)</h3>
+    
+    <!-- Q&A 리스트 -->
+    <div class="guide-section">
+      <!-- 왼쪽 컬럼 (1, 3, 5, 7, 9) -->
+      <div class="guide-column">
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">01</div>
+            <div class="guide-title">고3의 대입 전략 기준은 무엇인가요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+              하나의 결과만으로 전략을 정하기는 어렵습니다. 내신, 세특, 모의고사를 함께 살펴봐야 합니다. 본인에게 가장 유리한 전형을 찾는 것이 중요합니다.
+            </div>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">03</div>
+            <div class="guide-title">수시 원서 6장은 어떻게 쓰면 좋나요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+              일반적으로 상향2 + 적정2 + 안정2 지원 구성이 기본적으로 활용됩니다. 절대적인 기준이 아니므로 성적과 개인의 성향을 함께 고려해야 합니다.
+            </div>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">05</div>
+            <div class="guide-title">예비번호를 받으면 기대해도 되나요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+                대학과 학과에 따라 상황이 다릅니다. 충원율과 이전 합격 사례를 함께 확인해야 합니다. 막연한 기대보다는 다음 선택을 준비하는 것이 좋습니다.
+            </div>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">07</div>
+            <div class="guide-title">고3 세특은 더 보완할 수 있나요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+              충분히 보완할 수 있습니다. 다만 고3은 내신과 수능을 병행해야 하는 시기라 시간 여유가 적어, 더욱 부지런한 관리가 필요합니다.
+            </div>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">09</div>
+            <div class="guide-title">모의고사 성적이 불안정하면 어떻게 하나요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+              이런 경우 수시 6장 중 1~2장은 안정적으로 지원하고, 수능에서는 비교적 강점인 과목을 활용해 최저 기준 충족을 노리는 것이 좋습니다.
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 오른쪽 컬럼 (2, 4, 6, 8, 10) -->
+      <div class="guide-column">
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">02</div>
+            <div class="guide-title">고3 내신은 아직도 중요한가요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+              고3 1학기 내신은 학생부의 마지막 인상을 좌우하므로, 큰 하락 없이 관리하면서 가능하다면 상승 추세를 만드는 것이 바람직합니다.
+            </div>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">04</div>
+            <div class="guide-title">수시 지원 후 정시 준비도 가능한가요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+                수시 합격 시 정시 지원이 제한됩니다. 따라서 수시는 합격하면 진학할 대학만 지원해야 하며, 수시 및 정시 전략을 함께 설계해야 합니다.
+            </div>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">06</div>
+            <div class="guide-title">수시 납치는 어떤 경우를 말하나요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+              수시에 최초합격이나 추가합격 시 등록 여부와 관계없이 정시 지원이 불가능해, 수능 성적과 무관하게 해당 대학에 진학해야 하는 상황을 말합니다.
+            </div>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">08</div>
+            <div class="guide-title">정시에서는 학생부가 의미 없나요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+                아닙니다. 일부 대학에서는 학생부가 동점자 처리 등의 참고 자료로 활용 중이며, 정시 전형에서도 학생부를 반영하는 비율이 늘어나고 있습니다.
+            </div>
+          </div>
+        </div>
+        
+        <div class="guide-card">
+          <div class="guide-header">
+            <div class="guide-number">10</div>
+            <div class="guide-title">고3에서 가장 피해야 할 행동은 무엇인가요?</div>
+          </div>
+          <div class="guide-content">
+            <div class="guide-example">
+              수시·정시 방향을 자주 바꾸는 것입니다. 불안할수록 선택이 흔들리기 쉽습니다. 정한 전략을 끝까지 유지하는 힘이 필요합니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 47 -</div>
+  </div>
+</body>
+</html>

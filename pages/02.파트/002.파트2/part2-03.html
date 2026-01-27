@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트2-03</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+  <style>
+    /* 교육과정 편제표 축소 스타일 */
+    .curriculum-table {
+      font-size: 11px !important;
+      line-height: 1.4 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      border: 1px solid #E5E7EB !important;
+      border-radius: 6px !important;
+      overflow: hidden !important;
+      background-color: #ffffff !important;
+    }
+    .curriculum-table th,
+    .curriculum-table td {
+      padding: 1mm 1.6mm !important;
+      font-size: 11px !important;
+      line-height: 1.5 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    .curriculum-table thead th {
+      padding: 1.6mm 1.6mm !important;
+      font-size: 11px !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    .curriculum-table tbody tr {
+      height: auto !important;
+    }
+    .curriculum-table tbody td {
+      padding: 1mm 1.6mm !important;
+      font-size: 11px !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      border-right: 1px solid #E5E7EB !important;
+      border-top: none !important;
+      border-left: none !important;
+    }
+    /* 마지막 컬럼(3-2 학점) 오른쪽 모서리 이중선 제거 */
+    .curriculum-table th:last-child,
+    .curriculum-table td:last-child {
+      border-right: none !important;
+    }
+    /* 과목 컬럼 (1, 3, 5, 7, 9, 11번째) 가로 넓이 지정 */
+    .curriculum-table th:nth-child(1),
+    .curriculum-table th:nth-child(3),
+    .curriculum-table th:nth-child(5),
+    .curriculum-table th:nth-child(7),
+    .curriculum-table th:nth-child(9),
+    .curriculum-table th:nth-child(11),
+    .curriculum-table td:nth-child(1),
+    .curriculum-table td:nth-child(3),
+    .curriculum-table td:nth-child(5),
+    .curriculum-table td:nth-child(7),
+    .curriculum-table td:nth-child(9),
+    .curriculum-table td:nth-child(11) {
+      width: 10% !important;
+    }
+    /* 학점 컬럼 (2, 4, 6, 8, 10, 12번째) 가로 넓이 지정 */
+    .curriculum-table th:nth-child(2),
+    .curriculum-table th:nth-child(4),
+    .curriculum-table th:nth-child(6),
+    .curriculum-table th:nth-child(8),
+    .curriculum-table th:nth-child(10),
+    .curriculum-table th:nth-child(12),
+    .curriculum-table td:nth-child(2),
+    .curriculum-table td:nth-child(4),
+    .curriculum-table td:nth-child(6),
+    .curriculum-table td:nth-child(8),
+    .curriculum-table td:nth-child(10),
+    .curriculum-table td:nth-child(12) {
+      width:3% !important;
+    }
+    /* 마지막 행은 하단 선 제거 (바깥 테두리만 남기기) */
+    .curriculum-table tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+    /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
+    .curriculum-table th,
+    .curriculum-table td {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- 중제목 (연속) -->
+    <h2 class="title-2">
+      Chapter 2. 고교학점제 핵심 개념
+    </h2>
+    
+    <!-- 소제목 1-2 -->
+    <h3 class="title-3">2-1. 학점 / 이수 / 미이수</h3>
+    
+    <div class="text-body">
+        고교학점제는 대학처럼 학생이 스스로 시간표를 설계하는 제도입니다. 정해진 시간표를 따르기보다, 자신의 진로를 고려해 어떤 과목을 언제 이수할지 미리 계획하는 전략이 필요합니다.
+    </div>
+
+    <!-- 학점/이수/미이수 비교 박스 -->
+    <div style="display: flex; gap: 4mm; align-items: flex-start; margin-top: 1mm; margin-bottom: 3mm;">
+      <!-- 학점(Credit) -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 14.5px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">학점(Credit)</div>
+          <div style="font-size: 14px !important; color: #6b7280; text-align: center;">1학점 = 50분 수업 16회 기준</div>
+        </div>
+      </div>
+
+      <!-- 이수(Pass) -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 14.5px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">이수(Pass)</div>
+          <div style="font-size: 14px !important; color: #6b7280; text-align: center;">출석·성취기준 충족 시 학점 인정</div>
+        </div>
+      </div>
+
+      <!-- 미이수(I) -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 14.5px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">미이수(I)</div>
+          <div style="font-size: 14px !important; color: #6b7280; text-align: center;">결석 과다 또는 성취기준 미달</div>
+        </div>
+      </div>
+    </div>
+
+        <!-- 소제목 1-4 -->
+    <h3 class="title-3" style="margin-bottom: 3.5mm; margin-top: 2mm;">2-2. 졸업 이수 기준 (총 192학점)</h3>
+    
+    <!-- 학점 계산 다이어그램 -->
+    <div style="display: flex; gap: 3mm; align-items: center; justify-content: center; margin-top: 1mm;">
+      <!-- 교과(수업) -->
+      <div style="flex: 1; border: 1px solid #E5E7EB; border-radius: 4px; overflow: hidden; background-color: #ffffff;">
+        <div style="padding: 2mm 8mm; background-color:#3B82F6; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 4px 4px 0 0;">
+          수업 교과
+        </div>
+        <div style="padding: 3mm 4mm; background-color: #ffffff; text-align: center; box-sizing: border-box; border-radius: 0 0 4px 4px;">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 1mm; color: #1F2937;">174학점</div>
+          <div style="font-size: 14px; color: #6b7280;">공통과목·선택과목</div>
+        </div>
+      </div>
+      <!-- + 기호 -->
+      <div style="font-size: 15px; font-weight: 600; color: #6b7280; padding: 0 2mm; margin-top: 1mm;">+</div>
+      <!-- 창의적체험 -->
+      <div style="flex: 1; border: 1px solid #E5E7EB; border-radius: 4px; overflow: hidden; background-color: #ffffff;">
+        <div style="padding: 2mm 8mm; background-color:#3B82F6; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 4px 4px 0 0;">
+          창의적 체험
+        </div>
+        <div style="padding: 3mm 4mm; background-color: #ffffff; text-align: center; box-sizing: border-box; border-radius: 0 0 4px 4px;">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 1mm; color: #1F2937;">18학점</div>
+          <div style="font-size: 14px; color: #6b7280;">자율·동아리·진로</div>
+        </div>
+      </div>
+      <!-- = 기호 -->
+      <div style="font-size: 15px; font-weight: 600; color: #6b7280; padding: 0 2mm; margin-top: 1mm;">=</div>
+      <!-- 총 이수 학점 -->
+      <div style="flex: 1; border: 1px solid #E5E7EB; border-radius: 4px; overflow: hidden; background-color: #ffffff;">
+        <div style="padding: 2mm 8mm; background-color:#3B82F6; font-size:14px !important; font-weight:600; text-align:center; box-sizing: border-box; color: #FFFFFF; border-radius: 4px 4px 0 0;">
+          총 이수 학점
+        </div>
+        <div style="padding: 3mm 4mm; background-color: #ffffff; text-align: center; box-sizing: border-box; border-radius: 0 0 4px 4px;">
+          <div style="font-size: 14px; font-weight: 600; margin-bottom: 1mm; color: #1F2937;">192학점</div>
+          <div style="font-size: 14px; color: #6b7280;">졸업기준</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 소제목 1-3 -->
+    <h3 class="title-3" style="margin-bottom: 3.5mm; margin-top: 5mm;">2-3. 학교 교육과정 편제표 읽기</h3>
+    
+    <div class="text-body" style="margin-bottom: 2mm;">
+        각 고등학교는 3년 동안 어떤 과목을 몇 학점으로 개설하는지를 교육과정 편제표로 공개합니다. 아래 예시를 통해 편제표의 구성과 활용 방식을 확인해 보시기 바랍니다.
+    </div>
+    
+    <!-- 교육과정 편제표 -->
+    <table class="comparison-table curriculum-table" style="margin-top: 2mm;">
+      <thead>
+        <tr>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">1-1</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">1-2</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">2-1</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">2-2</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">3-1</th>
+          <th colspan="2" style="height: 8mm; padding-top: 4mm; padding-bottom: 4mm;">3-2</th>
+        </tr>
+        <tr>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+          <th>과목</th>
+          <th>학점</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>공통국어1</td>
+          <td>4</td>
+          <td>공통국어2</td>
+          <td>3</td>
+          <td>문학</td>
+          <td>4</td>
+          <td>독서와 작문</td>
+          <td>4</td>
+          <td>화법과 언어</td>
+          <td>4</td>
+          <td>매체</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>공통수학1</td>
+          <td>4</td>
+          <td>공통수학2</td>
+          <td>4</td>
+          <td>대수</td>
+          <td>4</td>
+          <td>미적분</td>
+          <td>4</td>
+          <td>확률과 통계</td>
+          <td>4</td>
+          <td>수학과 문화</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>공통영어1</td>
+          <td>3</td>
+          <td>공통영어2</td>
+          <td>4</td>
+          <td>영어 I</td>
+          <td>4</td>
+          <td>영어 II</td>
+          <td>4</td>
+          <td>영어독해와 작문</td>
+          <td>4</td>
+          <td>심화영어</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>한국사1</td>
+          <td>3</td>
+          <td>한국사2</td>
+          <td>3</td>
+          <td>운동과 건강</td>
+          <td>2</td>
+          <td>스포츠과학</td>
+          <td>2</td>
+          <td>스포츠생활1</td>
+          <td>2</td>
+          <td>스포츠생활2</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>통합사회1</td>
+          <td>3</td>
+          <td>통합사회2</td>
+          <td>4</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>통합과학1</td>
+          <td>4</td>
+          <td>통합과학2</td>
+          <td>3</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>과학탐구실험1</td>
+          <td>1</td>
+          <td>과학탐구실험2</td>
+          <td>1</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>체육1</td>
+          <td>2</td>
+          <td>체육2</td>
+          <td>2</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>한문/정보</td>
+          <td>3</td>
+          <td>정보/한문</td>
+          <td>3</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>음악/미술</td>
+          <td>2</td>
+          <td>음악/미술</td>
+          <td>2</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr style="font-weight: 600; background-color: #f3f4f6;">
+          <td>계</td>
+          <td>29</td>
+          <td>계</td>
+          <td>29</td>
+          <td>계</td>
+          <td>14</td>
+          <td>계</td>
+          <td>14</td>
+          <td>계</td>
+          <td>14</td>
+          <td>계</td>
+          <td>11</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- 세련된 팁 박스 -->
+    <div class="tip-box" style="font-size: 15px !important; margin-top: 2mm; padding-top: 4mm !important; padding-bottom: 3mm !important;">
+      <div class="tip-title" style="font-size: 15px !important;">체크 포인트</div>
+      <ul class="list-check" style="font-size: 15px !important;">
+        <li style="font-size: 15px !important;"><strong>전공 연계 : </strong>2∙3학년에 내 진로(희망 전공)과 관련된 과목이 개설되어 있는지 확인합니다.</li>
+        <li style="font-size: 15px !important;"><strong>과목 위계 : </strong>공통수학1/2 → 대수·미적분Ⅰ→ 미적분Ⅱ처럼 단계별 이수가 가능한지 확인합니다.</li>
+      </ul>
+    </div>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 11 -</div>
+  </div>
+</body>
+</html>

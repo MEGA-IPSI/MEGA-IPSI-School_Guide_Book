@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파트3-02</title>
+  <link rel="stylesheet" href="../../../styles.css">
+  <script>
+    // 플립북 모드 감지 및 스타일 조정
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isFlipbook = urlParams.get('flipbook') === '1';
+      
+      if (isFlipbook) {
+        function adjustForFlipbook() {
+          // body 스타일 조정
+          document.body.style.margin = '0';
+          document.body.style.padding = '0';
+          document.body.style.background = 'white';
+          document.body.style.display = 'block';
+          document.body.style.overflow = 'hidden';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
+          
+          const pageElement = document.querySelector('.page');
+          if (pageElement) {
+            pageElement.style.margin = '0';
+            pageElement.style.border = 'none';
+            
+            // A4 실제 크기: 210mm x 297mm
+            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
+            const a4WidthPx = 210 * 3.7795; // 약 794px
+            const a4HeightPx = 297 * 3.7795; // 약 1123px
+            
+            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
+            const iframeWidth = window.innerWidth;
+            const iframeHeight = window.innerHeight;
+            
+            // 스케일 비율 계산
+            const scaleX = iframeWidth / a4WidthPx;
+            const scaleY = iframeHeight / a4HeightPx;
+            const scale = Math.min(scaleX, scaleY);
+            
+            // body에 스케일 적용
+            document.body.style.transform = `scale(${scale})`;
+            document.body.style.transformOrigin = 'top left';
+            document.body.style.width = `${a4WidthPx}px`;
+            document.body.style.height = `${a4HeightPx}px`;
+            
+            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
+            window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'flipbook-resize') {
+                const newScaleX = event.data.width / a4WidthPx;
+                const newScaleY = event.data.height / a4HeightPx;
+                const newScale = Math.min(newScaleX, newScaleY);
+                document.body.style.transform = `scale(${newScale})`;
+              }
+            });
+          }
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
+        } else {
+          adjustForFlipbook();
+        }
+        
+        // iframe 크기 변경 감지
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(adjustForFlipbook, 100);
+        });
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="page">
+    <!-- 리포트 스타일 대제목 -->
+    <h1 class="report-title">
+      <span class="report-title-badge">PART 3</span>
+      <span class="report-title-text">대입 전략의 출발점인 학교생활기록부</span>
+    </h1>
+    
+    <!-- 본문 -->
+    <div class="text-body">
+      학생부는 고등학교 3년 동안의 학교생활을 공식적으로 정리한 문서입니다. 수시·정시 모든 대입 전형에서 활용되며, 학생의 학업·진로·공동체 역량을 파악하는 핵심 자료입니다.
+    </div>
+    
+    <!-- 중제목 (본문과의 실제 간격 2mm) -->
+    <h2 class="title-2" style="margin-top: 0mm;">
+      Chapter 1. 학생부의 역할과 중요성
+    </h2>
+
+        <!-- 소제목 1-1 -->
+    <h3 class="title-3" style="margin-top: 2mm;">1-1. 학생부로 평가하는 3가지 핵심 역량</h3>
+    
+    <!-- 3가지 핵심 역량 비교 박스 -->
+    <div style="display: flex; gap: 4mm; align-items: flex-start; margin-top: 1mm; margin-bottom: 3mm;">
+      <!-- 학업역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">✍🏻</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">학업역량</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            학업 성취도 · 탐구력<br>
+            학습 지속성 · 학업 태도
+          </div>
+        </div>
+      </div>
+
+      <!-- 진로역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🚩</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">진로역량</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            세특 탐구 흐름 · 활동 지속성<br>
+            전공 과목 이수 · 진로 탐색 활동
+          </div>
+        </div>
+      </div>
+
+      <!-- 공동체역량 -->
+      <div style="flex: 1;">
+        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
+          <div style="font-size: 18px !important; text-align: center; margin-bottom: 1.5mm;">🔗</div>
+          <div style="font-size: 15px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">공동체역량</div>
+          <div style="font-size: 14.5px !important; color: #6b7280; text-align: center; line-height: 1.6;">
+            성실성 · 배려 · 규칙 준수<br>
+            협업 · 리더십 · 소통 능력
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 소제목 1-1 -->
+    <h3 class="title-3" style="margin-top: 2mm; margin-bottom: 4mm;">1-2. 학생부종합 전형의 핵심 평가 자료</h3>
+
+    <!-- 총정리 박스 -->
+    <div class="info-box" style="margin-top: 1mm;">
+        <div class="info-title" style="margin-top: 0; margin-bottom: 3mm;">성적 그 이상의 '이야기'</div>
+        <div class="text-small" style="margin-top: 0; margin-bottom: 3mm;">
+          학생부는 내신 등급만을 보여주는 자료가 아닙니다. 어떤 과목을 선택했는지, 수업에 어떻게 참여했는지, 학습 과정에서 어떤 노력을 했는지가 함께 담겨 있습니다. 
+        </div>
+        <div class="info-title" style="margin-top: 0; margin-bottom: 3mm;">대학에 '나'를 보여주는 서류</div>
+        <div class="text-small" style="margin-top: 0; margin-bottom: -0.5mm;">
+          학교생활기록부는 학생의 고등학교 생활 전반을 공식적으로 기록한 자료로, 대입 전형에서 학업 태도와 진로 방향, 성장 과정을 종합적으로 파악하는 데 매우 중요한 서류입니다.
+        </div>
+    </div>
+
+    <!-- 소제목 1-1 -->
+    <h3 class="title-3" style="margin-top: 2mm; margin-bottom: 4mm;">1-3. 교과 전형에서도 중요해지는 학생부</h3>
+
+    <!-- 총정리 박스 -->
+    <div class="info-box" style="margin-top: 1mm;">
+        <div class="info-title" style="margin-top: 0; margin-bottom: 3mm;">정성 평가 도입 확대</div>
+        <div class="text-small" style="margin-top: 0; margin-bottom: 3mm;">
+          내신 성적(정량)과 서류 평가(정성)를 함께 반영하는 교과 전형이 늘어나면서, 대학은 교과 성적 외에도 창체, 세특, 행특 등 학생부 비교과 전반을 종합적으로 평가하고 있습니다.
+        </div>
+        <div class="info-title" style="margin-top: 3mm; margin-bottom: 3mm;">과목 이수 충실도 평가</div>
+        <div class="text-small" style="margin-top: 0; margin-bottom: -0.5mm;">
+          5등급제 도입으로 성적의 변별력이 낮아지면서, 대학은 단순한 등급보다 어떤 과목을 선택해 얼마나 충실하게 이수했는지를 중요한 평가 요소로 살펴봅니다.
+        </div>
+    </div>
+    
+    <!-- 페이지 하단 번호 -->
+    <div class="page-footer">- 17 -</div>
+  </div>
+</body>
+</html>
