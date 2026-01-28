@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>파트3-09</title>
+  <title>파트3-10</title>
   <link rel="stylesheet" href="../../../styles.css">
   <script>
     // 플립북 모드 감지 및 스타일 조정
@@ -78,7 +78,7 @@
     .comparison-container {
       display: flex;
       gap: 6mm;
-      margin-top: 4mm;
+      margin-top: 2mm;
       margin-bottom: 3mm;
     }
     
@@ -103,7 +103,7 @@
     
     .card-header {
       text-align: center;
-      padding: 3mm 3mm;
+      padding: 4mm 3mm;
       margin: -5mm -5mm 3mm -5mm;
       background-color: var(--color-primary);
       color: #ffffff;
@@ -121,7 +121,7 @@
     }
     
     .card-grade {
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: 600;
       margin-bottom: 1mm;
       color: #ffffff;
@@ -129,7 +129,7 @@
     }
     
     .card-year {
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 500;
       opacity: 0.8;
       margin-bottom: 0mm;
@@ -170,7 +170,7 @@
     }
     
     .comparison-card .section-block:last-of-type {
-      margin-bottom: 0mm;
+      margin-bottom: 0.3mm;
     }
     
     .section-title {
@@ -217,6 +217,15 @@
       line-height: 1.3;
     }
     
+    .section-content li.no-bullet {
+      padding-left: 0;
+      text-align: justify;
+    }
+    
+    .section-content li.no-bullet::before {
+      display: none;
+    }
+    
     .section-badge {
       display: inline-block;
       padding: 1.5mm 3.5mm;
@@ -231,276 +240,37 @@
     .highlight-box {
       margin-top: 3mm;
       padding: 3mm;
-      display: flex;
-      flex-direction: column;
-      gap: 2mm;
+      border-radius: 8px;
+      font-size: 12.5px;
+      line-height: 1.7;
+      background-color: #F0F9FF;
+      border-left: 3px solid var(--color-primary);
+      color: var(--color-text);
     }
     
-    .guide-header {
-      display: flex;
-      align-items: center;
-      gap: 2.5mm;
+    .intro-text {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--color-text-light);
+      margin-bottom: 4mm;
+      text-align: center;
+      padding: 3mm 4mm;
+      background-color: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
     }
     
-    .guide-number {
-      flex-shrink: 0;
-      color: var(--color-primary);
-      font-size: 16px;
-      margin-left: 1.5mm;
-      font-weight: 850;
-      -webkit-text-stroke: 0.3px var(--color-primary);
-      line-height: 2;
-      display: flex;
-      align-items: center;
-    }
-    
-    .guide-title {
-      flex: 1;
-      font-size: 14px;
+    .conclusion-box {
+      margin-top: 2.5mm;
+      border: 1px solid #3B82F6;
+      padding: 2.5mm 2mm;
+      font-size: 13.5px !important;
       font-weight: 700;
-      color: var(--color-text);
-      line-height: 2;
-      display: flex;
-      align-items: center;
-    }
-    
-    .guide-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5mm;
-    }
-    
-    .guide-example {
-      font-size: 14px;
       line-height: 1.5;
-      padding: 2mm 2.5mm;
-      border-radius: 4px;
+      text-align: center;
       background-color: #FAFAFA;
-      display: flex;
-      align-items: center;
-      gap: 2mm;
-    }
-    
-    .guide-icon {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-    }
-    
-    .guide-example.bad .guide-icon {
-      color: #DC2626;
-    }
-    
-    .guide-example.good .guide-icon {
-      color: var(--color-primary);
-    }
-    
-    .guide-text {
-      flex: 1;
-    }
-    
-    .guide-example.bad .guide-text {
-      color: var(--color-text);
-      font-weight: 400;
-    }
-    
-    .guide-example.good .guide-text {
-      color: var(--color-text);
-      font-weight: 400;
-    }
-    
-    /* 학생정보 표 스타일 - part2-07.html 디자인 적용 */
-    .student-info-table {
-      font-size: 12.5px !important;
-      border-radius: 6px !important;
-      overflow: hidden !important;
-    }
-    
-    .student-info-table * {
-      font-size: 12.5px !important;
-    }
-    
-    .comparison-table.student-info-table th,
-    .grade-comparison-table.student-info-table th,
-    .student-info-table th {
-      text-align: center !important;
-      padding-left: 4mm !important;
-      padding-right: 4mm !important;
-      font-size: 12.5px !important;
-    }
-    
-    .comparison-table.student-info-table th *,
-    .grade-comparison-table.student-info-table th *,
-    .student-info-table th * {
-      font-size: 12.5px !important;
-    }
-    
-    .student-info-table tbody tr {
-      background-color: #ffffff !important;
-    }
-    
-    .student-info-table tbody tr:nth-child(even) {
-      background-color: #ffffff !important;
-    }
-    
-    .comparison-table.student-info-table td,
-    .grade-comparison-table.student-info-table td,
-    .student-info-table td {
-      padding-top: 2mm !important;
-      padding-bottom: 2mm !important;
-      padding-left: 4mm !important;
-      padding-right: 4mm !important;
-      text-align: left !important;
-      font-weight: 400 !important;
-      font-size: 13.5px !important;
-      background-color: #ffffff !important;
-      color: var(--color-text) !important;
-      line-height: 1.8;
-      vertical-align: middle;
-    }
-    
-    .comparison-table.student-info-table td *,
-    .grade-comparison-table.student-info-table td *,
-    .student-info-table td * {
-      font-size: 13.5px !important;
-    }
-    
-    .comparison-table.student-info-table tbody td:nth-child(1),
-    .comparison-table.student-info-table tbody td:nth-child(1) *,
-    .grade-comparison-table.student-info-table tbody td:nth-child(1),
-    .grade-comparison-table.student-info-table tbody td:nth-child(1) * {
-      font-size: 12.5px !important;
-    }
-    
-    /* student-info-table 모서리 둥글기 - curriculum-table과 동일하게 */
-    .comparison-table.student-info-table,
-    .grade-comparison-table.student-info-table {
-      border-radius: 6px !important;
-      overflow: hidden !important;
-    }
-    
-    .comparison-table.student-info-table th,
-    .comparison-table.student-info-table td,
-    .grade-comparison-table.student-info-table th,
-    .grade-comparison-table.student-info-table td {
-      border-top-left-radius: 0 !important;
-      border-top-right-radius: 0 !important;
-      border-bottom-left-radius: 0 !important;
-      border-bottom-right-radius: 0 !important;
-    }
-    
-    .comparison-table.student-info-table tbody tr:first-child th:first-child,
-    .grade-comparison-table.student-info-table tbody tr:first-child th:first-child {
-      border-top-left-radius: 6px !important;
-    }
-    
-    .comparison-table.student-info-table tbody tr:first-child th:last-child,
-    .comparison-table.student-info-table tbody tr:first-child td:last-child,
-    .grade-comparison-table.student-info-table tbody tr:first-child th:last-child,
-    .grade-comparison-table.student-info-table tbody tr:first-child td:last-child {
-      border-top-right-radius: 6px !important;
-    }
-    
-    .comparison-table.student-info-table tbody tr:last-child td:first-child,
-    .grade-comparison-table.student-info-table tbody tr:last-child td:first-child {
-      border-bottom-left-radius: 6px !important;
-    }
-    
-    .comparison-table.student-info-table tbody tr:last-child td:last-child,
-    .grade-comparison-table.student-info-table tbody tr:last-child td:last-child {
-      border-bottom-right-radius: 6px !important;
-    }
-    
-    .student-info-table th {
-      vertical-align: middle;
-    }
-    
-    .student-info-table th:nth-child(1),
-    .student-info-table td:nth-child(1) {
-      width: 10% !important;
-    }
-    
-    .student-info-table th:nth-child(2),
-    .student-info-table td:nth-child(2) {
-      width: 90% !important;
-      text-align: left !important;
-    }
-    
-    /* 최종 강제: 출결상황 표와 학생정보 표의 텍스트 크기 설정 (최우선 최종 규칙) */
-    /* 출결상황 표: 헤더 12.5px, 데이터 13.5px */
-    .comparison-table.curriculum-table thead th {
-      padding: 1.6mm 1.6mm !important;
-      line-height: 1.6 !important;
-      vertical-align: middle !important;
-    }
-    
-    .comparison-table.curriculum-table thead th,
-    .comparison-table.curriculum-table thead th * {
-      font-size: 12.5px !important;
-    }
-    
-    .comparison-table.curriculum-table tbody td,
-    .comparison-table.curriculum-table tbody td *,
-    .comparison-table.curriculum-table tbody td:nth-child(1),
-    .comparison-table.curriculum-table tbody td:nth-child(1) * {
-      font-size: 13.5px !important;
-    }
-    
-    /* 학생정보 표: 헤더 12.5px, 데이터 13.5px */
-    .comparison-table.student-info-table th,
-    .comparison-table.student-info-table thead th,
-    .comparison-table.student-info-table thead th *,
-    .comparison-table.student-info-table th *,
-    .grade-comparison-table.student-info-table th,
-    .grade-comparison-table.student-info-table thead th,
-    .grade-comparison-table.student-info-table thead th *,
-    .grade-comparison-table.student-info-table th *,
-    .student-info-table th,
-    .student-info-table th * {
-      font-size: 12.5px !important;
-    }
-    
-    .comparison-table.student-info-table td,
-    .comparison-table.student-info-table tbody td,
-    .comparison-table.student-info-table tbody td *,
-    .comparison-table.student-info-table td *,
-    .grade-comparison-table.student-info-table td,
-    .grade-comparison-table.student-info-table tbody td,
-    .grade-comparison-table.student-info-table tbody td *,
-    .grade-comparison-table.student-info-table td *,
-    .student-info-table td,
-    .student-info-table td * {
-      font-size: 13.5px !important;
-    }
-    
-    /* 최종 강제: 수상경력 표 마지막 컬럼 오른쪽 테두리 제거 (최우선 최종 규칙) */
-    .comparison-table.curriculum-table thead th:last-child,
-    .comparison-table.curriculum-table tbody td:last-child,
-    .comparison-table.curriculum-table tbody tr:last-child td:last-child {
-      border-right: none !important;
-    }
-    
-    /* 학교폭력 조치상황 표 - 헤더 배경색 빨간색으로 변경 */
-    .comparison-table.violence-table thead th {
-      background-color: #DC2626 !important;
-    }
-    
-    /* 학교폭력 조치상황 표 - 컬럼 너비 지정 */
-    .comparison-table.violence-table th:nth-child(1),
-    .comparison-table.violence-table td:nth-child(1) {
-      width: 15% !important;
-    }
-    
-    .comparison-table.violence-table th:nth-child(2),
-    .comparison-table.violence-table td:nth-child(2) {
-      width: 20% !important;
-    }
-    
-    .comparison-table.violence-table th:nth-child(3),
-    .comparison-table.violence-table td:nth-child(3) {
-      width: 65% !important;
+      color: #3B82F6;
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -508,43 +278,129 @@
   <div class="page">
     <!-- 중제목 (연속) -->
     <h2 class="title-2">
-      Chapter 2. 2022 개정 학생부 구성
+      Chapter 3. 학생부의 실제 사례 분석
     </h2>
     
-    <!-- 소제목 1-2 -->
-    <h3 class="title-3">2-7. 행동특성 및 종합의견</h3>
-
-    <div class="text-body" style="margin-bottom: 2mm;">
-      ① 행동특성 및 종합의견
+    <!-- 소제목 -->
+    <h3 class="title-3">3-1. 유형별 비교 분석 (Good vs Weak)</h3>
+    
+    <!-- 상단 설명 -->
+    <div class="text-body" style="margin-bottom: 3mm;">
+        합격하는 학생부와 불합격하는 학생부의 차이가 무엇일까요? 실제 학생부 사례를 비교하며 입학사정관의 평가 관점을 살펴봅니다. 단순 활동 나열이 아닌, '진로 스토리'가 살아 있는 학생부의 차이를 확인해 보세요.
     </div>
-
-    <div class="text-body" style="margin-bottom: 0mm !important;">
-      위 항목은 학교생활 전반에서 드러난 학생의 태도와 성장을 담임교사가 종합적으로 정리한 부분입니다. 수업 태도, 생활 습관, 책임감과 협력 과정 등이 반영되어 학생의 인성과 공동체 역량 등을 파악할 수 있습니다.
-    </div>
+    
+    <!-- 비교 카드 컨테이너 -->
+    <div class="comparison-container">
       
-    <!-- 행동특성 및 종합의견 표 -->
-    <table class="comparison-table curriculum-table" style="margin-top: 4mm; margin-bottom: 4mm; table-layout: fixed;">
-      <thead>
-        <tr>
-          <th style="width: 8% !important; text-align: center !important; padding: 2mm 2mm !important; height: 1.6mm !important;">학년</th>
-          <th style="width: 92% !important; text-align: center !important; padding: 2mm 2mm !important; height: 1.6mm !important;">행동특성 및 종합의견</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="text-align: center !important; padding: 1mm 3mm !important; vertical-align: middle;">1</td>
-          <td style="text-align: justify !important; padding: 3mm 3mm !important; vertical-align: top;">수업과 학교생활 전반에 성실하게 참여하며 맡은 역할을 책임감 있게 수행함. 수업 중 제시된 과제나 활동에 적극적으로 임하며, 특히 탐구·토의 상황에서 자신의 의견을 논리적으로 정리해 표현하는 모습을 보임. 전자·기술 분야에 대한 관심을 바탕으로 교과 학습과 연계된 활동에 꾸준히 참여하며, 문제를 분석하고 해결하려는 태도가 돋보임. 교우 관계에서도 협력적인 자세를 유지하며 공동의 목표를 달성하기 위해 노력하는...</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- 진로활동 팁 박스 -->
-    <div class="tip-box" style="font-size: 14.5px !important; margin-top: 0.5mm !important; padding-top: 4mm !important; padding-bottom: 3mm !important;">
-      <div class="tip-title" style="font-size: 15px !important; margin-bottom: 3mm !important;">행동특성 및 종합의견</div>
-      <ul class="list-check" style="font-size: 15px !important; margin-bottom: 0 !important;">
-        <li style="font-size: 15px !important;"><strong>내용 : </strong>학생의 인성, 리더십, 공동체 의식, 학업 태도, 잠재력 등을 담임 선생님이 종합적으로 기록</li>
-        <li style="font-size: 15px !important;"><strong>전략 : </strong>스스로가 성장하는 모습을 담임 선생님이 인지할 수 있도록 긍정적이고 적극적인 소통 필요</li>
-      </ul>
+      <!-- 우수 사례 : A학생 -->
+      <div class="comparison-card old-system">
+        <div class="card-header old-system">
+          <div class="card-grade">우수 사례</div>
+          <div class="card-year">데이터 마케터 희망</div>
+        </div>
+        
+        <!-- ① 1·2학년 과목 선택 섹션 -->
+        <div class="section-block">
+          <div class="section-title">① 과목 선택</div>
+          <div class="section-content">
+            <ul>
+              <li>2학년 : 확률과통계·경제 이수</li>
+              <li>3학년 : 경제수학·사회문제탐구 이수</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ④ 최종 결과 섹션 -->
+        <div class="section-block">
+          <div class="section-title">② 진로 활동</div>
+          <div class="section-content">
+            <ul>
+                <li>데이터 분석가 진로 멘토링 참석</li>
+                <li>퍼포먼스 마케팅 직무 특강 참석</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ③ 학생부에 드러난 내용 섹션 -->
+        <div class="section-block">
+          <div class="section-title">③ 동아리 활동</div>
+          <div class="section-content">
+            <ul>
+              <li class="no-bullet">[경제 토론 동아리] 2년간 관련 활동에 지속적으로 참여하며 '공유 경제의 미래' 등 시사 주제를 중심으로 탐구를 이어감.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ② 3학년 과목 선택 섹션 -->
+        <div class="section-block">
+          <div class="section-title">④ 세특 내용</div>
+          <div class="section-content">
+            <ul>
+              <li class="no-bullet">[확률과통계] 교내 매점 만족도 설문조사를 설계하고, 데이터를 분석하여 '신메뉴 도입의 기대 효과'를 예측하는 보고서를 제출함.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 결론 -->
+        <div class="conclusion-box">
+          <strong>경영·데이터 분석 중심의 일관된 활동 구조</strong>
+        </div>
+      </div>
+      
+      <!-- 아쉬운 사례 : B학생 -->
+      <div class="comparison-card new-system">
+        <div class="card-header new-system">
+          <div class="card-grade">아쉬운 사례</div>
+          <div class="card-year">진로 미확정 학생</div>
+        </div>
+        
+        <!-- ① 1·2학년 과목 선택 섹션 -->
+        <div class="section-block">
+          <div class="section-title">① 과목 선택</div>
+          <div class="section-content">
+            <ul>
+                <li>2학년 : 물리학·세계사 이수</li>
+                <li>3학년 : 여행지리·아동발달과부모 이수</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ④ 최종 결과 섹션 -->
+        <div class="section-block">
+          <div class="section-title">② 진로 활동</div>
+          <div class="section-content">
+            <ul>
+              <li>변호사 직업 특강 참석</li>
+              <li>간호사 직무 체험 활동 참여</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ③ 학생부에 드러난 내용 섹션 -->
+        <div class="section-block">
+          <div class="section-title">③ 동아리 활동</div>
+          <div class="section-content">
+            <ul>
+                <li class="no-bullet">[배드민턴 동아리] 점심시간 배드민턴 리그에 지속적으로 참여하여 체력 관리와 자기 관리 태도를 보임.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- ② 3학년 과목 선택 섹션 -->
+        <div class="section-block">
+          <div class="section-title">④ 세특 내용</div>
+          <div class="section-content">
+            <ul>
+                <li class="no-bullet">[물리학] 수업에 성실히 참여하며 바른 태도를 유지하였고, 필기를 꾸준히 하여 학습 내용을 정리하는 데 노력하는 학생임.</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- 결론 -->
+        <div class="conclusion-box">
+          <strong>활동 전반에서 진로 방향의 일관성 부족</strong>
+        </div>
+      </div>
     </div>
     
     <!-- 페이지 하단 번호 -->
