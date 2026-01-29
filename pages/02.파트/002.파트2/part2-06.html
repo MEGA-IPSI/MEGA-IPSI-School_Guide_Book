@@ -312,6 +312,15 @@
       text-align: left !important;
     }
     
+    /* 평가 프로세스 표: 회색 셀 배경 제거 */
+    .comparison-table tbody tr:nth-child(even) {
+      background-color: #ffffff !important;
+    }
+    .comparison-table tbody td:nth-child(2),
+    .comparison-table tbody td:nth-child(3) {
+      background-color: #ffffff !important;
+    }
+
     /* comparison-table 컬럼별 가로 넓이 지정 */
     .comparison-table th:nth-child(1),
     .comparison-table td:nth-child(1) {

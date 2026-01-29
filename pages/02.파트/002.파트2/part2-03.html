@@ -162,6 +162,53 @@
       border-bottom-left-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
     }
+
+    /* 이수·미이수 기준 표 - 셀 높이 모두 동일 + 헤더 디자인 (comparison-table 중 curriculum-table 제외) */
+    .comparison-table:not(.curriculum-table) {
+      table-layout: fixed !important;
+    }
+    .comparison-table:not(.curriculum-table) th,
+    .comparison-table:not(.curriculum-table) td {
+      height: 8mm !important;
+      min-height: 8mm !important;
+      box-sizing: border-box !important;
+      vertical-align: middle !important;
+    }
+    /* 로우 셀(본문) 디자인 */
+    .comparison-table:not(.curriculum-table) td {
+      font-size: 14px !important;
+      padding-top: 2mm !important;
+      padding-bottom: 2mm !important;
+      padding-left: 3mm !important;
+      padding-right: 3mm !important;
+      font-weight: 400 !important;
+    }
+    .comparison-table:not(.curriculum-table) td * {
+      font-size: 14px !important;
+      font-weight: 400 !important;
+    }
+    /* 컬럼(헤더) 디자인 */
+    .comparison-table:not(.curriculum-table) th {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      padding: 2.5mm 8mm !important;
+      background-color: #3B82F6 !important;
+      text-align: center !important;
+      color: #FFFFFF !important;
+    }
+    .comparison-table:not(.curriculum-table) th * {
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      color: #FFFFFF !important;
+    }
+
+    /* 이수/미이수 조건 컬럼 가로 넓이 동일하게 */
+    .comparison-table:not(.curriculum-table) th:nth-child(2),
+    .comparison-table:not(.curriculum-table) td:nth-child(2),
+    .comparison-table:not(.curriculum-table) th:nth-child(3),
+    .comparison-table:not(.curriculum-table) td:nth-child(3) {
+      width: 43% !important;
+    }
   </style>
 </head>
 <body>
@@ -172,38 +219,39 @@
     </h2>
     
     <!-- 소제목 1-2 -->
-    <h3 class="title-3">2-1. 학점 / 이수 / 미이수</h3>
+    <h3 class="title-3">2-1. 과목별 이수 / 미이수 기준</h3>
     
     <div class="text-body">
-        고교학점제는 대학처럼 학생이 스스로 시간표를 설계하는 제도입니다. 정해진 시간표를 따르기보다, 자신의 진로를 고려해 어떤 과목을 언제 이수할지 미리 계획하는 전략이 필요합니다.
+      고교학점제는 대학처럼 학생이 자신의 진로에 맞는 과목을 선택해 학업 계획을 설계하는 제도입니다. 정해진 시간표를 그대로 따르기보다, 어떤 과목을 언제 이수할지 미리 결정하는 것이 중요합니다.  
     </div>
 
-    <!-- 학점/이수/미이수 비교 박스 -->
-    <div style="display: flex; gap: 4mm; align-items: flex-start; margin-top: 1mm; margin-bottom: 3mm;">
-      <!-- 학점(Credit) -->
-      <div style="flex: 1;">
-        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
-          <div style="font-size: 14.5px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">학점(Credit)</div>
-          <div style="font-size: 14px !important; color: #6b7280; text-align: center;">1학점 = 50분 수업 16회 기준</div>
-        </div>
-      </div>
-
-      <!-- 이수(Pass) -->
-      <div style="flex: 1;">
-        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
-          <div style="font-size: 14.5px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">이수(Pass)</div>
-          <div style="font-size: 14px !important; color: #6b7280; text-align: center;">출석·성취기준 충족 시 학점 인정</div>
-        </div>
-      </div>
-
-      <!-- 미이수(I) -->
-      <div style="flex: 1;">
-        <div style="border: 1px solid #E5E7EB; padding: 3mm 4mm; box-sizing: border-box; background-color: #ffffff; border-radius: 4px;">
-          <div style="font-size: 14.5px !important; font-weight: 700; color: #3B82F6; text-align: center; margin-bottom: 2mm;">미이수(I)</div>
-          <div style="font-size: 14px !important; color: #6b7280; text-align: center;">결석 과다 또는 성취기준 미달</div>
-        </div>
-      </div>
-    </div>
+    <!-- 과목별 이수·미이수 기준 표 -->
+    <table class="comparison-table" style="margin-top: 1mm;">
+      <thead>
+        <tr>
+          <th>유형</th>
+          <th>이수 조건</th>
+          <th>미이수 조건</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>공통 과목</strong></td>
+          <td>출석률 2/3 이상 그리고 성취율 40% 이상</td>
+          <td>출석률 2/3 미만 또는 성취율 40% 미만</td>
+        </tr>
+        <tr>
+          <td><strong>선택 과목</strong></td>
+          <td>출석률 2/3 이상</td>
+          <td>출석률 2/3 미만</td>
+        </tr>
+        <tr>
+          <td><strong>창체 활동</strong></td>
+          <td>학년별 수업일수 기준 출석률 2/3 이상</td>
+          <td>학년별 수업일수 기준 출석률 2/3 미만</td>
+        </tr>
+      </tbody>
+    </table>
 
         <!-- 소제목 1-4 -->
     <h3 class="title-3" style="margin-bottom: 3.5mm; margin-top: 2mm;">2-2. 졸업 이수 기준 (총 192학점)</h3>
@@ -301,7 +349,7 @@
           <td>4</td>
           <td>대수</td>
           <td>4</td>
-          <td>미적분</td>
+          <td>미적분 I</td>
           <td>4</td>
           <td>확률과통계</td>
           <td>4</td>
@@ -323,10 +371,10 @@
           <td>3</td>
         </tr>
         <tr>
-          <td>한국사1</td>
+          <td>통합사회1</td>
           <td>3</td>
-          <td>한국사2</td>
-          <td>3</td>
+          <td>통합사회2</td>
+          <td>4</td>
           <td>운동과건강</td>
           <td>2</td>
           <td>스포츠과학</td>
@@ -335,20 +383,6 @@
           <td>2</td>
           <td>스포츠생활2</td>
           <td>2</td>
-        </tr>
-        <tr>
-          <td>통합사회1</td>
-          <td>3</td>
-          <td>통합사회2</td>
-          <td>4</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
         </tr>
         <tr>
           <td>통합과학1</td>
@@ -378,53 +412,11 @@
           <td></td>
           <td></td>
         </tr>
-        <tr>
-          <td>체육1</td>
-          <td>2</td>
-          <td>체육2</td>
-          <td>2</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>한문/정보</td>
-          <td>3</td>
-          <td>정보/한문</td>
-          <td>3</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>음악/미술</td>
-          <td>2</td>
-          <td>음악/미술</td>
-          <td>2</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
         <tr style="font-weight: 600; background-color: #f3f4f6;">
           <td>계</td>
-          <td>29</td>
+          <td>19</td>
           <td>계</td>
-          <td>29</td>
+          <td>19</td>
           <td>계</td>
           <td>14</td>
           <td>계</td>
