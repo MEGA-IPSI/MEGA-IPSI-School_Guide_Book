@@ -149,9 +149,9 @@
       background-color: var(--color-primary);
       color: #ffffff;
       font-weight: 600;
-      font-size: 13.5px;
+      font-size: 13px;
       letter-spacing: 0.5px;
-      padding: 3.5mm 1.5mm !important;
+      padding: 3mm 1.5mm !important;
       text-align: center;
       vertical-align: middle;
       word-break: keep-all;
@@ -176,7 +176,7 @@
       color: #ffffff;
       font-weight: 600;
       font-size: 13px;
-      padding: 2.5mm 1.5mm !important;
+      padding: 2mm 1.5mm !important;
       text-align: center;
       vertical-align: middle;
       word-break: keep-all;
@@ -206,16 +206,16 @@
     
     /* 모집단위, 소양영역 컬럼 너비 */
     .subject-table th:nth-child(2),
-    .subject-table th:nth-child(4),
+    .subject-table th:nth-child(3),
     .subject-table td:nth-child(2),
-    .subject-table td:nth-child(4) {
+    .subject-table td:nth-child(3) {
       width: 23%;
     }
     
     /* 역량영역 컬럼 너비 (더 넓게) */
-    .subject-table th:nth-child(3),
-    .subject-table td:nth-child(3) {
-      width: 36%;
+    .subject-table th:nth-child(4),
+    .subject-table td:nth-child(4) {
+      width: 34%;
     }
     
     /* 선택과목 내부 구분 */
@@ -294,8 +294,8 @@
           <tr>
             <th>단과대학</th>
             <th>모집단위</th>
-            <th>역량영역</th>
             <th>소양영역</th>
+            <th>역량영역</th>
           </tr>
         </thead>
         <tbody>
@@ -303,130 +303,130 @@
           <tr>
             <td rowspan="2" class="college-cell">불교</td>
             <td>불교학부</td>
-            <td>역사, 윤리</td>
             <td>지리, 일반사회</td>
+            <td>역사, 윤리</td>
           </tr>
           <tr>
             <td>문화유산학과</td>
-            <td>역사, 일반사회</td>
             <td>한문</td>
+            <td>역사, 일반사회</td>
           </tr>
 
           <!-- 문과대학 -->
           <tr>
             <td rowspan="6" class="college-cell">문과</td>
             <td>국어국문·문예창작학부</td>
+            <td>역사, 일반사회, 한문</td>
             <td>국어</td>
-            <td>국어, 일반사회, 한문</td>
           </tr>
           <tr>
             <td>영어영문학부</td>
-            <td>국어, 영어</td>
             <td>일반사회, 역사</td>
+            <td>국어, 영어</td>
           </tr>
           <tr>
             <td>일본학과</td>
-            <td>국어, 일본어</td>
             <td>일반사회, 역사</td>
+            <td>국어, 일본어</td>
           </tr>
           <tr>
             <td>중어중문학과</td>
-            <td>국어, 중국어</td>
             <td>일반사회, 역사</td>
+            <td>국어, 중국어</td>
           </tr>
           <tr>
             <td>철학과</td>
-            <td>국어, 윤리</td>
             <td>교양, 한문</td>
+            <td>국어, 윤리</td>
           </tr>
           <tr>
             <td>사학과</td>
-            <td>국어, 역사</td>
             <td>일반사회, 지리, 윤리, 한문</td>
+            <td>국어, 역사</td>
           </tr>
 
           <!-- 법과대학 -->
           <tr>
             <td class="college-cell">법과</td>
             <td>법학과</td>
-            <td>국어, 일반사회</td>
             <td>윤리</td>
+            <td>국어, 일반사회</td>
           </tr>
 
           <!-- 사회과학대학 -->
           <tr>
             <td rowspan="4" class="college-cell">사회과학</td>
-            <td>정치외교학전공/행정학전공/북한학전공/광고홍보학과/미디어커뮤니케이션학전공</td>
-            <td>일반사회</td>
+            <td>정치외교학전공/행정학전공/<br>북한학전공/광고홍보학과/<br>미디어커뮤니케이션학전공</td>
             <td>역사, 윤리, 지리</td>
+            <td>일반사회</td>
           </tr>
           <tr>
             <td>경제학과, 식품산업관리학과</td>
-            <td>미적분Ⅱ, 경제수학, 일반사회</td>
             <td>역사, 윤리, 지리</td>
+            <td>미적분Ⅱ, 경제수학, 일반사회</td>
           </tr>
           <tr>
             <td>국제통상학과</td>
-            <td>미적분Ⅱ, 경제수학, 일반사회, 영어</td>
             <td>역사, 윤리, 지리</td>
+            <td>미적분Ⅱ, 경제수학, 일반사회, 영어</td>
           </tr>
           <tr>
-            <td>사회복지전공, 사회복지학과</td>
-            <td>일반사회, 윤리</td>
+            <td>사회학전공/사회복지학과</td>
             <td>역사, 지리</td>
+            <td>일반사회, 윤리</td>
           </tr>
 
           <!-- 경찰사법대학 -->
           <tr>
             <td class="college-cell">경찰사법</td>
             <td>경찰행정학부</td>
-            <td>미적분Ⅱ, 경제수학, 일반사회</td>
             <td>역사, 윤리, 지리</td>
+            <td>미적분Ⅱ, 경제수학, 일반사회</td>
           </tr>
 
           <!-- 경영대학 -->
           <tr>
             <td class="college-cell">경영</td>
             <td>경영학부(광역화)</td>
-            <td>미적분Ⅱ, 경제수학, 영어</td>
             <td>일반사회</td>
+            <td>미적분Ⅱ, 경제수학, 영어</td>
           </tr>
 
           <!-- 사범대학 -->
           <tr>
             <td rowspan="4" class="college-cell">사범</td>
             <td>교육학과</td>
-            <td>일반사회</td>
             <td>역사, 윤리, 지리</td>
+            <td>일반사회</td>
           </tr>
           <tr>
             <td>국어교육과</td>
-            <td>국어</td>
             <td>일반사회, 역사, 윤리, 지리</td>
+            <td>국어</td>
           </tr>
           <tr>
             <td>역사교육과</td>
-            <td>역사</td>
             <td>일반사회, 지리, 윤리</td>
+            <td>역사</td>
           </tr>
           <tr>
             <td>지리교육과</td>
-            <td>지리</td>
             <td>일반사회, 역사 윤리</td>
+            <td>지리</td>
           </tr>
 
           <!-- 예술대학 -->
           <tr>
             <td class="college-cell">예술</td>
             <td>연극학부, 영화영상학과</td>
-            <td></td>
             <td>일반사회, 역사, 윤리, 지리</td>
+            <td></td>
           </tr>
           <tr>
             <td rowspan="2" class="college-cell college-cell-last"></td>
             <td>열린전공학부(인문)</td>
+            <td>일반사회, 역사, 윤리, 지리,<br>제2외국어</td>
             <td>국어, 영어</td>
-            <td>일반사회, 역사, 윤리, 지리, 제2외국어</td>
           </tr>
         </tbody>        
       </table>
