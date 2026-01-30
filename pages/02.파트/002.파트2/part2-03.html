@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>파트2-03</title>
   <link rel="stylesheet" href="../../../styles.css">
+  <style>body{min-height:100vh;min-height:100dvh}</style>
   <script>
     // 플립북 모드 감지 및 스타일 조정
     (function() {
@@ -154,6 +155,10 @@
     .curriculum-table tbody tr:last-child td {
       border-bottom: none !important;
     }
+    /* 계 행만 회색, 나머지 행은 회색 배경 제거 */
+    .curriculum-table tbody tr:not(:last-child) {
+      background-color: transparent !important;
+    }
     /* 모든 셀의 border-radius 제거 - 테이블 바깥쪽 테두리만 둥글게 */
     .curriculum-table th,
     .curriculum-table td {
@@ -209,6 +214,73 @@
     .comparison-table:not(.curriculum-table) td:nth-child(3) {
       width: 43% !important;
     }
+
+    /* 이수·미이수 기준 카드형 디자인 */
+    .credit-card {
+      display: flex;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 2.5mm;
+      background: #fff;
+    }
+    .credit-card:last-child { margin-bottom: 0; }
+    .credit-card-label {
+      width: 18%;
+      min-width: 22mm;
+      background: #3B82F6;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 2.5mm 2mm;
+      text-align: center;
+      line-height: 1.3;
+    }
+    .credit-card-content {
+      flex: 1;
+      padding: 2mm 3mm;
+      background: #fff;
+      border-left: 1px solid #E5E7EB;
+    }
+    .credit-card-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .credit-card-content li {
+      padding-left: 5mm;
+      position: relative;
+      margin-bottom: 1mm;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #1F2937;
+    }
+    .credit-card-content li:last-child { margin-bottom: 0; }
+    .credit-card-content li:before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #3B82F6;
+      font-weight: bold;
+    }
+    .credit-card-toggle {
+      flex-shrink: 0;
+      width: 6mm;
+      height: 6mm;
+      min-width: 6mm;
+      min-height: 6mm;
+      border-radius: 50%;
+      background: #3B82F6;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -225,36 +297,39 @@
       고교학점제는 대학처럼 학생이 자신의 진로에 맞는 과목을 선택해 학업 계획을 설계하는 제도입니다. 정해진 시간표를 그대로 따르기보다, 어떤 과목을 언제 이수할지 미리 결정하는 것이 중요합니다.  
     </div>
 
-    <!-- 과목별 이수·미이수 기준 표 -->
-    <table class="comparison-table" style="margin-top: 1mm;">
-      <thead>
-        <tr>
-          <th>유형</th>
-          <th>이수 조건</th>
-          <th>미이수 조건</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>공통 과목</strong></td>
-          <td>출석률 2/3 이상 그리고 성취율 40% 이상</td>
-          <td>출석률 2/3 미만 또는 성취율 40% 미만</td>
-        </tr>
-        <tr>
-          <td><strong>선택 과목</strong></td>
-          <td>출석률 2/3 이상</td>
-          <td>출석률 2/3 미만</td>
-        </tr>
-        <tr>
-          <td><strong>창체 활동</strong></td>
-          <td>학년별 수업일수 기준 출석률 2/3 이상</td>
-          <td>학년별 수업일수 기준 출석률 2/3 미만</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- 과목별 이수·미이수 기준 카드 -->
+    <div class="credit-cards-wrap" style="margin-top: 1mm;">
+      <div class="credit-card">
+        <div class="credit-card-label">공통 과목</div>
+        <div class="credit-card-content">
+          <ul>
+            <li>이수 조건 : 출석률 2/3 이상 그리고 성취율 40% 이상</li>
+            <li>미이수 조건 : 출석률 2/3 미만 또는 성취율 40% 미만</li>
+          </ul>
+        </div>
+      </div>
+      <div class="credit-card">
+        <div class="credit-card-label">선택 과목</div>
+        <div class="credit-card-content">
+          <ul>
+            <li>이수 조건 : 출석률 2/3 이상</li>
+            <li>미이수 조건 : 출석률 2/3 미만</li>
+          </ul>
+        </div>
+      </div>
+      <div class="credit-card">
+        <div class="credit-card-label">창체 활동</div>
+        <div class="credit-card-content">
+          <ul>
+            <li>이수 조건 : 학년별 수업일수 기준 출석률 2/3 이상</li>
+            <li>미이수 조건 : 학년별 수업일수 기준 출석률 2/3 미만</li>
+          </ul>
+        </div>
+      </div>
+    </div>
 
         <!-- 소제목 1-4 -->
-    <h3 class="title-3" style="margin-bottom: 3.5mm; margin-top: 2mm;">2-2. 졸업 이수 기준 (총 192학점)</h3>
+    <h3 class="title-3" style="margin-bottom: 4mm; margin-top: 5mm;">2-2. 졸업 이수 기준 (총 192학점)</h3>
     
     <!-- 학점 계산 다이어그램 -->
     <div style="display: flex; gap: 3mm; align-items: center; justify-content: center; margin-top: 1mm;">
@@ -295,10 +370,10 @@
     </div>
     
     <!-- 소제목 1-3 -->
-    <h3 class="title-3" style="margin-bottom: 3.5mm; margin-top: 5mm;">2-3. 학교 교육과정 편제표 읽기</h3>
+    <h3 class="title-3" style="margin-bottom: 4mm; margin-top: 5mm;">2-3. 학교 교육과정 편제표 읽기</h3>
     
     <div class="text-body" style="margin-bottom: 2mm;">
-        각 고등학교는 3년 동안 어떤 과목을 몇 학점으로 개설하는지를 교육과정 편제표로 공개합니다. 아래 예시를 통해 편제표의 구성과 활용 방식을 확인해 보시기 바랍니다.
+      각 고등학교는 3년간 개설 과목과 이수 학점을 교육과정 편제표로 공개합니다. 아래에 제시된 내용은 편제표의 이해를 돕기 위한 자료로, 대학별 기계공학과 추천 과목(빨간색 음영)을 참고해 구성한 일부 샘플입니다.
     </div>
     
     <!-- 교육과정 편제표 -->
@@ -332,14 +407,14 @@
           <td>공통국어1</td>
           <td>4</td>
           <td>공통국어2</td>
-          <td>3</td>
-          <td>문학</td>
           <td>4</td>
-          <td>독서와작문</td>
+          <td>문학</td>
           <td>4</td>
           <td>화법과언어</td>
           <td>4</td>
-          <td>매체</td>
+          <td>독서와작문</td>
+          <td>4</td>
+          <td>매체의사소통</td>
           <td>3</td>
         </tr>
         <tr>
@@ -347,90 +422,76 @@
           <td>4</td>
           <td>공통수학2</td>
           <td>4</td>
-          <td>대수</td>
-          <td>4</td>
-          <td>미적분 I</td>
-          <td>4</td>
-          <td>확률과통계</td>
-          <td>4</td>
-          <td>수학과문화</td>
+          <td>영어독해와작문</td>
+          <td>3</td>
+          <td>영어발표와토톤</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">미적분 Ⅱ</td>
+          <td>3</td>
+          <td>미디어영어</td>
           <td>3</td>
         </tr>
         <tr>
           <td>공통영어1</td>
-          <td>3</td>
+          <td>4</td>
           <td>공통영어2</td>
           <td>4</td>
-          <td>영어 I</td>
+          <td>정보</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">기하</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">확률과통계</td>
           <td>4</td>
-          <td>영어 II</td>
-          <td>4</td>
-          <td>영어독해와작문</td>
-          <td>4</td>
-          <td>심화영어</td>
+          <td>수학과제탐구</td>
           <td>3</td>
         </tr>
         <tr>
           <td>통합사회1</td>
-          <td>3</td>
+          <td>4</td>
           <td>통합사회2</td>
           <td>4</td>
-          <td>운동과건강</td>
-          <td>2</td>
-          <td>스포츠과학</td>
-          <td>2</td>
-          <td>스포츠생활1</td>
-          <td>2</td>
-          <td>스포츠생활2</td>
-          <td>2</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">대수</td>
+          <td>4</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">미적분Ⅰ</td>
+          <td>4</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">역학과에너지</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">전자기와양자</td>
+          <td>3</td>
         </tr>
         <tr>
           <td>통합과학1</td>
           <td>4</td>
           <td>통합과학2</td>
+          <td>4</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">화학</td>
           <td>3</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td>과학탐구실험1</td>
-          <td>1</td>
-          <td>과학탐구실험2</td>
-          <td>1</td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">물리학</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">화학반응의세계</td>
+          <td>3</td>
+          <td style="background-color: rgba(220, 38, 38, 0.05);">물질과에너지</td>
+          <td>3</td>
         </tr>
         <tr style="font-weight: 600; background-color: #f3f4f6;">
           <td>계</td>
-          <td>19</td>
+          <td>20</td>
           <td>계</td>
-          <td>19</td>
+          <td>20</td>
           <td>계</td>
-          <td>14</td>
+          <td>17</td>
           <td>계</td>
-          <td>14</td>
+          <td>17</td>
           <td>계</td>
-          <td>14</td>
+          <td>17</td>
           <td>계</td>
-          <td>11</td>
+          <td>15</td>
         </tr>
       </tbody>
     </table>
     
     <!-- 세련된 팁 박스 -->
-    <div class="tip-box" style="font-size: 15px !important; margin-top: 2mm; padding-top: 4mm !important; padding-bottom: 3mm !important;">
+    <div class="tip-box" style="font-size: 15px !important; margin-top: 1mm; padding-top: 4mm !important; padding-bottom: 3mm !important;">
       <div class="tip-title" style="font-size: 15px !important;">체크 포인트</div>
       <ul class="list-check" style="font-size: 15px !important;">
         <li style="font-size: 15px !important;"><strong>전공 연계 : </strong>2∙3학년에 내 진로(희망 전공)와 관련된 과목이 개설되어 있는지 확인합니다.</li>

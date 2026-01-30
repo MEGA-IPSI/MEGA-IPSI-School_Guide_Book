@@ -21,6 +21,7 @@ body {
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
+  min-height: 100dvh; /* 모바일 주소창 대응 - 100vh는 모바일에서 실제 보이는 영역보다 커서 텍스트가 아래로 밀림 */
 }
 
 :root {
@@ -774,6 +775,7 @@ body.page-title-body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: 100dvh; /* 모바일 주소창 대응 - 100vh는 모바일에서 실제 보이는 영역보다 커서 텍스트가 아래로 밀림 */
 }
 
 /* A4 비율 - page-01.html과 동일한 여백 구조 */
