@@ -43,6 +43,7 @@ School_Guide_Book_Development/
 3. **돋보기 아이콘** : 아이콘 클릭 시 전체화면으로 크게 노출
 4. **Ctrl+F** : 검색하고 싶은 키워드 입력 시 해당 텍스트에 밑줄
 5. **컴퓨터** : 좌/우 마우스 클릭으로 페이지 넘기기 (Double Page View)
+6. **테블릿** : 좌/우 화살표 버튼으로 페이지 넘기기 (Double Page View)
 6. **모바일** : 좌/우 화살표 버튼으로 페이지 넘기기 (Single Page View)
 
 ---
