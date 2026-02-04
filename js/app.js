@@ -678,10 +678,22 @@
         if (!isMobileView()) return;
 
         const side = event.data.side;
+        const currentPage = $("#flipbook").turn("page") || 1;
+        let targetPage = currentPage;
+
         if (side === "left") {
-          $("#flipbook").turn("previous");
+          targetPage = currentPage - 1;
         } else if (side === "right") {
-          $("#flipbook").turn("next");
+          targetPage = currentPage + 1;
+        }
+
+        // 범위 보정
+        if (targetPage < 1) targetPage = 1;
+        if (targetPage > PAGE_FILES.length) targetPage = PAGE_FILES.length;
+
+        if (targetPage !== currentPage) {
+          preloadAround(targetPage, getPreloadRadius());
+          $("#flipbook").turn("page", targetPage);
         }
       });
 
