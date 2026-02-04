@@ -464,63 +464,49 @@
       const ARROW_MARGIN = (mode === "desktop") ? 30 : 18;
       const ARROW_SIZE = 44;
       const MIN_SCREEN_MARGIN = 10;
-      // 모바일: 태블릿과 동일한 페이지~버튼 간격(18px) 적용, 위쪽 배치에 맞게
-      const MOBILE_TOP_MARGIN = 18;
 
       const $flipbookWrapper = $(".flipbook-wrapper");
       const $prevBtn = $("#prevBtn");
       const $nextBtn = $("#nextBtn");
 
-      if ($flipbookWrapper.length && $prevBtn.length && $nextBtn.length) {
-        const wrapperRect = $flipbookWrapper[0].getBoundingClientRect();
-        const wrapperLeft = wrapperRect.left;
-        const wrapperRight = wrapperRect.right;
-        const wrapperTop = wrapperRect.top;
-        const wrapperHeight = wrapperRect.height;
+      if (!$flipbookWrapper.length || !$prevBtn.length || !$nextBtn.length) return;
 
-        const viewportWidth = window.innerWidth;
-
-        if (isMobile) {
-          // 모바일: 화살표를 페이지 위쪽·중앙 쪽에 배치 (두 버튼이 가운데로 모이도록)
-          const topY = wrapperTop - MOBILE_TOP_MARGIN - ARROW_SIZE;
-          const centerX = (wrapperLeft + wrapperRight) / 2;
-          const MOBILE_ARROW_GAP = 12;  // 두 화살표 사이 간격
-          let prevLeft = centerX - MOBILE_ARROW_GAP - ARROW_SIZE;
-          let nextLeft = centerX + MOBILE_ARROW_GAP;
-          if (prevLeft < MIN_SCREEN_MARGIN) prevLeft = MIN_SCREEN_MARGIN;
-          if (nextLeft + ARROW_SIZE > viewportWidth - MIN_SCREEN_MARGIN) {
-            nextLeft = viewportWidth - ARROW_SIZE - MIN_SCREEN_MARGIN;
-          }
-          $prevBtn.css({
-            left: prevLeft + 'px',
-            top: Math.max(MIN_SCREEN_MARGIN, topY) + 'px',
-            transform: 'translateY(0)'
-          });
-          $nextBtn.css({
-            left: nextLeft + 'px',
-            top: Math.max(MIN_SCREEN_MARGIN, topY) + 'px',
-            transform: 'translateY(0)'
-          });
-        } else {
-          // PC/태블릿: 양쪽 페이지 바깥에 배치
-          let prevLeft = wrapperLeft - ARROW_MARGIN - ARROW_SIZE;
-          let nextLeft = wrapperRight + ARROW_MARGIN;
-          if (prevLeft < MIN_SCREEN_MARGIN) prevLeft = MIN_SCREEN_MARGIN;
-          if (nextLeft + ARROW_SIZE > viewportWidth - MIN_SCREEN_MARGIN) {
-            nextLeft = viewportWidth - ARROW_SIZE - MIN_SCREEN_MARGIN;
-          }
-          $prevBtn.css({
-            left: prevLeft + 'px',
-            top: (wrapperTop + wrapperHeight / 2) + 'px',
-            transform: 'translateY(-50%)'
-          });
-          $nextBtn.css({
-            left: nextLeft + 'px',
-            top: (wrapperTop + wrapperHeight / 2) + 'px',
-            transform: 'translateY(-50%)'
-          });
-        }
+      // 📱 모바일에서는 화살표 버튼 완전히 숨김
+      if (isMobile) {
+        $prevBtn.css("display", "none");
+        $nextBtn.css("display", "none");
+        return;
       }
+
+      // PC/태블릿: 버튼 다시 보이도록
+      $prevBtn.css("display", "");
+      $nextBtn.css("display", "");
+
+      const wrapperRect = $flipbookWrapper[0].getBoundingClientRect();
+      const wrapperLeft = wrapperRect.left;
+      const wrapperRight = wrapperRect.right;
+      const wrapperTop = wrapperRect.top;
+      const wrapperHeight = wrapperRect.height;
+
+      const viewportWidth = window.innerWidth;
+
+      // PC/태블릿: 양쪽 페이지 바깥에 배치
+      let prevLeft = wrapperLeft - ARROW_MARGIN - ARROW_SIZE;
+      let nextLeft = wrapperRight + ARROW_MARGIN;
+      if (prevLeft < MIN_SCREEN_MARGIN) prevLeft = MIN_SCREEN_MARGIN;
+      if (nextLeft + ARROW_SIZE > viewportWidth - MIN_SCREEN_MARGIN) {
+        nextLeft = viewportWidth - ARROW_SIZE - MIN_SCREEN_MARGIN;
+      }
+      $prevBtn.css({
+        left: prevLeft + "px",
+        top: (wrapperTop + wrapperHeight / 2) + "px",
+        transform: "translateY(-50%)"
+      });
+      $nextBtn.css({
+        left: nextLeft + "px",
+        top: (wrapperTop + wrapperHeight / 2) + "px",
+        transform: "translateY(-50%)"
+      });
     }
 
     // 전체화면
@@ -683,6 +669,21 @@
           });
         });
       })();
+
+      // 📱 모바일 전용: iframe 내부에서 보낸 "모서리 탭" 메세지를 받아 페이지 넘기기
+      window.addEventListener("message", function(event) {
+        if (!event || !event.data || event.data.type !== "flipbook-edge-tap") return;
+
+        // 오직 모바일 뷰에서만 동작
+        if (!isMobileView()) return;
+
+        const side = event.data.side;
+        if (side === "left") {
+          $("#flipbook").turn("previous");
+        } else if (side === "right") {
+          $("#flipbook").turn("next");
+        }
+      });
 
       updatePageUI(1, [1]);
       setTimeout(updateNavButtonPosition, 200);
