@@ -147,37 +147,55 @@
       transform: translateY(-50%);
       width: 44px;
       height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      box-sizing: border-box;
+      padding: 0;
       border-radius: 50%;
       border: none;
       background: rgba(255, 255, 255, 0.9);
       color: #1f2937;
-      font-size: 20px;
+      font-size: 22px;
+      line-height: 1;
+      font-family: inherit;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      transition: all 0.2s ease;
+      transition: background 0.2s ease, box-shadow 0.2s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(8px);
-      line-height: 1;
-      padding-top: 1px;
+      flex-shrink: 0;
+    }
+    .nav-btn .nav-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-btn .nav-arrow svg {
+      width: 18px;
+      height: 18px;
+      color: #adb5bd;
+    }
+    .nav-btn.prev-btn .nav-arrow svg {
+      transform: translateX(-2px);
+    }
+    .nav-btn.next-btn .nav-arrow svg {
+      transform: translateX(2px);
     }
     .nav-btn:hover {
       background: rgba(255, 255, 255, 1);
-      transform: translateY(-50%) scale(1.08);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
     .nav-btn:active {
-      transform: translateY(-50%) scale(0.95);
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     }
     .nav-btn:focus { outline: none; }
-    .prev-btn { padding-left: 2px; }
-    /* 모바일: 화살표가 위쪽에 배치되므로 transform 기준을 맞춤 (JS에서 top 위치 지정) */
+    /* 모바일: transform 기준 유지 (JS에서 top 지정) */
     @media (max-width: 767px) {
-      .nav-btn:hover { transform: translateY(0) scale(1.08); }
-      .nav-btn:active { transform: translateY(0) scale(0.95); }
+      .nav-btn:hover,
+      .nav-btn:active { transform: translateY(0); }
     }
 
     .bottom-bar {
@@ -386,8 +404,8 @@
 <body>
   <div class="flipbook-wrapper">
     <div id="flipbook"></div>
-    <button class="nav-btn prev-btn" id="prevBtn">&#10094;</button>
-    <button class="nav-btn next-btn" id="nextBtn">&#10095;</button>
+    <button type="button" class="nav-btn prev-btn" id="prevBtn"><span class="nav-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M18 4 L6 12 L18 20 Z" fill="currentColor"/></svg></span></button>
+    <button type="button" class="nav-btn next-btn" id="nextBtn"><span class="nav-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 4 L18 12 L6 20 Z" fill="currentColor"/></svg></span></button>
   </div>
 
   <div class="bottom-bar">
