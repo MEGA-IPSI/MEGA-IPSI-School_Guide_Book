@@ -19,7 +19,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      height: 100dvh; /* 모바일 주소창 대응 */
+      height: 100dvh;
       font-family: sans-serif;
       overflow: hidden;
     }
@@ -53,46 +53,39 @@
       filter: blur(5px);
       opacity: 0.85;
       z-index: 0;
-      box-shadow: 
+      box-shadow:
         -2px 0 6px rgba(0, 0, 0, 0.08),
         2px 0 6px rgba(0, 0, 0, 0.08);
     }
 
-    /* 페이지 넘김 중에는 그림자 기둥 숨김 (페이지 뒤로 가려짐) */
     .flipbook-wrapper.turning::after {
       opacity: 0;
       transition: opacity 0.15s ease-in;
     }
 
-    /* 페이지 넘김이 끝나면 그림자 기둥 다시 표시 */
     .flipbook-wrapper:not(.turning)::after {
       transition: opacity 0.4s ease-out;
     }
 
-    /* 단면(모바일)에서는 숨김 */
+    /* ✅ 모바일(single)에서는 기둥 숨김 */
     @media (max-width: 767px) {
-      .flipbook-wrapper::after {
-        display: none;
-      }
+      .flipbook-wrapper::after { display: none; }
     }
 
     #flipbook {
       box-shadow: 0 0 20px rgba(0,0,0,0.3);
       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
       overflow: hidden;
-      will-change: transform;
       transform: translateZ(0);
       perspective: 10000px;
       transform-style: preserve-3d;
     }
 
-    /* ✅ 페이지 기본 */
     #flipbook .page {
       position: relative;
       background: #fff;
       overflow: hidden;
-      z-index: 2; /* 페이지가 중앙 그림자보다 위로 오도록 */
-      will-change: transform;
+      z-index: 2;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       transform-style: preserve-3d;
@@ -100,20 +93,15 @@
       transition: box-shadow 0.3s ease-out;
     }
 
-    /* 페이지 넘김 시 동적 그림자 효과 */
     .flipbook-wrapper.turning #flipbook .page {
-      box-shadow: 
+      box-shadow:
         0 0 20px rgba(0, 0, 0, 0.15),
         0 10px 30px rgba(0, 0, 0, 0.1);
     }
-    
 
-    /* 첫 번째 빈 페이지 스타일 */
     #flipbook .page:first-child {
       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     }
-
-    /* 페이지 모서리 입체 그림자 제거됨 */
 
     #flipbook .page iframe {
       width: 100%;
@@ -130,19 +118,27 @@
       -webkit-backface-visibility: hidden;
       -webkit-transform: translateZ(0);
       -webkit-font-smoothing: antialiased;
-      will-change: opacity;
     }
 
-    /* 완전히 로드된 iframe만 표시 (transition 없이 즉시) */
+    /* src가 붙은 iframe은 로드되며 표시 (빈 페이지 안 보이게) */
+    #flipbook .page iframe[data-src-loaded="true"],
     #flipbook .page iframe[data-ready="true"] {
       opacity: 1;
-      will-change: auto;
       transition: none;
     }
-    
-    /* 페이지 전환 중에도 콘텐츠 안정적으로 유지 */
+
     .flipbook-wrapper.turning #flipbook .page iframe[data-ready="true"] {
       pointer-events: none;
+    }
+
+    /* ✅ will-change는 전환 중에만 */
+    .flipbook-wrapper.turning #flipbook,
+    .flipbook-wrapper.turning #flipbook .page {
+      will-change: transform;
+    }
+
+    .flipbook-wrapper.turning #flipbook .page iframe[data-ready="true"] {
+      will-change: opacity, transform;
     }
 
     .nav-btn {
@@ -167,20 +163,23 @@
       line-height: 1;
       padding-top: 1px;
     }
-    .nav-btn:hover { 
-      background: rgba(255, 255, 255, 1); 
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 1);
       transform: translateY(-50%) scale(1.08);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    .nav-btn:active { 
+    .nav-btn:active {
       transform: translateY(-50%) scale(0.95);
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
     }
     .nav-btn:focus { outline: none; }
-
     .prev-btn { padding-left: 2px; }
+    /* 모바일: 화살표가 위쪽에 배치되므로 transform 기준을 맞춤 (JS에서 top 위치 지정) */
+    @media (max-width: 767px) {
+      .nav-btn:hover { transform: translateY(0) scale(1.08); }
+      .nav-btn:active { transform: translateY(0) scale(0.95); }
+    }
 
-    /* 하단바 */
     .bottom-bar {
       width: auto;
       padding: 8px 12px;
@@ -219,7 +218,6 @@
     }
     .page-slider:hover { background: #cbd5e1; }
 
-    /* 슬라이더 채워진 부분 파란색으로 */
     .page-slider::-webkit-slider-runnable-track {
       height: 3px;
       border-radius: 999px;
@@ -265,7 +263,6 @@
       background: #e2e8f0;
     }
 
-    /* Firefox에서 슬라이더 채워진 부분 파란색으로 */
     .page-slider::-moz-range-progress {
       height: 3px;
       border-radius: 999px;
@@ -311,16 +308,28 @@
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
-    .page-label .page-slash {
-      color: #475569;
+    /* 모바일·태블릿: 페이지 번호 입력 비활성 — 클릭해도 아무 변화 없음 */
+    @media (max-width: 1024px) {
+      .page-label .page-number {
+        -webkit-tap-highlight-color: transparent;
+        tap-highlight-color: transparent;
+        cursor: default;
+      }
+      .page-label .page-number:hover,
+      .page-label .page-number:active {
+        color: #475569;
+        background: transparent;
+      }
+      .page-label .page-number[contenteditable="true"],
+      .page-label .page-number[contenteditable="true"]:focus {
+        outline: none;
+        box-shadow: none;
+      }
     }
 
-    .page-label .page-total {
-      color: #475569;
-      margin-left: 4px;
-    }
+    .page-label .page-slash { color: #475569; }
+    .page-label .page-total { color: #475569; margin-left: 4px; }
 
-    /* 전체화면 버튼 */
     .fullscreen-btn {
       width: 20px;
       height: 20px;
@@ -346,13 +355,7 @@
       color: #3b82f6;
     }
 
-    .fullscreen-btn:hover svg {
-      stroke: #3b82f6;
-    }
-
-    .fullscreen-btn:active {
-      transform: scale(0.95);
-    }
+    .fullscreen-btn:active { transform: scale(0.95); }
 
     .fullscreen-btn svg {
       width: 16px;
@@ -364,13 +367,25 @@
       stroke-linejoin: round;
       transition: stroke 0.2s ease;
     }
+    /* 모바일·태블릿: 돋보기(전체화면) 비활성 — 클릭해도 아무 변화 없음 */
+    @media (max-width: 1024px) {
+      .fullscreen-btn {
+        -webkit-tap-highlight-color: transparent;
+      }
+      .fullscreen-btn:hover,
+      .fullscreen-btn:focus,
+      .fullscreen-btn:active {
+        outline: none;
+        background: transparent;
+        transform: none;
+      }
+    }
   </style>
 </head>
-<body>
 
+<body>
   <div class="flipbook-wrapper">
     <div id="flipbook"></div>
-
     <button class="nav-btn prev-btn" id="prevBtn">&#10094;</button>
     <button class="nav-btn next-btn" id="nextBtn">&#10095;</button>
   </div>
@@ -391,7 +406,7 @@
   <script>
     const PAGE_FILES = [
       'pages/00.표지/title.html',
-      'pages/01.목차/list.html', 
+      'pages/01.목차/list.html',
       'pages/02.파트/001.파트1/part1-01.html',
       'pages/02.파트/001.파트1/part1-02.html',
       'pages/02.파트/001.파트1/part1-03.html',
@@ -455,22 +470,37 @@
       'pages/03.부록/004.부록4/appendix4-09.html'
     ];
 
-    const BASE_PAGE_WIDTH = 600;
-    const BASE_PAGE_HEIGHT = Math.round(600 * 1.414);
+    // ✅ 3단계 breakpoint
+    const BP_MOBILE_MAX = 767;   // mobile: 1page
+    const BP_TABLET_MAX = 1024;  // tablet: 2page
+    // desktop: 2page
+
     let bookInitialized = false;
+
+    function getViewMode() {
+      const w = window.innerWidth;
+      if (w <= BP_MOBILE_MAX) return "mobile";
+      if (w <= BP_TABLET_MAX) return "tablet";
+      return "desktop";
+    }
+
+    function isMobileView() {
+      return getViewMode() === "mobile";
+    }
+
+    function isDesktopOnly() {
+      return getViewMode() === "desktop"; // desktop(1025px~)만 true
+    }
 
     function setupIframeLoadHandler(iframe) {
       const $iframe = $(iframe);
       if ($iframe.attr("data-handler-setup") === "true") return;
       $iframe.attr("data-handler-setup", "true");
-      
+
       iframe.addEventListener("load", function() {
-        // iframe이 완전히 로드되고 내부 콘텐츠까지 렌더링 완료 보장
         function markReady() {
-          // 모든 리소스(이미지, 폰트 등)가 완전히 로드될 때까지 대기
           requestAnimationFrame(function() {
             requestAnimationFrame(function() {
-              // 이중 requestAnimationFrame으로 렌더링 완료 보장
               $iframe.attr("data-ready", "true");
             });
           });
@@ -478,44 +508,36 @@
 
         try {
           const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          
-          // 이미지 로딩 완료 확인
+
           function checkImagesLoaded() {
             const images = iframeDoc.querySelectorAll('img');
             let loadedCount = 0;
             const totalImages = images.length;
-            
+
             if (totalImages === 0) {
               markReady();
               return;
             }
-            
+
             images.forEach(function(img) {
               if (img.complete) {
                 loadedCount++;
               } else {
                 img.addEventListener('load', function() {
                   loadedCount++;
-                  if (loadedCount === totalImages) {
-                    markReady();
-                  }
+                  if (loadedCount === totalImages) markReady();
                 });
                 img.addEventListener('error', function() {
                   loadedCount++;
-                  if (loadedCount === totalImages) {
-                    markReady();
-                  }
+                  if (loadedCount === totalImages) markReady();
                 });
               }
             });
-            
-            if (loadedCount === totalImages) {
-              markReady();
-            }
+
+            if (loadedCount === totalImages) markReady();
           }
-          
+
           if (iframeDoc.readyState === 'complete') {
-            // document.fonts.ready로 폰트 로딩 완료 확인
             if (iframeDoc.fonts && iframeDoc.fonts.ready) {
               iframeDoc.fonts.ready.then(function() {
                 setTimeout(checkImagesLoaded, 100);
@@ -537,7 +559,6 @@
             });
           }
         } catch (e) {
-          // cross-origin 에러 시 충분한 대기 시간
           setTimeout(function() {
             requestAnimationFrame(function() {
               requestAnimationFrame(function() {
@@ -551,42 +572,60 @@
 
     function createPages() {
       const $flipbook = $("#flipbook");
+
       PAGE_FILES.forEach((pageFile, index) => {
         const pageNum = index + 1;
 
-        // ✅ 모든 페이지를 즉시 로드 (loading="eager"로 변경)
+        // ✅ iframe은 src 없이 생성 (lazy attach)
         const iframe = $("<iframe></iframe>")
-          .attr("src", pageFile + "?flipbook=1")
           .attr("data-src", pageFile + "?flipbook=1")
-          .attr("data-src-loaded", "true")
-          .attr("loading", "eager")
-          .css({ 
+          .attr("loading", "lazy")
+          .css({
             "pointer-events": "auto",
-            "transform": "translateZ(0)",
-            "will-change": "opacity"
+            "transform": "translateZ(0)"
           });
 
-        // 모든 iframe에 로드 핸들러 설정
         setupIframeLoadHandler(iframe[0]);
 
         const pageClass = (pageNum % 2 === 0) ? "even" : "odd";
-        $("<div></div>")
+
+        const $page = $("<div></div>")
           .addClass("page " + pageClass)
           .attr("data-page", pageNum)
-          .append(iframe)
-          .appendTo($flipbook);
+          .append(iframe);
+
+        $page.appendTo($flipbook);
       });
     }
 
-    function preloadAdjacentPages(currentPage) {
-      // ✅ 모든 페이지가 이미 로드되어 있으므로 추가 로드 불필요
-      // 안전성을 위해 함수는 유지하되 빈 함수로 처리
+    function ensurePageLoaded(pageNum) {
+      if (!pageNum || pageNum < 1 || pageNum > PAGE_FILES.length) return;
+
+      const $page = $("#flipbook .page[data-page='" + pageNum + "']");
+      const $iframe = $page.find("iframe");
+
+      if (!$iframe.length) return;
+      if ($iframe.attr("data-src-loaded") === "true") return;
+
+      const src = $iframe.attr("data-src");
+      if (!src) return;
+
+      $iframe.attr("src", src);
+      $iframe.attr("data-src-loaded", "true");
     }
 
-    function isMobileView() {
-      return window.innerWidth < 768;
+    function getPreloadRadius() {
+      return getViewMode() === "desktop" ? 3 : 2;
     }
 
+    function preloadAround(page, radius) {
+      radius = radius == null ? getPreloadRadius() : radius;
+      for (let p = page - radius; p <= page + radius; p++) {
+        ensurePageLoaded(p);
+      }
+    }
+
+    // 모바일(single) vs 그 외(double) 기준 슬라이더 매핑
     function pageToSliderPos(page, isMobile) {
       if (isMobile) return Math.max(1, Math.min(page || 1, PAGE_FILES.length));
       if (page === 1) return 1;
@@ -610,28 +649,18 @@
       const value = parseInt($slider.val(), 10) || 1;
       const max = parseInt($slider.attr("max"), 10) || 1;
       const progress = max > 1 ? ((value - 1) / (max - 1)) * 100 : 0;
-      
-      // WebKit 브라우저용 그라디언트 설정
-      const gradient = `linear-gradient(to right, #3b82f6 ${progress}%, #e2e8f0 ${progress}%)`;
-      $slider[0].style.setProperty('--slider-progress', progress + '%');
-      
-      // 직접 스타일 적용 (WebKit)
-      const sliderElement = $slider[0];
-      if (sliderElement.style) {
-        // WebKit의 경우 track에 직접 적용할 수 없으므로, CSS 변수 사용
-        document.documentElement.style.setProperty('--slider-progress', progress + '%');
-      }
+      document.documentElement.style.setProperty('--slider-progress', progress + '%');
     }
 
     function updatePageUI(page, view) {
       const isMobile = isMobileView();
+      const sliderMax = getSliderMax(isMobile);
+
+      $("#pageSlider").attr("max", sliderMax);
+
       const sliderPos = pageToSliderPos(page || 1, isMobile);
       $("#pageSlider").val(sliderPos);
 
-      const sliderMax = getSliderMax(isMobile);
-      $("#pageSlider").attr("max", sliderMax);
-
-      // 슬라이더 진행률 업데이트
       updateSliderProgress();
 
       let pageNumberText = "";
@@ -645,25 +674,34 @@
       } else if (page) {
         pageNumberText = `${page}`;
       }
-      
+
       const $pageLabel = $("#pageLabel");
       const $existingNumber = $pageLabel.find(".page-number");
       if ($existingNumber.length) {
         $existingNumber.text(pageNumberText);
         $pageLabel.find(".page-total").text(PAGE_FILES.length);
       } else {
-        $pageLabel.html(`<span class="page-number">${pageNumberText}</span><span class="page-slash">/</span><span class="page-total">${PAGE_FILES.length}</span>`);
+        $pageLabel.html(
+          `<span class="page-number">${pageNumberText}</span>` +
+          `<span class="page-slash">/</span>` +
+          `<span class="page-total">${PAGE_FILES.length}</span>`
+        );
       }
     }
 
     function updateFlipbookLayout() {
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const isMobile = viewportWidth < 768;
 
-      const ARROW_MARGIN = 30;
+      const mode = getViewMode();            // mobile/tablet/desktop
+      const isMobile = (mode === "mobile");  // ✅ 모바일만 single
+
       const SCREEN_MARGIN = 10;
       const ARROW_WIDTH = 44;
+
+      // PC는 기존 여백 유지, 태블릿/모바일은 조금 줄여 화면 효율 ↑
+      const ARROW_MARGIN = (mode === "desktop") ? 30 : 18;
+
       const navBtnSpace = (ARROW_MARGIN + ARROW_WIDTH + SCREEN_MARGIN) * 2;
 
       const bottomBarHeight = 40;
@@ -672,26 +710,33 @@
       const maxBookWidth = Math.max(viewportWidth - navBtnSpace, viewportWidth * 0.9);
       const maxBookHeight = viewportHeight - bottomBarHeight - verticalMargin;
 
-      let pageWidth, pageHeight, bookWidth, bookHeight, displayMode;
+      // ✅ A4 비율 유지
       const A4_RATIO = 297 / 210;
 
+      let pageWidth, pageHeight, bookWidth, bookHeight, displayMode;
+
       if (isMobile) {
+        // ✅ 모바일: 1페이지
         pageWidth = maxBookWidth;
         pageHeight = Math.round(pageWidth * A4_RATIO);
+
         if (pageHeight > maxBookHeight) {
           pageHeight = maxBookHeight;
           pageWidth = Math.round(pageHeight / A4_RATIO);
         }
+
         bookWidth = pageWidth;
         bookHeight = pageHeight;
         displayMode = "single";
 
-        const scaleFactor = 0.97;
+        const scaleFactor = 0.97; // 모바일은 살짝 여유
         bookWidth = Math.round(bookWidth * scaleFactor);
         bookHeight = Math.round(bookHeight * scaleFactor);
         pageWidth = Math.round(pageWidth * scaleFactor);
         pageHeight = Math.round(pageHeight * scaleFactor);
+
       } else {
+        // ✅ 태블릿/PC: 2페이지
         const maxPageWidth = maxBookWidth / 2;
         const maxPageHeight = maxBookHeight;
 
@@ -707,7 +752,9 @@
         bookHeight = pageHeight;
         displayMode = "double";
 
-        const scaleFactor = 0.97;
+        // 태블릿은 2페이지 유지 안정화를 위해 조금 더 축소
+        const scaleFactor = (mode === "tablet") ? 0.94 : 0.97;
+
         bookWidth = Math.round(bookWidth * scaleFactor);
         bookHeight = Math.round(bookHeight * scaleFactor);
         pageWidth = Math.round(pageWidth * scaleFactor);
@@ -719,6 +766,7 @@
       $("#flipbook .page").css({ width: pageWidth, height: pageHeight });
       $(".bottom-bar").css({ width: bookWidth });
 
+      // iframe 내부 A4 컨텐츠 리사이즈 메시지 유지
       setTimeout(function() {
         $("#flipbook .page iframe[data-ready='true']").each(function() {
           try {
@@ -739,13 +787,16 @@
           height: bookHeight,
           display: displayMode,
           autoCenter: true,
-          elevation: 0,
+          elevation: getViewMode() === "desktop" ? 0 : 1,
           gradients: false,
-          duration: 1000,
+          duration: getViewMode() === "desktop" ? 1000 : 650,
           acceleration: true,
           when: {
             turning: function(event, page, view) {
               $(".flipbook-wrapper").addClass("turning");
+
+              // ✅ 전환 직전: 다음/이전 페이지 미리 로드 (반경은 모드별)
+              preloadAround(page, getPreloadRadius());
 
               $("#flipbook .page").removeClass("even odd");
               $("#flipbook .page").each(function(index) {
@@ -754,10 +805,12 @@
               });
             },
             turned: function(event, page, view) {
-              // 현재 보이는 페이지의 iframe이 완전히 로드되었는지 확인
+              // ✅ 전환 완료 후에도 주변 페이지 추가 로드 (연속 넘길 때 대비)
+              preloadAround(page, getPreloadRadius());
+
               const currentPages = view || [page];
               let allReady = true;
-              
+
               currentPages.forEach(function(p) {
                 const $page = $("#flipbook .page[data-page='" + p + "']");
                 const $iframe = $page.find("iframe");
@@ -765,30 +818,25 @@
                   allReady = false;
                 }
               });
-              
-              // 모든 페이지가 준비되었을 때만 turning 제거
-              if (allReady) {
+
+              function finalize() {
                 requestAnimationFrame(function() {
                   $(".flipbook-wrapper").removeClass("turning");
-                  updatePageUI(page, view);
-                });
-              } else {
-                // 아직 로딩 중이면 잠시 후 다시 확인
-                setTimeout(function() {
-                  requestAnimationFrame(function() {
-                    $(".flipbook-wrapper").removeClass("turning");
-                    updatePageUI(page, view);
+                  $("#flipbook .page").removeClass("even odd");
+                  $("#flipbook .page").each(function(index) {
+                    if ((index + 1) % 2 === 0) $(this).addClass("even");
+                    else $(this).addClass("odd");
                   });
-                }, 100);
+                  const isMobileCheck = isMobileView();
+                  $("#pageSlider").attr("max", getSliderMax(isMobileCheck));
+                  updatePageUI(page, view);
+                  requestAnimationFrame(updateNavButtonPosition);
+                });
               }
+
+              if (allReady) finalize();
+              else setTimeout(finalize, 100);
             }
-          }
-        });
-        
-        // 자연스러운 easing 함수 적용
-        $.extend($.easing, {
-          easeOutQuad: function(x, t, b, c, d) {
-            return -c * (t /= d) * (t - 2) + b;
           }
         });
 
@@ -811,18 +859,19 @@
 
       const page = $("#flipbook").turn("page") || 1;
       const view = $("#flipbook").turn("view");
-      
-      // 모바일에서 슬라이더 max를 명시적으로 업데이트
-      const sliderMax = getSliderMax(isMobile);
-      $("#pageSlider").attr("max", sliderMax);
-      
+      $("#pageSlider").attr("max", getSliderMax(isMobile));
       updatePageUI(page, view);
       updateNavButtonPosition();
     }
 
     function updateNavButtonPosition() {
-      const ARROW_MARGIN = 30;
+      const mode = getViewMode();
+      const isMobile = isMobileView();
+      const ARROW_MARGIN = (mode === "desktop") ? 30 : 18;
+      const ARROW_SIZE = 44;
       const MIN_SCREEN_MARGIN = 10;
+      // 모바일: 태블릿과 동일한 페이지~버튼 간격(18px) 적용, 위쪽 배치에 맞게
+      const MOBILE_TOP_MARGIN = 18;
 
       const $flipbookWrapper = $(".flipbook-wrapper");
       const $prevBtn = $("#prevBtn");
@@ -837,141 +886,91 @@
 
         const viewportWidth = window.innerWidth;
 
-        let prevLeft = wrapperLeft - ARROW_MARGIN - 44;
-        if (prevLeft < MIN_SCREEN_MARGIN) prevLeft = MIN_SCREEN_MARGIN;
-
-        let nextLeft = wrapperRight + ARROW_MARGIN;
-        if (nextLeft + 44 > viewportWidth - MIN_SCREEN_MARGIN) {
-          nextLeft = viewportWidth - 44 - MIN_SCREEN_MARGIN;
+        if (isMobile) {
+          // 모바일: 화살표를 페이지 위쪽·중앙 쪽에 배치 (두 버튼이 가운데로 모이도록)
+          const topY = wrapperTop - MOBILE_TOP_MARGIN - ARROW_SIZE;
+          const centerX = (wrapperLeft + wrapperRight) / 2;
+          const MOBILE_ARROW_GAP = 12;  // 두 화살표 사이 간격
+          let prevLeft = centerX - MOBILE_ARROW_GAP - ARROW_SIZE;
+          let nextLeft = centerX + MOBILE_ARROW_GAP;
+          if (prevLeft < MIN_SCREEN_MARGIN) prevLeft = MIN_SCREEN_MARGIN;
+          if (nextLeft + ARROW_SIZE > viewportWidth - MIN_SCREEN_MARGIN) {
+            nextLeft = viewportWidth - ARROW_SIZE - MIN_SCREEN_MARGIN;
+          }
+          $prevBtn.css({
+            left: prevLeft + 'px',
+            top: Math.max(MIN_SCREEN_MARGIN, topY) + 'px',
+            transform: 'translateY(0)'
+          });
+          $nextBtn.css({
+            left: nextLeft + 'px',
+            top: Math.max(MIN_SCREEN_MARGIN, topY) + 'px',
+            transform: 'translateY(0)'
+          });
+        } else {
+          // PC/태블릿: 양쪽 페이지 바깥에 배치
+          let prevLeft = wrapperLeft - ARROW_MARGIN - ARROW_SIZE;
+          let nextLeft = wrapperRight + ARROW_MARGIN;
+          if (prevLeft < MIN_SCREEN_MARGIN) prevLeft = MIN_SCREEN_MARGIN;
+          if (nextLeft + ARROW_SIZE > viewportWidth - MIN_SCREEN_MARGIN) {
+            nextLeft = viewportWidth - ARROW_SIZE - MIN_SCREEN_MARGIN;
+          }
+          $prevBtn.css({
+            left: prevLeft + 'px',
+            top: (wrapperTop + wrapperHeight / 2) + 'px',
+            transform: 'translateY(-50%)'
+          });
+          $nextBtn.css({
+            left: nextLeft + 'px',
+            top: (wrapperTop + wrapperHeight / 2) + 'px',
+            transform: 'translateY(-50%)'
+          });
         }
-
-        $prevBtn.css({
-          left: prevLeft + 'px',
-          top: (wrapperTop + wrapperHeight / 2) + 'px'
-        });
-
-        $nextBtn.css({
-          left: nextLeft + 'px',
-          top: (wrapperTop + wrapperHeight / 2) + 'px'
-        });
       }
     }
 
-    // 전체화면 전환 함수
+    // 전체화면
     function requestFullscreen() {
       const elem = document.documentElement;
-      
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen().catch(err => {
-          console.log('전체화면 요청 실패:', err);
-        });
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-      } else if (elem.mozRequestFullScreen) {
-        elem.mozRequestFullScreen();
-      } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
-      }
+      if (elem.requestFullscreen) elem.requestFullscreen().catch(()=>{});
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.mozRequestFullScreen) elem.mozRequestFullScreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
     }
 
-    // 전체화면 종료 함수
     function exitFullscreen() {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
     }
 
-    // 전체화면 상태 확인 함수
     function isFullscreen() {
-      return !!(document.fullscreenElement || 
-                document.webkitFullscreenElement || 
-                document.mozFullScreenElement || 
+      return !!(document.fullscreenElement ||
+                document.webkitFullscreenElement ||
+                document.mozFullScreenElement ||
                 document.msFullscreenElement);
-    }
-
-    // 전체화면 아이콘 업데이트
-    function updateFullscreenIcon() {
-      // SVG 아이콘은 상태에 따라 변경할 필요 없음 (동일한 돋보기 아이콘 사용)
     }
 
     $(document).ready(function () {
       createPages();
 
+      // ✅ 첫 화면은 1페이지 주변만 로드 (반경은 모드별)
+      preloadAround(1, getPreloadRadius());
+
       const isMobile = isMobileView();
       $("#pageSlider").attr("max", getSliderMax(isMobile)).val(1);
 
       updateFlipbookLayout();
-      // 초기 로딩 시 기둥이 바로 보이도록 보장
       $(".flipbook-wrapper").removeClass("turning");
 
-      // 전체화면 버튼 클릭 이벤트
-      $("#fullscreenBtn").on("click", function() {
-        if (isFullscreen()) {
-          exitFullscreen();
-        } else {
-          requestFullscreen();
+      $("#fullscreenBtn").on("click", function(e) {
+        if (!isDesktopOnly()) {
+          e.preventDefault();
+          return;
         }
-      });
-
-      // 전체화면 상태 변경 감지
-      document.addEventListener('fullscreenchange', updateFullscreenIcon);
-      document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
-      document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
-      document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
-
-      // 초기 아이콘 상태 설정
-      updateFullscreenIcon();
-
-      $("#flipbook").bind("turned", function (e, page, view) {
-        // 현재 보이는 페이지의 iframe이 완전히 로드되었는지 확인
-        const currentPages = view || [page];
-        let allReady = true;
-        
-        currentPages.forEach(function(p) {
-          const $page = $("#flipbook .page[data-page='" + p + "']");
-          const $iframe = $page.find("iframe");
-          if ($iframe.length && !$iframe.attr("data-ready")) {
-            allReady = false;
-          }
-        });
-        
-        // 모든 페이지가 준비되었을 때만 turning 제거
-        function finalize() {
-          requestAnimationFrame(function() {
-            $(".flipbook-wrapper").removeClass("turning");
-
-            $("#flipbook .page").removeClass("even odd");
-            $("#flipbook .page").each(function(index) {
-              if ((index + 1) % 2 === 0) $(this).addClass("even");
-              else $(this).addClass("odd");
-            });
-
-            // 모바일에서 슬라이더 max를 명시적으로 업데이트
-            const isMobileCheck = isMobileView();
-            const sliderMax = getSliderMax(isMobileCheck);
-            $("#pageSlider").attr("max", sliderMax);
-            
-            updatePageUI(page, view);
-            requestAnimationFrame(function() {
-              updateNavButtonPosition();
-            });
-          });
-        }
-        
-        if (allReady) {
-          finalize();
-        } else {
-          // 아직 로딩 중이면 잠시 후 다시 확인
-          setTimeout(function() {
-            finalize();
-          }, 150);
-        }
+        if (isFullscreen()) exitFullscreen();
+        else requestFullscreen();
       });
 
       $("#prevBtn").click(function() {
@@ -987,43 +986,51 @@
         const isMobile = isMobileView();
         const targetPage = sliderPosToPage(sliderPos, isMobile);
         updateSliderProgress();
+        preloadAround(targetPage, getPreloadRadius());
         $("#flipbook").turn("page", targetPage);
       });
 
-      // 페이지 번호 클릭 시 직접 편집 가능하게
       $(document).on("click", ".page-number", function(e) {
+        // ✅ PC에서만 입력 이동 기능 허용
+        if (!isDesktopOnly()) return;
+
         e.stopPropagation();
         const $numberSpan = $(this);
-        if ($numberSpan.attr("contenteditable") === "true") return; // 이미 편집 모드면 무시
-        
+        if ($numberSpan.attr("contenteditable") === "true") return;
+
         const currentPage = $("#flipbook").turn("page") || 1;
         const originalText = $numberSpan.text();
-        
-        // 범위 형식(8-9)인 경우 첫 번째 숫자만 추출
+
+        // 범위(8-9)면 첫 숫자만
         const firstPage = parseInt(originalText.split('-')[0], 10) || currentPage;
-        
+
         $numberSpan
           .attr("contenteditable", "true")
           .text(firstPage)
           .focus();
-        
-        // 텍스트 전체 선택
+
         const range = document.createRange();
         range.selectNodeContents($numberSpan[0]);
         const selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
       });
-      
-      // 페이지 번호 편집 완료 시
+
       $(document).on("keydown", ".page-number[contenteditable='true']", function(e) {
+        // ✅ PC에서만 동작 (혹시 다른 환경에서 contenteditable이 켜졌을 때 대비)
+        if (!isDesktopOnly()) {
+          $(this).attr("contenteditable", "false");
+          return;
+        }
+
         const $numberSpan = $(this);
         const maxPage = PAGE_FILES.length;
-        
+
         if (e.key === "Enter") {
           e.preventDefault();
           const pageNum = parseInt($numberSpan.text(), 10);
           if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= maxPage) {
+            preloadAround(pageNum, getPreloadRadius());
             $("#flipbook").turn("page", pageNum);
           }
           $numberSpan.attr("contenteditable", "false");
@@ -1034,45 +1041,54 @@
           $numberSpan.attr("contenteditable", "false");
         }
       });
-      
-      // 포커스가 벗어나면 편집 모드 해제
+
       $(document).on("blur", ".page-number[contenteditable='true']", function() {
+        // ✅ PC에서만 동작
+        if (!isDesktopOnly()) {
+          $(this).attr("contenteditable", "false");
+          return;
+        }
+
         const $numberSpan = $(this);
         const maxPage = PAGE_FILES.length;
         const pageNum = parseInt($numberSpan.text(), 10);
-        
+
         if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= maxPage) {
+          preloadAround(pageNum, getPreloadRadius());
           $("#flipbook").turn("page", pageNum);
         } else {
-          // 유효하지 않은 값이면 현재 페이지로 복구
           const currentPage = $("#flipbook").turn("page") || 1;
           $numberSpan.text(currentPage);
         }
-        
+
         $numberSpan.attr("contenteditable", "false");
       });
 
-      $(window).on("resize", function() {
-        const isMobile = isMobileView();
-        $("#pageSlider").attr("max", getSliderMax(isMobile));
-
-        const currentPage = $("#flipbook").turn("page") || 1;
-        const currentSliderPos = pageToSliderPos(currentPage, isMobile);
-        $("#pageSlider").val(currentSliderPos);
-        updateSliderProgress();
-
-        updateFlipbookLayout();
-
-        setTimeout(function() {
-          $("#flipbook .page").removeClass("even odd");
-          $("#flipbook .page").each(function(index) {
-            if ((index + 1) % 2 === 0) $(this).addClass("even");
-            else $(this).addClass("odd");
+      (function() {
+        var resizeScheduled = false;
+        $(window).on("resize", function() {
+          if (resizeScheduled) return;
+          resizeScheduled = true;
+          requestAnimationFrame(function() {
+            resizeScheduled = false;
+            const isMobile = isMobileView();
+            $("#pageSlider").attr("max", getSliderMax(isMobile));
+            const currentPage = $("#flipbook").turn("page") || 1;
+            const currentSliderPos = pageToSliderPos(currentPage, isMobile);
+            $("#pageSlider").val(currentSliderPos);
+            updateSliderProgress();
+            updateFlipbookLayout();
+            setTimeout(function() {
+              $("#flipbook .page").removeClass("even odd");
+              $("#flipbook .page").each(function(index) {
+                if ((index + 1) % 2 === 0) $(this).addClass("even");
+                else $(this).addClass("odd");
+              });
+            }, 100);
+            setTimeout(updateNavButtonPosition, 100);
           });
-        }, 100);
-
-        setTimeout(updateNavButtonPosition, 100);
-      });
+        });
+      })();
 
       updatePageUI(1, [1]);
       setTimeout(updateNavButtonPosition, 200);
