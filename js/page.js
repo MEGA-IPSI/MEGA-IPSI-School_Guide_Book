@@ -60,51 +60,77 @@
   });
 
   /**
-   * 📱 모바일 플립북에서 사용할 "모서리 탭" 네비게이션
-   * - 페이지(iframe) 안쪽에서 좌/우 모서리를 탭하면 부모(메인 플립북)에 메세지를 보냄
+   * 📱 모바일 플립북에서 사용할 "스와이프" 네비게이션
+   * - 페이지(iframe) 안쪽에서 좌↔우로 스윽 미는 제스처를 감지
+   * - 좌/우 스와이프 방향만 부모(메인 플립북)에 전달
    * - 실제 이전/다음 페이지 이동 여부는 부모 쪽(app.js)에서
    *   "현재가 모바일 뷰인지"를 확인한 뒤 결정
    */
-  function handleEdgeTap(event) {
-    try {
-      // 터치/클릭 좌표 추출
-      const point =
-        (event.changedTouches && event.changedTouches[0]) ||
-        (event.touches && event.touches[0]) ||
-        event;
+  let touchStartX = null;
+  let touchStartY = null;
 
-      if (!point || typeof point.clientX !== "number") return;
+  document.addEventListener(
+    "touchstart",
+    function (event) {
+      if (!event.touches || event.touches.length === 0) return;
+      const t = event.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+    },
+    { passive: true }
+  );
 
-      const x = point.clientX;
-      const width = window.innerWidth || document.documentElement.clientWidth;
-      if (!width) return;
+  document.addEventListener(
+    "touchend",
+    function (event) {
+      try {
+        if (
+          touchStartX == null ||
+          touchStartY == null ||
+          !event.changedTouches ||
+          event.changedTouches.length === 0
+        ) {
+          return;
+        }
 
-      const EDGE_RATIO = 0.25; // 좌/우 25% 구역을 "모서리"로 간주
+        const t = event.changedTouches[0];
+        const dx = t.clientX - touchStartX;
+        const dy = Math.abs(t.clientY - touchStartY);
 
-      let side = null;
-      if (x <= width * EDGE_RATIO) {
-        side = "left";
-      } else if (x >= width * (1 - EDGE_RATIO)) {
-        side = "right";
+        // 세로로 많이 움직였거나, 가로 이동이 너무 짧으면 무시
+        const MIN_SWIPE_DISTANCE = 40; // px
+        const MAX_VERTICAL_DRIFT = 80; // px
+        if (Math.abs(dx) < MIN_SWIPE_DISTANCE || dy > MAX_VERTICAL_DRIFT) {
+          touchStartX = null;
+          touchStartY = null;
+          return;
+        }
+
+        let side = null;
+        if (dx < 0) {
+          // 오른쪽으로 넘기기 (→)
+          side = "right";
+        } else if (dx > 0) {
+          // 왼쪽으로 넘기기 (←)
+          side = "left";
+        }
+
+        if (side && window.parent && window.parent !== window) {
+          window.parent.postMessage(
+            {
+              type: "flipbook-edge-tap",
+              side: side,
+            },
+            "*"
+          );
+        }
+      } catch (e) {
+        // 조용히 무시
+      } finally {
+        touchStartX = null;
+        touchStartY = null;
       }
-
-      if (!side) return;
-
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage(
-          {
-            type: "flipbook-edge-tap",
-            side: side,
-          },
-          "*"
-        );
-      }
-    } catch (e) {
-      // 조용히 무시
-    }
-  }
-
-  // 전체 문서에 대해 터치/클릭 리스너 등록
-  document.addEventListener("click", handleEdgeTap, false);
-  document.addEventListener("touchend", handleEdgeTap, false);
+    },
+    { passive: true }
+  );
 })();
