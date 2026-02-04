@@ -4,77 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>파트1-03</title>
-  <link rel="stylesheet" href="../../../styles.css">
+  <link rel="stylesheet" href="../../../css/styles.css">
   <style>body{min-height:100vh;min-height:100dvh}</style>
-  <script>
-    // 플립북 모드 감지 및 스타일 조정
-    (function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isFlipbook = urlParams.get('flipbook') === '1';
-      
-      if (isFlipbook) {
-        function adjustForFlipbook() {
-          // body 스타일 조정
-          document.body.style.margin = '0';
-          document.body.style.padding = '0';
-          document.body.style.background = 'white';
-          document.body.style.display = 'block';
-          document.body.style.overflow = 'hidden';
-          document.body.style.width = '100%';
-          document.body.style.height = '100%';
-          
-          const pageElement = document.querySelector('.page');
-          if (pageElement) {
-            pageElement.style.margin = '0';
-            pageElement.style.border = 'none';
-            
-            // A4 실제 크기: 210mm x 297mm
-            // 브라우저에서 1mm ≈ 3.7795px (96 DPI)
-            const a4WidthPx = 210 * 3.7795; // 약 794px
-            const a4HeightPx = 297 * 3.7795; // 약 1123px
-            
-            // iframe 크기 가져오기 (window.innerWidth/Height 사용)
-            const iframeWidth = window.innerWidth;
-            const iframeHeight = window.innerHeight;
-            
-            // 스케일 비율 계산
-            const scaleX = iframeWidth / a4WidthPx;
-            const scaleY = iframeHeight / a4HeightPx;
-            const scale = Math.min(scaleX, scaleY);
-            
-            // body에 스케일 적용
-            document.body.style.transform = `scale(${scale})`;
-            document.body.style.transformOrigin = 'top left';
-            document.body.style.width = `${a4WidthPx}px`;
-            document.body.style.height = `${a4HeightPx}px`;
-            
-            // postMessage로 크기 정보 받기 (부모에서 전송하는 경우)
-            window.addEventListener('message', function(event) {
-              if (event.data && event.data.type === 'flipbook-resize') {
-                const newScaleX = event.data.width / a4WidthPx;
-                const newScaleY = event.data.height / a4HeightPx;
-                const newScale = Math.min(newScaleX, newScaleY);
-                document.body.style.transform = `scale(${newScale})`;
-              }
-            });
-          }
-        }
-        
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', adjustForFlipbook);
-        } else {
-          adjustForFlipbook();
-        }
-        
-        // iframe 크기 변경 감지
-        let resizeTimer;
-        window.addEventListener('resize', function() {
-          clearTimeout(resizeTimer);
-          resizeTimer = setTimeout(adjustForFlipbook, 100);
-        });
-      }
-    })();
-  </script>
+  <script src="../../../js/page.js"></script>
   <style>
     /* 학년별 설계 내용 커스텀 레이아웃 */
     .comparison-table .year-plan-row td {

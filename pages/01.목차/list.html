@@ -7,69 +7,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../styles.css" />
+  <link rel="stylesheet" href="../../css/styles.css" />
   <style>body{min-height:100vh;min-height:100dvh}</style>
 
-  <script>
-    (function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isFlipbook = urlParams.get("flipbook") === "1";
-
-      if (isFlipbook) {
-        function adjustForFlipbook() {
-          document.body.style.margin = "0";
-          document.body.style.padding = "0";
-          document.body.style.background = "white";
-          document.body.style.display = "block";
-          document.body.style.overflow = "hidden";
-          document.body.style.width = "100%";
-          document.body.style.height = "100%";
-
-          const pageElement = document.querySelector(".page");
-          if (pageElement) {
-            pageElement.style.margin = "0";
-            pageElement.style.border = "none";
-
-            const a4WidthPx = 210 * 3.7795;
-            const a4HeightPx = 297 * 3.7795;
-
-            const iframeWidth = window.innerWidth;
-            const iframeHeight = window.innerHeight;
-
-            const scaleX = iframeWidth / a4WidthPx;
-            const scaleY = iframeHeight / a4HeightPx;
-            const scale = Math.min(scaleX, scaleY);
-
-            document.body.style.transform = `scale(${scale})`;
-            document.body.style.transformOrigin = "top left";
-            document.body.style.width = `${a4WidthPx}px`;
-            document.body.style.height = `${a4HeightPx}px`;
-
-            window.addEventListener("message", function (event) {
-              if (event.data && event.data.type === "flipbook-resize") {
-                const newScaleX = event.data.width / a4WidthPx;
-                const newScaleY = event.data.height / a4HeightPx;
-                const newScale = Math.min(newScaleX, newScaleY);
-                document.body.style.transform = `scale(${newScale})`;
-              }
-            });
-          }
-        }
-
-        if (document.readyState === "loading") {
-          document.addEventListener("DOMContentLoaded", adjustForFlipbook);
-        } else {
-          adjustForFlipbook();
-        }
-
-        let resizeTimer;
-        window.addEventListener("resize", function () {
-          clearTimeout(resizeTimer);
-          resizeTimer = setTimeout(adjustForFlipbook, 100);
-        });
-      }
-    })();
-  </script>
+  <script src="../../js/page.js"></script>
 
 <style>
   /* 페이지 베이스 */

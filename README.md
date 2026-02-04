@@ -4,10 +4,13 @@
 
 ```
 School_Guide_Book_Development/
-├── index.html           
-├── styles.css            
-├── README.md               
-└── pages/                  
+├── index.html
+├── css/
+│   └── styles.css
+├── js/
+│   ├── app.js       
+│   └── page.js      
+└── pages/
     ├── 00.표지/
     │   └── title.html
     ├── 01.목차/
