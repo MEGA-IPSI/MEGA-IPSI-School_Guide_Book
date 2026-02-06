@@ -192,26 +192,27 @@
       will-change: opacity, transform;
     }
 
-    /* 하단바: PC·태블릿 = 로딩바+페이지바+첫/끝/돋보기 | 모바일 = 페이지바만.
-       너비는 JS(updateFlipbookLayout)에서 bookWidth로만 설정 → 플립북과 동일 유지. CSS에서 width 변경 금지.
-       항목 간 간격은 모바일·태블릿·PC 동일하게 유지 (--bottom-bar-gap) */
+    /* 하단바: 플립북 좌우 길이만큼 무조건 차지 (JS에서 bookWidth로 설정). CSS에서 width 변경 금지.
+       PC·태블릿: 모든 항목 노출. 유동 조절은 로딩바 좌우 길이만 → 페이지 양옆까지 맞춤.
+       모바일: 로딩바 미노출. 유동 조절은 페이지바(화살표+입력란) 좌우 길이만 → 페이지 양옆까지 맞춤.
+       박스 간 여백(--bottom-bar-gap 8px)은 PC·태블릿·모바일 어떤 상황에서도 유지. */
     .bottom-bar {
       --bottom-bar-gap: 8px;
       position: relative;
       width: auto;
       max-width: 100%;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: var(--bottom-bar-gap);
       color: #64748b;
       font-size: 11px;
-      box-sizing: border-box;
       flex-shrink: 0;
       margin-top: 15px;
       overflow-x: hidden;
     }
 
-    /* PC: 로딩바 더 길게. flex로 남는 공간 분배 → 플립북 너비에 맞춰 유동 */
+    /* PC·태블릿: 로딩바만 좌우 유동 → 플립북 너비까지 채움. 페이지바·아이콘은 고정. */
     .bottom-bar-slider-box {
       width: auto;
       flex: 3 1 0;
@@ -228,22 +229,19 @@
       box-sizing: border-box;
     }
 
-    /* 테블릿: 로딩바 짧게, 페이지 영역과 함께 flex로 비율 유동 조절 */
+    /* 테블릿: 로딩바만 짧게(유동), 페이지바·아이콘은 고정 */
     @media (max-width: 1024px) {
       .bottom-bar-slider-box {
         flex: 1 1 0;
         max-width: 420px;
         min-width: 80px;
       }
-      .bottom-bar-inner {
-        flex: 1 1 0;
-        min-width: 0;
-      }
     }
 
+    /* PC·태블릿: 페이지바(화살표+흰 박스) 고정. 모바일에서는 유동(아래 767px에서 오버라이드) */
     .bottom-bar-inner {
-      flex: 1;
-      min-width: 0;
+      flex: 0 0 auto;
+      min-width: 250px;
       min-height: 36px;
       padding: 7px 12px;
       display: flex;
@@ -319,8 +317,7 @@
     }
 
     .bottom-bar-nav {
-      flex: 1;
-      min-width: 0;
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -417,10 +414,14 @@
       outline: none;
     }
 
-    /* 모바일(767px 이하): 로딩바만 숨김 (페이지바 + 첫/끝/돋보기 노출) */
+    /* 모바일(767px 이하): 로딩바 미노출. 페이지바(화살표+입력란) 좌우 길이만 유동 → 플립북 양옆까지 맞춤 */
     @media (max-width: 767px) {
       .bottom-bar-slider-box {
         display: none;
+      }
+      .bottom-bar-inner {
+        flex: 1 1 0;
+        min-width: 0;
       }
       .page-input-box {
         min-width: 100px;
@@ -438,6 +439,7 @@
     .page-label .page-slash { color: #475569; }
     .page-label .page-total { color: #475569; margin-left: 4px; }
 
+    /* 아이콘 영역(첫/맨뒤/돋보기): 넓이 고정, 유동 아님 */
     .bottom-bar .icon-boxes {
       display: flex;
       align-items: center;

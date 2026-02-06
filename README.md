@@ -41,7 +41,7 @@ School_Guide_Book_Development/
 
 ## 구현 기능
 
-1. **컴퓨터 (Double Page View)**
+**1. 컴퓨터 (Double Page View)**
 - 하단 진행 슬라이더
 - 현재 페이지 표시
 - 페이지 번호 직접 입력
@@ -49,7 +49,7 @@ School_Guide_Book_Development/
 - 시작 / 종료 페이지 이동 버튼
 - 전체화면 보기 버튼
 
-2. **태플릿 (Double Page View)**
+**2. 태플릿 (Double Page View)**
 - 하단 진행 슬라이더
 - 현재 페이지 표시
 - 페이지 번호 직접 입력
@@ -57,7 +57,7 @@ School_Guide_Book_Development/
 - 시작 / 종료 페이지 이동 버튼
 - 전체화면 보기 버튼
 
-3. **모바일 (Single Page View)**
+**3. 모바일 (Single Page View)**
 - 현재 페이지 표시
 - 페이지 번호 직접 입력
 - 이전 / 다음 페이지 이동 버튼

@@ -326,7 +326,7 @@
       $(".flipbook-wrapper").css({ width: bookWidth, height: bookHeight });
       $("#flipbook").css({ width: bookWidth, height: bookHeight });
       $("#flipbook .page").css({ width: pageWidth, height: pageHeight });
-      /* 하단바 너비 = 플립북과 동일(모바일·태블릿·PC 공통) */
+      /* 하단바: 플립북 좌우 길이만큼 무조건 차지 (리사이즈 시마다 동일하게 갱신) */
       $(".bottom-bar").css({ width: bookWidth });
 
       // iframe 내부 A4 컨텐츠 리사이즈 메시지 유지
