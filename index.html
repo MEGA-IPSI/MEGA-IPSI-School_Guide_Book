@@ -10,6 +10,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
 
   <style>
+    html {
+      height: 100%;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -18,15 +22,64 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      height: 100dvh;
+      min-height: 100vh;
+      min-height: 100dvh;
+      height: 100%;
       font-family: sans-serif;
       overflow: hidden;
     }
 
+    /* 전체화면 시 위치 고정: body를 뷰포트에 고정 후 중앙 정렬 */
+    html:fullscreen,
+    html:-webkit-full-screen,
+    html:-moz-full-screen {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #eee;
+    }
+
+    html:fullscreen body,
+    html:-webkit-full-screen body,
+    html:-moz-full-screen body,
+    body.fullscreen-active {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      min-height: 0 !important;
+      display: block !important;
+    }
+
+    /* 전체화면 시 콘텐츠를 뷰포트 정중앙에 고정 */
+    html:fullscreen .main-content,
+    html:-webkit-full-screen .main-content,
+    html:-moz-full-screen .main-content,
+    body.fullscreen-active .main-content {
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .flipbook-wrapper {
       position: relative;
-      margin: 10px auto 0 auto;
+      margin: 2px auto 0 auto;
       flex-shrink: 0;
     }
 
@@ -139,86 +192,74 @@
       will-change: opacity, transform;
     }
 
-    .nav-btn {
-      position: fixed;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 44px;
-      height: 44px;
-      min-width: 44px;
-      min-height: 44px;
+    /* 하단바: PC·태블릿 = 로딩바+페이지바+첫/끝/돋보기 | 모바일 = 페이지바만.
+       너비는 JS(updateFlipbookLayout)에서 bookWidth로만 설정 → 플립북과 동일 유지. CSS에서 width 변경 금지.
+       항목 간 간격은 모바일·태블릿·PC 동일하게 유지 (--bottom-bar-gap) */
+    .bottom-bar {
+      --bottom-bar-gap: 8px;
+      position: relative;
+      width: auto;
+      max-width: 100%;
+      display: flex;
+      align-items: center;
+      gap: var(--bottom-bar-gap);
+      color: #64748b;
+      font-size: 11px;
       box-sizing: border-box;
-      padding: 0;
-      border-radius: 50%;
-      border: none;
-      background: rgba(255, 255, 255, 0.9);
-      color: #1f2937;
-      font-size: 22px;
-      line-height: 1;
-      font-family: inherit;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      transition: background 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(8px);
       flex-shrink: 0;
-    }
-    .nav-btn .nav-arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .nav-btn .nav-arrow svg {
-      width: 18px;
-      height: 18px;
-      color: #adb5bd;
-    }
-    .nav-btn.prev-btn .nav-arrow svg {
-      transform: translateX(-2px);
-    }
-    .nav-btn.next-btn .nav-arrow svg {
-      transform: translateX(2px);
-    }
-    .nav-btn:hover {
-      background: rgba(255, 255, 255, 1);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-    .nav-btn:active {
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    }
-    .nav-btn:focus { outline: none; }
-    /* 모바일: transform 기준 유지 (JS에서 top 지정) */
-    @media (max-width: 767px) {
-      .nav-btn:hover,
-      .nav-btn:active { transform: translateY(0); }
+      margin-top: 15px;
+      overflow-x: hidden;
     }
 
-    .bottom-bar {
+    /* PC: 로딩바 더 길게. flex로 남는 공간 분배 → 플립북 너비에 맞춰 유동 */
+    .bottom-bar-slider-box {
       width: auto;
-      padding: 8px 12px;
+      flex: 3 1 0;
+      min-width: 80px;
+      max-width: 1000px;
+      height: 36px;
+      background: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
       display: flex;
       align-items: center;
-      gap: 12px;
-      color: #64748b;
-      font-size: 12px;
+      justify-content: center;
+      padding: 0 12px;
       box-sizing: border-box;
-      flex-shrink: 0;
-      margin-top: 16px;
+    }
+
+    /* 테블릿: 로딩바 짧게, 페이지 영역과 함께 flex로 비율 유동 조절 */
+    @media (max-width: 1024px) {
+      .bottom-bar-slider-box {
+        flex: 1 1 0;
+        max-width: 420px;
+        min-width: 80px;
+      }
+      .bottom-bar-inner {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
+
+    .bottom-bar-inner {
+      flex: 1;
+      min-width: 0;
+      min-height: 36px;
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(8px);
-      border-radius: 8px;
+      border-radius: 5px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-sizing: border-box;
     }
 
     .page-slider-wrapper {
-      flex: 1.2;
-      min-width: 0;
+      width: 100%;
       display: flex;
       align-items: center;
-      width: 85%;
     }
 
     .page-slider {
@@ -229,10 +270,10 @@
       border-radius: 999px;
       background: #e2e8f0;
       outline: none;
-      cursor: pointer;
+      pointer-events: none;
+      cursor: default;
       transition: background 0.2s;
     }
-    .page-slider:hover { background: #cbd5e1; }
 
     .page-slider::-webkit-slider-runnable-track {
       height: 3px;
@@ -243,35 +284,27 @@
     .page-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
       background: #3b82f6;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+      cursor: default;
+      box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
       transition: all 0.2s;
-      margin-top: -6.5px;
-    }
-    .page-slider::-webkit-slider-thumb:hover {
-      background: #2563eb;
-      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
-      transform: scale(1.1);
+      margin-top: -5px;
+      pointer-events: none;
     }
 
     .page-slider::-moz-range-thumb {
-      width: 16px;
-      height: 16px;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
       background: #3b82f6;
-      cursor: pointer;
+      cursor: default;
       border: none;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+      box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
       transition: all 0.2s;
-    }
-    .page-slider::-moz-range-thumb:hover {
-      background: #2563eb;
-      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
-      transform: scale(1.1);
+      pointer-events: none;
     }
     .page-slider::-moz-range-track {
       height: 3px;
@@ -285,70 +318,154 @@
       background: #3b82f6;
     }
 
+    .bottom-bar-nav {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--bottom-bar-gap);
+    }
+
+    .bottom-bar-arrow {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      min-height: 22px;
+      padding: 0;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      color: #3b82f6;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .bottom-bar-arrow:hover {
+      background: rgba(147, 197, 253, 0.35);
+      color: #3b82f6;
+    }
+    .bottom-bar-arrow:active {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    .bottom-bar-arrow:focus { outline: none; }
+    .bottom-bar-arrow svg {
+      width: 16px;
+      height: 30px;
+      stroke: currentColor;
+      stroke-width: 3;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .page-input-box {
+      min-width: 170px;
+      width: 170px;
+      padding: 0 6px;
+      height: 22px;
+      min-height: 22px;
+      box-sizing: border-box;
+      background: #eef2f7;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-input-box .page-label {
+      line-height: 1;
+      margin: 0;
+      margin-left: -6px;
+      justify-content: center;
+      padding-top: 1px;
+    }
+
     .page-label {
       font-variant-numeric: tabular-nums;
-      min-width: 50px;
+      min-width: 46px;
       text-align: center;
       color: #475569;
       font-weight: 500;
-      font-size: 12px;
-      margin-left: -2px;
+      font-size: 10.5px;
+      margin: 0;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      gap: 10px;
     }
 
     .page-label .page-number {
       cursor: text;
-      transition: all 0.2s ease;
-      padding: 2px 4px;
-      border-radius: 4px;
+      padding: 1px 3px;
+      border-radius: 3px;
       color: #475569;
       display: inline-block;
       min-width: 2.5ch;
+      outline: none;
+      border: none;
     }
-
-    .page-label .page-number:hover {
-      color: #3b82f6;
-      background: rgba(59, 130, 246, 0.1);
-    }
-
-    .page-label .page-number[contenteditable="true"] {
-      outline: 2px solid #3b82f6;
-      outline-offset: -2px;
-      background: white;
-      color: #1e293b;
-    }
-
+    .page-label .page-number:focus,
     .page-label .page-number[contenteditable="true"]:focus {
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      outline: none;
+      border: none;
+      box-shadow: none;
+    }
+    .page-input-box:focus-within {
+      outline: none;
     }
 
-    /* 모바일·태블릿: 페이지 번호 입력 비활성 — 클릭해도 아무 변화 없음 */
-    @media (max-width: 1024px) {
+    /* 모바일(767px 이하): 로딩바만 숨김 (페이지바 + 첫/끝/돋보기 노출) */
+    @media (max-width: 767px) {
+      .bottom-bar-slider-box {
+        display: none;
+      }
+      .page-input-box {
+        min-width: 100px;
+        width: 100px;
+      }
+    }
+
+    /* 모바일에서도 페이지 번호 탭 시 입력 가능 (탭 하이라이트만 제거) */
+    @media (max-width: 767px) {
       .page-label .page-number {
         -webkit-tap-highlight-color: transparent;
-        tap-highlight-color: transparent;
-        cursor: default;
-      }
-      .page-label .page-number:hover,
-      .page-label .page-number:active {
-        color: #475569;
-        background: transparent;
-      }
-      .page-label .page-number[contenteditable="true"],
-      .page-label .page-number[contenteditable="true"]:focus {
-        outline: none;
-        box-shadow: none;
       }
     }
 
     .page-label .page-slash { color: #475569; }
     .page-label .page-total { color: #475569; margin-left: 4px; }
 
-    .fullscreen-btn {
-      width: 20px;
-      height: 20px;
+    .bottom-bar .icon-boxes {
+      display: flex;
+      align-items: center;
+      gap: var(--bottom-bar-gap);
+      flex-shrink: 0;
+    }
+
+    .bottom-bar .icon-box {
+      width: 36px;
+      height: 36px;
+      background: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      padding: 0;
+    }
+
+    .bottom-bar .icon-box .first-page-btn,
+    .bottom-bar .icon-box .last-page-btn,
+    .bottom-bar .icon-box .fullscreen-btn {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      min-height: 22px;
+      margin: 0;
       border: none;
       background: transparent;
       color: #3b82f6;
@@ -359,23 +476,34 @@
       font-size: 14px;
       padding: 0;
       border-radius: 4px;
+      box-sizing: border-box;
       transition: all 0.2s ease;
       flex-shrink: 0;
       line-height: 1;
-      margin-left: 2px;
-      margin-top: 1px;
     }
 
-    .fullscreen-btn:hover {
-      background: rgba(0, 0, 0, 0.05);
+    .bottom-bar .icon-box .first-page-btn:hover,
+    .bottom-bar .icon-box .last-page-btn:hover,
+    .bottom-bar .icon-box .fullscreen-btn:hover {
+      background: rgba(147, 197, 253, 0.35);
+      color: #3b82f6;
+    }
+    .bottom-bar .icon-box .first-page-btn:active,
+    .bottom-bar .icon-box .last-page-btn:active,
+    .bottom-bar .icon-box .fullscreen-btn:active {
+      background: rgba(0, 0, 0, 0.08);
+    }
+    .bottom-bar .icon-box .first-page-btn:focus,
+    .bottom-bar .icon-box .last-page-btn:focus,
+    .bottom-bar .icon-box .fullscreen-btn:focus {
+      outline: none;
       color: #3b82f6;
     }
 
-    .fullscreen-btn:active { transform: scale(0.95); }
-
+    .first-page-btn svg,
+    .last-page-btn svg,
     .fullscreen-btn svg {
-      width: 16px;
-      height: 16px;
+      display: block;
       stroke: currentColor;
       stroke-width: 3;
       fill: none;
@@ -383,40 +511,92 @@
       stroke-linejoin: round;
       transition: stroke 0.2s ease;
     }
-    /* 모바일·태블릿: 돋보기(전체화면) 비활성 — 클릭해도 아무 변화 없음 */
+    .first-page-btn svg {
+      width: 15px;
+      height: 15px;
+    }
+    .last-page-btn svg {
+      width: 15px;
+      height: 15px;
+      transform: scaleX(-1);
+    }
+    .fullscreen-btn svg {
+      width: 14px;
+      height: 14px;
+    }
     @media (max-width: 1024px) {
+      .first-page-btn,
+      .last-page-btn,
       .fullscreen-btn {
         -webkit-tap-highlight-color: transparent;
       }
+      .first-page-btn:hover,
+      .first-page-btn:focus,
+      .first-page-btn:active,
+      .last-page-btn:hover,
+      .last-page-btn:focus,
+      .last-page-btn:active,
       .fullscreen-btn:hover,
       .fullscreen-btn:focus,
       .fullscreen-btn:active {
         outline: none;
-        background: transparent;
-        transform: none;
       }
     }
   </style>
 </head>
 
 <body>
+  <div class="main-content">
   <div class="flipbook-wrapper">
     <div id="flipbook"></div>
-    <button type="button" class="nav-btn prev-btn" id="prevBtn"><span class="nav-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M18 4 L6 12 L18 20 Z" fill="currentColor"/></svg></span></button>
-    <button type="button" class="nav-btn next-btn" id="nextBtn"><span class="nav-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 4 L18 12 L6 20 Z" fill="currentColor"/></svg></span></button>
   </div>
 
   <div class="bottom-bar">
-    <div class="page-slider-wrapper">
-      <input type="range" min="1" id="pageSlider" class="page-slider">
+    <div class="bottom-bar-slider-box">
+      <div class="page-slider-wrapper">
+        <input type="range" min="1" max="1" value="1" id="pageSlider" class="page-slider" aria-label="현재 페이지 위치" tabindex="-1" readonly>
+      </div>
     </div>
-    <span id="pageLabel" class="page-label"></span>
-    <button class="fullscreen-btn" id="fullscreenBtn" title="전체화면">
-      <svg id="fullscreenIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="9" cy="10" r="6"></circle>
-        <path d="m14.5 15.5 5.5 5.5"></path>
-      </svg>
-    </button>
+    <div class="bottom-bar-inner">
+      <div class="bottom-bar-nav">
+        <button type="button" class="bottom-bar-arrow bottom-bar-prev" id="bottomPrevBtn" aria-label="이전 페이지">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="page-input-box">
+          <span id="pageLabel" class="page-label"></span>
+        </div>
+        <button type="button" class="bottom-bar-arrow bottom-bar-next" id="bottomNextBtn" aria-label="다음 페이지">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="icon-boxes">
+      <div class="icon-box">
+        <button type="button" class="first-page-btn" id="firstPageBtn" title="첫 페이지" aria-label="맨 처음">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6" y1="6" x2="6" y2="18"/>
+            <path d="M18 5L10 12l8 7V5z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="icon-box">
+        <button type="button" class="last-page-btn" id="lastPageBtn" title="맨 뒤 페이지" aria-label="맨 뒤">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6" y1="6" x2="6" y2="18"/>
+            <path d="M18 5L10 12l8 7V5z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="icon-box">
+        <button class="fullscreen-btn" id="fullscreenBtn" title="전체화면">
+          <svg id="fullscreenIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="9" cy="10" r="6"></circle>
+            <path d="m14.5 15.5 l5.5 5.5"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
   </div>
 
   <script src="js/app.js"></script>

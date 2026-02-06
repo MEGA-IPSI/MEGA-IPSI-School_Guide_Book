@@ -219,44 +219,7 @@
       }
     }
 
-    // 모바일(single) vs 그 외(double) 기준 슬라이더 매핑
-    function pageToSliderPos(page, isMobile) {
-      if (isMobile) return Math.max(1, Math.min(page || 1, PAGE_FILES.length));
-      if (page === 1) return 1;
-      return Math.ceil((page - 1) / 2) + 1;
-    }
-
-    function sliderPosToPage(sliderPos, isMobile) {
-      if (isMobile) return Math.max(1, Math.min(sliderPos || 1, PAGE_FILES.length));
-      if (sliderPos === 1) return 1;
-      return (sliderPos - 1) * 2;
-    }
-
-    function getSliderMax(isMobile) {
-      if (isMobile) return PAGE_FILES.length;
-      if (PAGE_FILES.length === 1) return 1;
-      return Math.ceil((PAGE_FILES.length - 1) / 2) + 1;
-    }
-
-    function updateSliderProgress() {
-      const $slider = $("#pageSlider");
-      const value = parseInt($slider.val(), 10) || 1;
-      const max = parseInt($slider.attr("max"), 10) || 1;
-      const progress = max > 1 ? ((value - 1) / (max - 1)) * 100 : 0;
-      document.documentElement.style.setProperty('--slider-progress', progress + '%');
-    }
-
     function updatePageUI(page, view) {
-      const isMobile = isMobileView();
-      const sliderMax = getSliderMax(isMobile);
-
-      $("#pageSlider").attr("max", sliderMax);
-
-      const sliderPos = pageToSliderPos(page || 1, isMobile);
-      $("#pageSlider").val(sliderPos);
-
-      updateSliderProgress();
-
       let pageNumberText = "";
       if (view && view.length > 1) {
         const pages = view.filter(p => p && p <= PAGE_FILES.length);
@@ -281,6 +244,19 @@
           `<span class="page-total">${PAGE_FILES.length}</span>`
         );
       }
+
+      const currentPage = page || 1;
+      const $slider = $("#pageSlider");
+      if ($slider.length) {
+        const max = PAGE_FILES.length;
+        const rightPage = (view && view.length)
+          ? Math.max(...view.filter(p => p && p <= max), 1)
+          : currentPage;
+        const sliderPage = Math.min(rightPage, max);
+        $slider.val(sliderPage);
+        const pct = max > 1 ? ((sliderPage - 1) / (max - 1)) * 100 : 0;
+        $slider[0].style.setProperty("--slider-progress", pct + "%");
+      }
     }
 
     function updateFlipbookLayout() {
@@ -290,18 +266,10 @@
       const mode = getViewMode();            // mobile/tablet/desktop
       const isMobile = (mode === "mobile");  // ✅ 모바일만 single
 
-      const SCREEN_MARGIN = 10;
-      const ARROW_WIDTH = 44;
-
-      // PC는 기존 여백 유지, 태블릿/모바일은 조금 줄여 화면 효율 ↑
-      const ARROW_MARGIN = (mode === "desktop") ? 30 : 18;
-
-      const navBtnSpace = (ARROW_MARGIN + ARROW_WIDTH + SCREEN_MARGIN) * 2;
-
       const bottomBarHeight = 40;
       const verticalMargin = 20;
 
-      const maxBookWidth = Math.max(viewportWidth - navBtnSpace, viewportWidth * 0.9);
+      const maxBookWidth = viewportWidth * 0.95;
       const maxBookHeight = viewportHeight - bottomBarHeight - verticalMargin;
 
       // ✅ A4 비율 유지
@@ -358,6 +326,7 @@
       $(".flipbook-wrapper").css({ width: bookWidth, height: bookHeight });
       $("#flipbook").css({ width: bookWidth, height: bookHeight });
       $("#flipbook .page").css({ width: pageWidth, height: pageHeight });
+      /* 하단바 너비 = 플립북과 동일(모바일·태블릿·PC 공통) */
       $(".bottom-bar").css({ width: bookWidth });
 
       // iframe 내부 A4 컨텐츠 리사이즈 메시지 유지
@@ -421,10 +390,7 @@
                     if ((index + 1) % 2 === 0) $(this).addClass("even");
                     else $(this).addClass("odd");
                   });
-                  const isMobileCheck = isMobileView();
-                  $("#pageSlider").attr("max", getSliderMax(isMobileCheck));
                   updatePageUI(page, view);
-                  requestAnimationFrame(updateNavButtonPosition);
                 });
               }
 
@@ -453,72 +419,11 @@
 
       const page = $("#flipbook").turn("page") || 1;
       const view = $("#flipbook").turn("view");
-      $("#pageSlider").attr("max", getSliderMax(isMobile));
       updatePageUI(page, view);
-      updateNavButtonPosition();
-    }
 
-    function updateNavButtonPosition() {
-      const mode = getViewMode();
-      const isMobile = isMobileView();
-      const ARROW_MARGIN = (mode === "desktop") ? 30 : 18;
-      const ARROW_SIZE = 44;
-      const MIN_SCREEN_MARGIN = 10;
-      const MOBILE_TOP_MARGIN = 18;
-
-      const $flipbookWrapper = $(".flipbook-wrapper");
-      const $prevBtn = $("#prevBtn");
-      const $nextBtn = $("#nextBtn");
-
-      if (!$flipbookWrapper.length || !$prevBtn.length || !$nextBtn.length) return;
-
-      const wrapperRect = $flipbookWrapper[0].getBoundingClientRect();
-      const wrapperLeft = wrapperRect.left;
-      const wrapperRight = wrapperRect.right;
-      const wrapperTop = wrapperRect.top;
-      const wrapperHeight = wrapperRect.height;
-
-      const viewportWidth = window.innerWidth;
-
-      if (isMobile) {
-        // 모바일: 화살표를 페이지 위쪽·중앙 쪽에 배치 (두 버튼이 가운데로 모이도록)
-        const topY = wrapperTop - MOBILE_TOP_MARGIN - ARROW_SIZE;
-        const centerX = (wrapperLeft + wrapperRight) / 2;
-        const MOBILE_ARROW_GAP = 12;  // 두 화살표 사이 간격
-        let prevLeft = centerX - MOBILE_ARROW_GAP - ARROW_SIZE;
-        let nextLeft = centerX + MOBILE_ARROW_GAP;
-        if (prevLeft < MIN_SCREEN_MARGIN) prevLeft = MIN_SCREEN_MARGIN;
-        if (nextLeft + ARROW_SIZE > viewportWidth - MIN_SCREEN_MARGIN) {
-          nextLeft = viewportWidth - ARROW_SIZE - MIN_SCREEN_MARGIN;
-        }
-        $prevBtn.css({
-          left: prevLeft + 'px',
-          top: Math.max(MIN_SCREEN_MARGIN, topY) + 'px',
-          transform: 'translateY(0)'
-        });
-        $nextBtn.css({
-          left: nextLeft + 'px',
-          top: Math.max(MIN_SCREEN_MARGIN, topY) + 'px',
-          transform: 'translateY(0)'
-        });
-      } else {
-        // PC/태블릿: 양쪽 페이지 바깥에 배치
-        let prevLeft = wrapperLeft - ARROW_MARGIN - ARROW_SIZE;
-        let nextLeft = wrapperRight + ARROW_MARGIN;
-        if (prevLeft < MIN_SCREEN_MARGIN) prevLeft = MIN_SCREEN_MARGIN;
-        if (nextLeft + ARROW_SIZE > viewportWidth - MIN_SCREEN_MARGIN) {
-          nextLeft = viewportWidth - ARROW_SIZE - MIN_SCREEN_MARGIN;
-        }
-        $prevBtn.css({
-          left: prevLeft + 'px',
-          top: (wrapperTop + wrapperHeight / 2) + 'px',
-          transform: 'translateY(-50%)'
-        });
-        $nextBtn.css({
-          left: nextLeft + 'px',
-          top: (wrapperTop + wrapperHeight / 2) + 'px',
-          transform: 'translateY(-50%)'
-        });
+      const $slider = $("#pageSlider");
+      if ($slider.length) {
+        $slider.attr("max", PAGE_FILES.length);
       }
     }
 
@@ -551,42 +456,45 @@
       // ✅ 첫 화면은 1페이지 주변만 로드 (반경은 모드별)
       preloadAround(1, getPreloadRadius());
 
-      const isMobile = isMobileView();
-      $("#pageSlider").attr("max", getSliderMax(isMobile)).val(1);
-
       updateFlipbookLayout();
       $(".flipbook-wrapper").removeClass("turning");
 
+      function onFullscreenChange() {
+        document.body.classList.toggle("fullscreen-active", isFullscreen());
+      }
+      document.addEventListener("fullscreenchange", onFullscreenChange);
+      document.addEventListener("webkitfullscreenchange", onFullscreenChange);
+      document.addEventListener("mozfullscreenchange", onFullscreenChange);
+      document.addEventListener("MSFullscreenChange", onFullscreenChange);
+
+      /* 전체화면: PC·태블릿·모바일 모두 동작 */
       $("#fullscreenBtn").on("click", function(e) {
-        if (!isDesktopOnly()) {
-          e.preventDefault();
-          return;
-        }
+        e.preventDefault();
         if (isFullscreen()) exitFullscreen();
         else requestFullscreen();
       });
 
-      $("#prevBtn").click(function() {
+      $("#bottomPrevBtn").click(function() {
         $("#flipbook").turn("previous");
       });
 
-      $("#nextBtn").click(function() {
+      $("#bottomNextBtn").click(function() {
         $("#flipbook").turn("next");
       });
 
-      $("#pageSlider").on("input change", function () {
-        const sliderPos = parseInt($(this).val(), 10);
-        const isMobile = isMobileView();
-        const targetPage = sliderPosToPage(sliderPos, isMobile);
-        updateSliderProgress();
-        preloadAround(targetPage, getPreloadRadius());
-        $("#flipbook").turn("page", targetPage);
+      $("#firstPageBtn").click(function() {
+        preloadAround(1, getPreloadRadius());
+        $("#flipbook").turn("page", 1);
       });
 
-      $(document).on("click", ".page-number", function(e) {
-        // ✅ PC에서만 입력 이동 기능 허용
-        if (!isDesktopOnly()) return;
+      $("#lastPageBtn").click(function() {
+        const lastPage = PAGE_FILES.length;
+        preloadAround(lastPage, getPreloadRadius());
+        $("#flipbook").turn("page", lastPage);
+      });
 
+      /* 페이지 번호 클릭/탭 후 입력: PC·태블릿·모바일 모두 동작 */
+      $(document).on("click", ".page-number", function(e) {
         e.stopPropagation();
         const $numberSpan = $(this);
         if ($numberSpan.attr("contenteditable") === "true") return;
@@ -610,12 +518,6 @@
       });
 
       $(document).on("keydown", ".page-number[contenteditable='true']", function(e) {
-        // ✅ PC에서만 동작 (혹시 다른 환경에서 contenteditable이 켜졌을 때 대비)
-        if (!isDesktopOnly()) {
-          $(this).attr("contenteditable", "false");
-          return;
-        }
-
         const $numberSpan = $(this);
         const maxPage = PAGE_FILES.length;
 
@@ -636,12 +538,6 @@
       });
 
       $(document).on("blur", ".page-number[contenteditable='true']", function() {
-        // ✅ PC에서만 동작
-        if (!isDesktopOnly()) {
-          $(this).attr("contenteditable", "false");
-          return;
-        }
-
         const $numberSpan = $(this);
         const maxPage = PAGE_FILES.length;
         const pageNum = parseInt($numberSpan.text(), 10);
@@ -664,12 +560,6 @@
           resizeScheduled = true;
           requestAnimationFrame(function() {
             resizeScheduled = false;
-            const isMobile = isMobileView();
-            $("#pageSlider").attr("max", getSliderMax(isMobile));
-            const currentPage = $("#flipbook").turn("page") || 1;
-            const currentSliderPos = pageToSliderPos(currentPage, isMobile);
-            $("#pageSlider").val(currentSliderPos);
-            updateSliderProgress();
             updateFlipbookLayout();
             setTimeout(function() {
               $("#flipbook .page").removeClass("even odd");
@@ -678,11 +568,9 @@
                 else $(this).addClass("odd");
               });
             }, 100);
-            setTimeout(updateNavButtonPosition, 100);
           });
         });
       })();
 
       updatePageUI(1, [1]);
-      setTimeout(updateNavButtonPosition, 200);
     });
