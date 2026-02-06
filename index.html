@@ -212,7 +212,7 @@
       overflow-x: hidden;
     }
 
-    /* PC·태블릿: 로딩바만 좌우 유동 → 플립북 너비까지 채움. 페이지바·아이콘은 고정. */
+    /* PC·태블릿(901px~): 로딩바만 좌우 유동. 좁은 화면(900px 이하)에서는 로딩바 숨김(아래 미디어) */
     .bottom-bar-slider-box {
       width: auto;
       flex: 3 1 0;
@@ -229,7 +229,7 @@
       box-sizing: border-box;
     }
 
-    /* 테블릿: 로딩바만 짧게(유동), 페이지바·아이콘은 고정 */
+    /* 테블릿(901~1024px): 로딩바만 짧게(유동) */
     @media (max-width: 1024px) {
       .bottom-bar-slider-box {
         flex: 1 1 0;
@@ -238,7 +238,7 @@
       }
     }
 
-    /* PC·태블릿: 페이지바(화살표+흰 박스) 고정. 모바일에서는 유동(아래 767px에서 오버라이드) */
+    /* PC·태블릿(901px~): 페이지바 고정. 900px 이하에서는 모바일처럼 로딩바 숨기고 페이지바 유동(아래 미디어) */
     .bottom-bar-inner {
       flex: 0 0 auto;
       min-width: 250px;
@@ -414,8 +414,8 @@
       outline: none;
     }
 
-    /* 모바일(767px 이하): 로딩바 미노출. 페이지바(화살표+입력란) 좌우 길이만 유동 → 플립북 양옆까지 맞춤 */
-    @media (max-width: 767px) {
+    /* 좁은 화면(900px 이하): 모바일처럼 로딩바 숨김, 페이지바만 유동 → 폰 가로 전환 등에서 깨지지 않음 */
+    @media (max-width: 900px) {
       .bottom-bar-slider-box {
         display: none;
       }
