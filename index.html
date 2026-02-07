@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!doctype html>
 <html lang="ko">
 <head>
@@ -341,10 +342,14 @@
       stroke-linejoin: round;
     }
 
+    /* ✅ 회색 박스(페이지 입력바) */
     .page-input-box {
       min-width: 170px;
       width: 170px;
-      padding: 0 6px;
+
+      /* ✅ PC: 좌우 여백 10px */
+      padding: 0 10px;
+
       height: 22px;
       min-height: 22px;
       box-sizing: border-box;
@@ -355,24 +360,33 @@
       justify-content: center;
     }
 
-    /* ===========================
-       ✅ 최종 반영 핵심: 여기부터
-       =========================== */
+    /* ✅ 모바일 가로 + 태블릿 가로: 좌우 여백 8px */
+    @media (max-width: 1024px) and (orientation: landscape) {
+      .page-input-box { padding: 0 8px; }
+    }
 
-    /* ✅ (1) PC/가로형 느낌 유지: margin-left:-6px 유지 (너의 원본 유지) */
+    /* ✅ 모바일 세로 + 태블릿 세로: 좌우 여백 6px */
+    @media (max-width: 1024px) and (orientation: portrait) {
+      .page-input-box { padding: 0 6px; }
+    }
+
+    /* ✅ 라벨 컨테이너(회색 박스 안에서 항상 가운데) */
     .page-input-box .page-label {
       line-height: 1;
       margin: 0;
       padding-top: 1px;
       width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* ✅ (2) 어떤 상황에서도 "현재 / 전체" 간격 동일하게 고정 (grid 3칸) */
+    /* ✅ 현재 / 전체 간격 규칙: 무조건 4px / 4px */
     .page-label {
       display: inline-grid;
       grid-auto-flow: column;
       grid-template-columns: auto auto auto; /* 현재 | / | 전체 */
-      column-gap: 3px;                        /* ✅ 좌우 동일 간격 */
+      column-gap: 4px;                       /* ✅ 항상 4px */
       align-items: center;
       justify-content: center;
 
@@ -389,12 +403,12 @@
     .page-label .page-total {
       display: inline-block;
       text-align: center;
-      margin: 0;           /* ✅ 혹시 남아있는 margin 영향 제거 */
+      margin: 0;
+      padding: 0;
     }
 
     .page-label .page-number {
       cursor: text;
-      padding: 0;
       border-radius: 3px;
       color: #475569;
       min-width: 2.5ch;
@@ -409,38 +423,24 @@
     }
     .page-input-box:focus-within { outline: none; }
 
-     @media (max-width: 1024px) {
+    /* ✅ 1024px 이하(모바일/태블릿): 로딩바 숨김 + 페이지바 유동 */
+    @media (max-width: 1024px) {
       .bottom-bar-slider-box { display: none; }
       .bottom-bar-inner { flex: 1 1 0; min-width: 0; }
       .page-input-box { min-width: 100px; width: 100px; }
     }
 
-    /* ✅ 모바일에서도 페이지 번호 탭 시 입력 가능 */
+    /* 모바일에서도 페이지 번호 탭 시 입력 가능 */
     @media (max-width: 767px) {
       .page-label .page-number { -webkit-tap-highlight-color: transparent; }
     }
 
-    /* ✅ 기본값(혹시 JS가 늦게 적용될 때 대비) */
+    /* (선택) 숫자 비대칭 방지용: 세로(single)에서 현재/전체 폭 동일 */
     :root{
-      --total-digits: 2; /* 63이면 2 */
+      --total-digits: 2; /* 예: 63 => 2 */
       --page-cell-w: calc(var(--total-digits) * 1ch + 0.8ch);
     }
-
-    /* ✅ (4) 모바일 세로 + 태블릿 세로: 중앙 정렬 + 현재/전체 폭 동일 */
     @media (max-width: 1024px) and (orientation: portrait) {
-      .page-label { column-gap: 3px; }
-      .page-input-box{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      /* ✅ 세로에서는 margin-left:-6px 제거해서 "정중앙" 고정 */
-      .page-input-box .page-label{
-        margin-left: 0 !important;
-      }
-
-      /* ✅ 현재/전체 숫자 폭을 동일하게 (비대칭 방지) */
       .page-label .page-number,
       .page-label .page-total{
         min-width: 0 !important;
@@ -448,9 +448,8 @@
       }
     }
 
-    /* ✅ 태블릿 세로(portrait)에서는 모바일처럼 로딩바 숨김 */
+    /* 태블릿 세로(portrait)에서는 기둥/로딩바 숨김(이미 로딩바는 숨김) */
     @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-      .bottom-bar-slider-box { display: none !important; }
       .flipbook-wrapper::after { display: none !important; }
     }
 
@@ -473,6 +472,7 @@
       }
     }
 
+    /* 아이콘 영역 */
     .bottom-bar .icon-boxes {
       display: flex;
       align-items: center;
@@ -598,7 +598,7 @@
         </div>
 
         <div class="icon-box">
-          <button class="fullscreen-btn" id="fullscreenBtn" title="전체화면">
+          <button class="fullscreen-btn" id="fullscreenBtn" title="전체화면" aria-label="전체화면">
             <svg id="fullscreenIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <circle cx="9" cy="10" r="6"></circle>
               <path d="m14.5 15.5 l5.5 5.5"></path>
