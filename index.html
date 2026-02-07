@@ -526,6 +526,44 @@
       width: 14px;
       height: 14px;
     }
+        /* 기본값(혹시 JS가 늦게 적용될 때 대비) */
+    :root{
+      --total-digits: 2; /* 63이면 2 */
+      --page-cell-w: calc(var(--total-digits) * 1ch + 0.8ch); /* 숫자 폭 + 여유 */
+    }
+    
+    /* ✅ 모바일 세로 + 태블릿 세로: single 모드에서 페이지바 정렬/폭 보정 */
+    @media (max-width: 1024px) and (orientation: portrait) {
+    
+      /* 회색 박스 안 텍스트를 진짜 정중앙에 */
+      .page-input-box{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    
+      /* 기존에 너가 넣어둔 margin-left:-6px 때문에 중심이 흔들릴 수 있어서 세로에선 제거 */
+      .page-input-box .page-label{
+        margin-left: 0 !important;
+        width: 100%;
+        justify-content: center;
+        gap: 6px; /* 간격은 보기 좋게 유지 */
+      }
+    
+      /* ✅ 현재/전체 숫자 영역 폭을 동일하게 강제 */
+      .page-label .page-number,
+      .page-label .page-total{
+        min-width: 0 !important;
+        width: var(--page-cell-w);
+        text-align: center;
+        display: inline-block;
+      }
+    
+      /* 세로에선 total 쪽 margin-left(4px)도 중심을 깨니까 제거 */
+      .page-label .page-total{
+        margin-left: 0 !important;
+      }
+    }
     /* ✅ 태블릿 세로(portrait)에서는 모바일처럼 로딩바(슬라이더) 숨김 */
     @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
       .bottom-bar-slider-box { display: none !important; }
