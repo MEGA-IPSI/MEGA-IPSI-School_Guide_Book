@@ -241,6 +241,7 @@ function updatePageUI(page, view) {
 
   const $pageLabel = $("#pageLabel");
   const $existingNumber = $pageLabel.find(".page-number");
+  
   if ($existingNumber.length) {
     $existingNumber.text(pageNumberText);
     $pageLabel.find(".page-total").text(PAGE_FILES.length);
@@ -251,7 +252,11 @@ function updatePageUI(page, view) {
       `<span class="page-total">${PAGE_FILES.length}</span>`
     );
   }
-
+  
+  /* ✅ 여기 2줄 추가 */
+  const totalDigits = String(PAGE_FILES.length).length;
+  document.documentElement.style.setProperty('--total-digits', totalDigits);
+  
   const currentPage = page || 1;
   const $slider = $("#pageSlider");
   if ($slider.length) {
