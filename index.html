@@ -10,9 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/3/turn.min.js"></script>
 
   <style>
-    html {
-      height: 100%;
-    }
+    html { height: 100%; }
 
     body {
       margin: 0;
@@ -29,7 +27,6 @@
       overflow: hidden;
     }
 
-    /* 전체화면 시 위치 고정: body를 뷰포트에 고정 후 중앙 정렬 */
     html:fullscreen,
     html:-webkit-full-screen,
     html:-moz-full-screen {
@@ -57,7 +54,6 @@
       display: block !important;
     }
 
-    /* 전체화면 시 콘텐츠를 뷰포트 정중앙에 고정 */
     html:fullscreen .main-content,
     html:-webkit-full-screen .main-content,
     html:-moz-full-screen .main-content,
@@ -83,7 +79,6 @@
       flex-shrink: 0;
     }
 
-    /* 중앙 경계선 그림자 기둥 */
     .flipbook-wrapper::after {
       content: "";
       position: absolute;
@@ -115,12 +110,10 @@
       opacity: 0;
       transition: opacity 0.15s ease-in;
     }
-
     .flipbook-wrapper:not(.turning)::after {
       transition: opacity 0.4s ease-out;
     }
 
-    /* ✅ 모바일(single)에서는 기둥 숨김 */
     @media (max-width: 767px) {
       .flipbook-wrapper::after { display: none; }
     }
@@ -171,7 +164,6 @@
       -webkit-font-smoothing: auto;
     }
 
-    /* src가 붙은 iframe은 로드되며 표시 (빈 페이지 안 보이게) */
     #flipbook .page iframe[data-src-loaded="true"],
     #flipbook .page iframe[data-ready="true"] {
       opacity: 1;
@@ -182,7 +174,6 @@
       pointer-events: none;
     }
 
-    /* ✅ will-change는 전환 중에만 */
     .flipbook-wrapper.turning #flipbook,
     .flipbook-wrapper.turning #flipbook .page {
       will-change: transform;
@@ -192,10 +183,6 @@
       will-change: opacity, transform;
     }
 
-    /* 하단바: 플립북 좌우 길이만큼 무조건 차지 (JS에서 bookWidth로 설정). CSS에서 width 변경 금지.
-       PC·태블릿: 모든 항목 노출. 유동 조절은 로딩바 좌우 길이만 → 페이지 양옆까지 맞춤.
-       모바일: 로딩바 미노출. 유동 조절은 페이지바(화살표+입력란) 좌우 길이만 → 페이지 양옆까지 맞춤.
-       박스 간 여백(--bottom-bar-gap 8px)은 PC·태블릿·모바일 어떤 상황에서도 유지. */
     .bottom-bar {
       --bottom-bar-gap: 8px;
       position: relative;
@@ -212,7 +199,6 @@
       overflow-x: hidden;
     }
 
-    /* PC·태블릿(901px~): 로딩바만 좌우 유동. 좁은 화면(900px 이하)에서는 로딩바 숨김(아래 미디어) */
     .bottom-bar-slider-box {
       width: auto;
       flex: 3 1 0;
@@ -229,7 +215,6 @@
       box-sizing: border-box;
     }
 
-    /* 테블릿(901~1024px): 로딩바만 짧게(유동) */
     @media (max-width: 1024px) {
       .bottom-bar-slider-box {
         flex: 1 1 0;
@@ -238,7 +223,6 @@
       }
     }
 
-    /* PC·태블릿(901px~): 페이지바 고정. 900px 이하에서는 모바일처럼 로딩바 숨기고 페이지바 유동(아래 미디어) */
     .bottom-bar-inner {
       flex: 0 0 auto;
       min-width: 250px;
@@ -309,7 +293,6 @@
       border-radius: 999px;
       background: #e2e8f0;
     }
-
     .page-slider::-moz-range-progress {
       height: 3px;
       border-radius: 999px;
@@ -372,26 +355,42 @@
       justify-content: center;
     }
 
+    /* ===========================
+       ✅ 최종 반영 핵심: 여기부터
+       =========================== */
+
+    /* ✅ (1) PC/가로형 느낌 유지: margin-left:-6px 유지 (너의 원본 유지) */
     .page-input-box .page-label {
       line-height: 1;
       margin: 0;
-      margin-left: -6px;
-      justify-content: center;
+      margin-left: -6px;     /* ✅ PC/모바일 가로/태블릿 가로에서 유지 */
       padding-top: 1px;
+      width: 100%;
     }
 
+    /* ✅ (2) 어떤 상황에서도 "현재 / 전체" 간격 동일하게 고정 (grid 3칸) */
     .page-label {
+      display: inline-grid;
+      grid-auto-flow: column;
+      grid-template-columns: auto auto auto; /* 현재 | / | 전체 */
+      column-gap: 6px;                        /* ✅ 좌우 동일 간격 */
+      align-items: center;
+      justify-content: center;
+
       font-variant-numeric: tabular-nums;
-      min-width: 46px;
-      text-align: center;
       color: #475569;
       font-weight: 500;
       font-size: 10.5px;
-      margin: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      text-align: center;
+      min-width: 46px;
+    }
+
+    .page-label .page-number,
+    .page-label .page-slash,
+    .page-label .page-total {
+      display: inline-block;
+      text-align: center;
+      margin: 0;           /* ✅ 혹시 남아있는 margin 영향 제거 */
     }
 
     .page-label .page-number {
@@ -399,7 +398,6 @@
       padding: 1px 3px;
       border-radius: 3px;
       color: #475569;
-      display: inline-block;
       min-width: 2.5ch;
       outline: none;
       border: none;
@@ -410,43 +408,78 @@
       border: none;
       box-shadow: none;
     }
-    .page-input-box:focus-within {
-      outline: none;
-    }
+    .page-input-box:focus-within { outline: none; }
 
-    /* 좁은 화면(900px 이하): 모바일처럼 로딩바 숨김, 페이지바만 유동 → 폰 가로 전환 등에서 깨지지 않음 */
+    /* ✅ (3) 900px 이하: 로딩바 숨김 + 페이지바 유동 */
     @media (max-width: 900px) {
-      .bottom-bar-slider-box {
-        display: none;
+      .bottom-bar-slider-box { display: none; }
+      .bottom-bar-inner { flex: 1 1 0; min-width: 0; }
+      .page-input-box { min-width: 100px; width: 100px; }
+    }
+
+    /* ✅ 모바일에서도 페이지 번호 탭 시 입력 가능 */
+    @media (max-width: 767px) {
+      .page-label .page-number { -webkit-tap-highlight-color: transparent; }
+    }
+
+    /* ✅ 기본값(혹시 JS가 늦게 적용될 때 대비) */
+    :root{
+      --total-digits: 2; /* 63이면 2 */
+      --page-cell-w: calc(var(--total-digits) * 1ch + 0.8ch);
+    }
+
+    /* ✅ (4) 모바일 세로 + 태블릿 세로: 중앙 정렬 + 현재/전체 폭 동일 */
+    @media (max-width: 1024px) and (orientation: portrait) {
+      .page-input-box{
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-      .bottom-bar-inner {
-        flex: 1 1 0;
-        min-width: 0;
+
+      /* ✅ 세로에서는 margin-left:-6px 제거해서 "정중앙" 고정 */
+      .page-input-box .page-label{
+        margin-left: 0 !important;
       }
-      .page-input-box {
-        min-width: 100px;
-        width: 100px;
+
+      /* ✅ 현재/전체 숫자 폭을 동일하게 (비대칭 방지) */
+      .page-label .page-number,
+      .page-label .page-total{
+        min-width: 0 !important;
+        width: var(--page-cell-w);
       }
     }
 
-    /* 모바일에서도 페이지 번호 탭 시 입력 가능 (탭 하이라이트만 제거) */
-    @media (max-width: 767px) {
-      .page-label .page-number {
+    /* ✅ 태블릿 세로(portrait)에서는 모바일처럼 로딩바 숨김 */
+    @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+      .bottom-bar-slider-box { display: none !important; }
+      .flipbook-wrapper::after { display: none !important; }
+    }
+
+    @media (max-width: 1024px) {
+      .first-page-btn,
+      .last-page-btn,
+      .fullscreen-btn {
         -webkit-tap-highlight-color: transparent;
       }
+      .first-page-btn:hover,
+      .first-page-btn:focus,
+      .first-page-btn:active,
+      .last-page-btn:hover,
+      .last-page-btn:focus,
+      .last-page-btn:active,
+      .fullscreen-btn:hover,
+      .fullscreen-btn:focus,
+      .fullscreen-btn:active {
+        outline: none;
+      }
     }
 
-    .page-label .page-slash { color: #475569; }
-    .page-label .page-total { color: #475569; margin-left: 4px; }
-
-    /* 아이콘 영역(첫/맨뒤/돋보기): 넓이 고정, 유동 아님 */
     .bottom-bar .icon-boxes {
       display: flex;
       align-items: center;
       gap: var(--bottom-bar-gap);
       flex-shrink: 0;
     }
-
     .bottom-bar .icon-box {
       width: 36px;
       height: 36px;
@@ -459,7 +492,6 @@
       box-sizing: border-box;
       padding: 0;
     }
-
     .bottom-bar .icon-box .first-page-btn,
     .bottom-bar .icon-box .last-page-btn,
     .bottom-bar .icon-box .fullscreen-btn {
@@ -483,7 +515,6 @@
       flex-shrink: 0;
       line-height: 1;
     }
-
     .bottom-bar .icon-box .first-page-btn:hover,
     .bottom-bar .icon-box .last-page-btn:hover,
     .bottom-bar .icon-box .fullscreen-btn:hover {
@@ -513,137 +544,70 @@
       stroke-linejoin: round;
       transition: stroke 0.2s ease;
     }
-    .first-page-btn svg {
-      width: 15px;
-      height: 15px;
-    }
-    .last-page-btn svg {
-      width: 15px;
-      height: 15px;
-      transform: scaleX(-1);
-    }
-    .fullscreen-btn svg {
-      width: 14px;
-      height: 14px;
-    }
-        /* 기본값(혹시 JS가 늦게 적용될 때 대비) */
-    :root{
-      --total-digits: 2; /* 63이면 2 */
-      --page-cell-w: calc(var(--total-digits) * 1ch + 0.8ch); /* 숫자 폭 + 여유 */
-    }
-    
-    /* ✅ 모바일 세로 + 태블릿 세로: single 모드에서 페이지바 정렬/폭 보정 */
-    @media (max-width: 1024px) and (orientation: portrait) {
-    
-      /* 회색 박스 안 텍스트를 진짜 정중앙에 */
-      .page-input-box{
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    
-      /* 기존에 너가 넣어둔 margin-left:-6px 때문에 중심이 흔들릴 수 있어서 세로에선 제거 */
-      .page-input-box .page-label{
-        margin-left: 0 !important;
-        width: 100%;
-        justify-content: center;
-        gap: 6px; /* 간격은 보기 좋게 유지 */
-      }
-    
-      /* ✅ 현재/전체 숫자 영역 폭을 동일하게 강제 */
-      .page-label .page-number,
-      .page-label .page-total{
-        min-width: 0 !important;
-        width: var(--page-cell-w);
-        text-align: center;
-        display: inline-block;
-      }
-    
-      /* 세로에선 total 쪽 margin-left(4px)도 중심을 깨니까 제거 */
-      .page-label .page-total{
-        margin-left: 0 !important;
-      }
-    }
-    /* ✅ 태블릿 세로(portrait)에서는 모바일처럼 로딩바(슬라이더) 숨김 */
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-      .bottom-bar-slider-box { display: none !important; }
-    }
-    @media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
-      .flipbook-wrapper::after { display: none !important; }
-    }
-    @media (max-width: 1024px) {
-      .first-page-btn,
-      .last-page-btn,
-      .fullscreen-btn {
-        -webkit-tap-highlight-color: transparent;
-      }
-      .first-page-btn:hover,
-      .first-page-btn:focus,
-      .first-page-btn:active,
-      .last-page-btn:hover,
-      .last-page-btn:focus,
-      .last-page-btn:active,
-      .fullscreen-btn:hover,
-      .fullscreen-btn:focus,
-      .fullscreen-btn:active {
-        outline: none;
-      }
-    }
+    .first-page-btn svg { width: 15px; height: 15px; }
+    .last-page-btn svg { width: 15px; height: 15px; transform: scaleX(-1); }
+    .fullscreen-btn svg { width: 14px; height: 14px; }
   </style>
 </head>
 
 <body>
   <div class="main-content">
-  <div class="flipbook-wrapper">
-    <div id="flipbook"></div>
-  </div>
+    <div class="flipbook-wrapper">
+      <div id="flipbook"></div>
+    </div>
 
-  <div class="bottom-bar">
-    <div class="bottom-bar-slider-box">
-      <div class="page-slider-wrapper">
-        <input type="range" min="1" max="1" value="1" id="pageSlider" class="page-slider" aria-label="현재 페이지 위치" tabindex="-1" readonly>
-      </div>
-    </div>
-    <div class="bottom-bar-inner">
-      <div class="bottom-bar-nav">
-        <button type="button" class="bottom-bar-arrow bottom-bar-prev" id="bottomPrevBtn" aria-label="이전 페이지">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <div class="page-input-box">
-          <span id="pageLabel" class="page-label"></span>
+    <div class="bottom-bar">
+      <div class="bottom-bar-slider-box">
+        <div class="page-slider-wrapper">
+          <input type="range" min="1" max="1" value="1" id="pageSlider" class="page-slider" aria-label="현재 페이지 위치" tabindex="-1" readonly>
         </div>
-        <button type="button" class="bottom-bar-arrow bottom-bar-next" id="bottomNextBtn" aria-label="다음 페이지">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
+      </div>
+
+      <div class="bottom-bar-inner">
+        <div class="bottom-bar-nav">
+          <button type="button" class="bottom-bar-arrow bottom-bar-prev" id="bottomPrevBtn" aria-label="이전 페이지">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+
+          <div class="page-input-box">
+            <span id="pageLabel" class="page-label"></span>
+          </div>
+
+          <button type="button" class="bottom-bar-arrow bottom-bar-next" id="bottomNextBtn" aria-label="다음 페이지">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="icon-boxes">
+        <div class="icon-box">
+          <button type="button" class="first-page-btn" id="firstPageBtn" title="첫 페이지" aria-label="맨 처음">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="6" x2="6" y2="18"/>
+              <path d="M18 5L10 12l8 7V5z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="icon-box">
+          <button type="button" class="last-page-btn" id="lastPageBtn" title="끝 페이지" aria-label="맨 뒤">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="6" y1="6" x2="6" y2="18"/>
+              <path d="M18 5L10 12l8 7V5z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="icon-box">
+          <button class="fullscreen-btn" id="fullscreenBtn" title="전체화면">
+            <svg id="fullscreenIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="9" cy="10" r="6"></circle>
+              <path d="m14.5 15.5 l5.5 5.5"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
-    <div class="icon-boxes">
-      <div class="icon-box">
-        <button type="button" class="first-page-btn" id="firstPageBtn" title="첫 페이지" aria-label="맨 처음">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="6" y1="6" x2="6" y2="18"/>
-            <path d="M18 5L10 12l8 7V5z"/>
-          </svg>
-        </button>
-      </div>
-      <div class="icon-box">
-        <button type="button" class="last-page-btn" id="lastPageBtn" title="끝 페이지" aria-label="맨 뒤">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="6" y1="6" x2="6" y2="18"/>
-            <path d="M18 5L10 12l8 7V5z"/>
-          </svg>
-        </button>
-      </div>
-      <div class="icon-box">
-        <button class="fullscreen-btn" id="fullscreenBtn" title="전체화면">
-          <svg id="fullscreenIcon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="9" cy="10" r="6"></circle>
-            <path d="m14.5 15.5 l5.5 5.5"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
   </div>
 
   <script src="js/app.js"></script>
