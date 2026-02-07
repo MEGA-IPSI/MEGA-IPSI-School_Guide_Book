@@ -363,7 +363,6 @@
     .page-input-box .page-label {
       line-height: 1;
       margin: 0;
-      margin-left: -6px;     /* ✅ PC/모바일 가로/태블릿 가로에서 유지 */
       padding-top: 1px;
       width: 100%;
     }
@@ -373,7 +372,7 @@
       display: inline-grid;
       grid-auto-flow: column;
       grid-template-columns: auto auto auto; /* 현재 | / | 전체 */
-      column-gap: 6px;                        /* ✅ 좌우 동일 간격 */
+      column-gap: 3px;                        /* ✅ 좌우 동일 간격 */
       align-items: center;
       justify-content: center;
 
@@ -395,7 +394,7 @@
 
     .page-label .page-number {
       cursor: text;
-      padding: 1px 3px;
+      padding: 0;
       border-radius: 3px;
       color: #475569;
       min-width: 2.5ch;
@@ -430,6 +429,7 @@
 
     /* ✅ (4) 모바일 세로 + 태블릿 세로: 중앙 정렬 + 현재/전체 폭 동일 */
     @media (max-width: 1024px) and (orientation: portrait) {
+      .page-label { column-gap: 3px; }
       .page-input-box{
         display: flex;
         align-items: center;
