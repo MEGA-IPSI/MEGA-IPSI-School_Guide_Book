@@ -86,6 +86,13 @@ function isDesktopOnly() {
   return getViewMode() === "desktop"; // desktop(1025px~)만 true
 }
 
+// ✅ 태블릿(768~1024) + 세로(portrait)면 모바일처럼 취급
+function isTabletPortrait() {
+  const w = window.innerWidth;
+  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+  return (w > BP_MOBILE_MAX && w <= BP_TABLET_MAX && isPortrait);
+}
+
 function setupIframeLoadHandler(iframe) {
   const $iframe = $(iframe);
   if ($iframe.attr("data-handler-setup") === "true") return;
@@ -264,7 +271,7 @@ function updateFlipbookLayout() {
   const viewportHeight = window.innerHeight;
 
   const mode = getViewMode();            // mobile/tablet/desktop
-  const isMobile = (mode === "mobile");  // ✅ 모바일만 single
+  const isMobile = (mode === "mobile") || isTabletPortrait();  // ✅ 모바일 + 태블릿 세로는 single
 
   const bottomBarHeight = 40;
   const verticalMargin = 20;
